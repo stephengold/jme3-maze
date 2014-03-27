@@ -34,18 +34,19 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
-import jme3utilities.navigation.NavNode;
+import jme3utilities.navigation.NavVertex;
 
 /**
- * The app state for getting player input while the avatar is at a navigation
- * node.
+ * The application state for getting player input, enabled when the avatar is
+ * stationary. Input is ignored while the avatar is turning. Input during avatar
+ * translation is processed when the state is re-enabled, in other words, when
+ * the avatar reaches the destination vertex.
  * <p>
  * Each instance is disabled at creation.
  *
@@ -85,13 +86,13 @@ class InputState
      */
     private Application application = null;
     /**
-     * active node: set by activate()
+     * active vertex: set by activate()
      */
-    private NavNode activeNode;
+    private NavVertex activeVertex;
     /**
-     * the player's avatar: set by constructor (not null)
+     * one of the player's avatars: set by constructor (not null)
      */
-    final private Spatial cameraNode;
+    final private Spatial avatar;
     /**
      * most recent action string
      */
@@ -102,27 +103,26 @@ class InputState
     /**
      * Instantiate a disabled input state.
      *
-     * @param cameraNode the player's avatar: set by constructor (not null)
+     * @param avatar one of the player's avatars (not null)
      */
-    InputState(Node cameraNode) {
-        assert cameraNode != null;
+    InputState(Spatial avatar) {
 
-        this.cameraNode = cameraNode;
+        this.avatar = avatar;
         setEnabled(false);
     }
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Enable this method, specifying the active node.
+     * Enable this method, specifying the active vertex.
      *
-     * @param node which node the player's avatar is at (not null)
+     * @param vertex which vertex the player is at (not null)
      */
-    public void activate(NavNode node) {
-        assert node != null;
-        logger.log(Level.INFO, "node={0}", node);
+    public void activate(NavVertex vertex) {
+        assert vertex != null;
+        logger.log(Level.INFO, "vertex={0}", vertex);
 
-        activeNode = node;
+        activeVertex = vertex;
         setEnabled(true);
     }
     // *************************************************************************
@@ -199,16 +199,16 @@ class InputState
     public void update(float elapsedTime) {
         Validate.nonNegative(elapsedTime, "interval");
         super.update(elapsedTime);
+
+        Quaternion orientation = MySpatial.getWorldOrientation(avatar);
         /*
          * Process the most recent action string.
          */
-        Quaternion orientation = MySpatial.getWorldOrientation(cameraNode);
         Vector3f direction;
-
         switch (lastActionString) {
             case advanceActionString:
                 direction = orientation.mult(Vector3f.UNIT_X);
-                NavArc arc = activeNode.findLeastTurn(direction);
+                NavArc arc = activeVertex.findLeastTurn(direction);
                 Vector3f arcDirection = arc.getStartDirection();
                 float dot = direction.dot(arcDirection);
                 if (1f - dot < epsilon) {
@@ -286,7 +286,7 @@ class InputState
         MoveState moveState = stateManager.getState(MoveState.class);
         moveState.activate(arc);
         setEnabled(false);
-        activeNode = null;
+        activeVertex = null;
     }
 
     /**
@@ -300,8 +300,8 @@ class InputState
 
         AppStateManager stateManager = application.getStateManager();
         TurnState turnState = stateManager.getState(TurnState.class);
-        turnState.activate(activeNode, newDirection);
+        turnState.activate(activeVertex, newDirection);
         setEnabled(false);
-        activeNode = null;
+        activeVertex = null;
     }
 }

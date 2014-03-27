@@ -31,16 +31,16 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
-import jme3utilities.navigation.NavNode;
+import jme3utilities.navigation.NavVertex;
 
 /**
- * App state for camera rotation to a specified navigation arc.
+ * Application state to rotate the player's avatars at a constant angular rate
+ * until they face a specified navigation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -65,18 +65,19 @@ class TurnState
      */
     private Application application = null;
     /**
-     * turn rate of the camera node: set by constructor (in radians per second,
+     * turn rate of the avatar: set by constructor (in radians per second,
      * &gt;0)
      */
     private float turnRate;
     /**
-     * active node: set by activate()
+     * active vertex: set by activate()
      */
-    private NavNode activeNode = null;
+    private NavVertex activeVertex = null;
     /**
-     * the player's avatar: set by constructor (not null)
+     * the player's avatars: set by constructor (not null, not empty, all
+     * elements not null)
      */
-    final private Spatial cameraNode;
+    final private Spatial[] avatars;
     /**
      * final direction of turn: set by activate()
      */
@@ -85,18 +86,21 @@ class TurnState
     // constructors
 
     /**
-     * Instantiate a disabled turn state with a specified camera node and turn
-     * rate.
+     * Instantiate a disabled turn state with a specified avatar and turn rate.
      *
-     * @param cameraNode the player's avatar: set by constructor (not null)
-     * @param turnRate turn rate of the camera node (in radians per second,
-     * &gt;0)
+     * @param avatars the player's avatars (not null, not empty, not altered,
+     * all elements not null)
+     * @param turnRate turn rate of the avatar (in radians per second, &gt;0)
      */
-    TurnState(Node cameraNode, float turnRate) {
-        assert cameraNode != null;
+    TurnState(Spatial[] avatars, float turnRate) {
+        assert avatars != null;
+        assert avatars.length > 0 : avatars.length;
+        for (Spatial a : avatars) {
+            assert a != null;
+        }
         assert turnRate > 0f : turnRate;
 
-        this.cameraNode = cameraNode;
+        this.avatars = avatars.clone();
         this.turnRate = turnRate;
         setEnabled(false);
     }
@@ -104,20 +108,19 @@ class TurnState
     // new methods exposed
 
     /**
-     * Enable this state with the specified the navigation node and final
-     * direction.
+     * Enable this state with the specified the vertex and final direction.
      *
-     * @param node which navigation node (not null)
+     * @param vertex which navigation vertex (not null)
      * @param finalDirection direction when the turn is complete (not null)
      */
-    void activate(NavNode node, Vector3f finalDirection) {
-        assert node != null;
+    void activate(NavVertex vertex, Vector3f finalDirection) {
+        assert vertex != null;
         assert finalDirection != null;
         assert finalDirection.isUnitVector() : finalDirection;
-        logger.log(Level.INFO, "node={0}, direction={1}",
-                new Object[]{node, finalDirection});
+        logger.log(Level.INFO, "vertex={0}, direction={1}",
+                new Object[]{vertex, finalDirection});
 
-        activeNode = node;
+        activeVertex = vertex;
         this.finalDirection = finalDirection.clone();
         setEnabled(true);
     }
@@ -155,7 +158,7 @@ class TurnState
     public void update(float elapsedTime) {
         Validate.nonNegative(elapsedTime, "elapsed time");
 
-        Quaternion orientation = MySpatial.getWorldOrientation(cameraNode);
+        Quaternion orientation = MySpatial.getWorldOrientation(avatars[0]);
         Vector3f direction = orientation.mult(Vector3f.UNIT_X);
         float dot = finalDirection.dot(direction);
         if (1f - dot < epsilon) {
@@ -180,7 +183,12 @@ class TurnState
         Quaternion rotation = new Quaternion();
         rotation.fromAngleNormalAxis(turnAngle, turnAxis);
         orientation = rotation.mult(orientation);
-        MySpatial.setWorldOrientation(cameraNode, orientation);
+        /*
+         * Rotate each avatar to the new orientation.
+         */
+        for (Spatial avatar : avatars) {
+            MySpatial.setWorldOrientation(avatar, orientation);
+        }
     }
     // *************************************************************************
     // private methods
@@ -191,8 +199,8 @@ class TurnState
     private void goInput() {
         AppStateManager stateManager = application.getStateManager();
         InputState inputState = stateManager.getState(InputState.class);
-        inputState.activate(activeNode);
+        inputState.activate(activeVertex);
         setEnabled(false);
-        activeNode = null;
+        activeVertex = null;
     }
 }
