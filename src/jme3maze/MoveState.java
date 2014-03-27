@@ -36,11 +36,11 @@ import java.util.logging.Logger;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
-import jme3utilities.navigation.NavNode;
+import jme3utilities.navigation.NavVertex;
 
 /**
- * App state for camera translation between navigation nodes using a constant
- * velocity.
+ * Application state to translate the player's avatars on a constant-velocity
+ * trajectory until they reach a specified vertex.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -54,7 +54,8 @@ class MoveState
      */
     final private static float epsilon = 1e-3f;
     /**
-     * maximum number of arcs for which the avatar turns automatically
+     * maximum number of arcs per vertex for which the avatar turns
+     * automatically
      */
     final private static int maxArcsForAutoTurn = 2;
     /**
@@ -69,12 +70,12 @@ class MoveState
      */
     private Application application;
     /**
-     * movement rate of the camera node: set by constructor (in world units per
+     * translation rate of the avatar: set by constructor (in world units per
      * second, &gt;0)
      */
     private float moveSpeed;
     /*
-     * number of moves the player has made (&ge;0)
+     * number of moves the player has made since the start of the game (&ge;0)
      */
     private int moveCount = 0;
     /**
@@ -84,31 +85,37 @@ class MoveState
     /**
      * the player's goal: set by constructor
      */
-    private NavNode goalNode;
+    private NavVertex goalVertex;
     /**
-     * the player's avatar: set by constructor (not null)
+     * the player's avatars: set by constructor (not null, not empty, all
+     * elements not null)
      */
-    final private Spatial cameraNode;
+    final private Spatial[] avatars;
     // *************************************************************************
     // constructors
 
     /**
-     * Instantiate a disabled move state with a specified camera node, movement
-     * rate, and goal.
+     * Instantiate a disabled move state with a specified avatar, movement rate,
+     * and goal.
      *
-     * @param cameraNode the player's avatar: set by constructor (not null)
-     * @param moveSpeed movement rate of the camera node (in world units per
-     * second, &gt;0)
-     * @param goalNode (not null)
+     * @param avatars the player's avatars (not null, not empty, not altered,
+     * all elements not null)
+     * @param moveSpeed movement rate of the avatars (in world units per second,
+     * &gt;0)
+     * @param goalVertex (not null)
      */
-    MoveState(Spatial cameraNode, float moveSpeed, NavNode goalNode) {
-        assert cameraNode != null;
+    MoveState(Spatial[] avatars, float moveSpeed, NavVertex goalVertex) {
+        assert avatars != null;
+        assert avatars.length > 0 : avatars.length;
+        for (Spatial a : avatars) {
+            assert a != null;
+        }
         assert moveSpeed > 0f : moveSpeed;
-        assert goalNode != null;
+        assert goalVertex != null;
 
-        this.cameraNode = cameraNode;
+        this.avatars = avatars.clone();
         this.moveSpeed = moveSpeed;
-        this.goalNode = goalNode;
+        this.goalVertex = goalVertex;
 
         setEnabled(false);
     }
@@ -143,9 +150,9 @@ class MoveState
      *
      * @param newGoal goal of the game (not null)
      */
-    public void setGoal(NavNode newGoal) {
+    public void setGoal(NavVertex newGoal) {
         Validate.nonNull(newGoal, "goal");
-        goalNode = newGoal;
+        goalVertex = newGoal;
     }
 
     /**
@@ -188,22 +195,29 @@ class MoveState
         Validate.nonNegative(elapsedTime, "interval");
         super.update(elapsedTime);
 
-        NavNode destinationNode = activeArc.getToNode();
-        Vector3f destination = destinationNode.getLocation();
-        Vector3f location = cameraNode.getWorldTranslation();
+        NavVertex destinationVertex = activeArc.getToVertex();
+        Vector3f destination = destinationVertex.getLocation();
+        Vector3f location = avatars[0].getWorldTranslation();
         Vector3f offset = destination.subtract(location);
         float distance = offset.length();
         if (distance < epsilon) {
-            completion(destinationNode);
+            completion(destinationVertex);
             return;
         }
-
+        /*
+         * Compute the player's new location.
+         */
         float maxDistance = elapsedTime * moveSpeed;
         if (distance > maxDistance) {
             offset.multLocal(maxDistance / distance);
         }
         Vector3f newLocation = location.add(offset);
-        MySpatial.setWorldLocation(cameraNode, newLocation);
+        /*
+         * Translate each avatar to the new location.
+         */
+        for (Spatial avatar : avatars) {
+            MySpatial.setWorldLocation(avatar, newLocation);
+        }
     }
     // *************************************************************************
     // private methods
@@ -211,14 +225,14 @@ class MoveState
     /**
      * The move is complete.
      *
-     * @param destinationNode (not null)
+     * @param destinationVertex (not null)
      */
-    private void completion(NavNode destinationNode) {
-        assert destinationNode != null;
+    private void completion(NavVertex destinationVertex) {
+        assert destinationVertex != null;
         /*
          * Check whether the player has reached the goal.
          */
-        if (destinationNode == goalNode) {
+        if (destinationVertex == goalVertex) {
             if (moveCount == 1) {
                 System.out.printf("Completed the maze in one move!\n");
             } else {
@@ -229,25 +243,25 @@ class MoveState
             application.stop();
             return;
         }
-        int numArcs = destinationNode.getNumArcs();
+        int numArcs = destinationVertex.getNumArcs();
         boolean autoTurn = numArcs <= maxArcsForAutoTurn;
         AppStateManager stateManager = application.getStateManager();
         if (autoTurn) {
             /*
-             * Turn to the arc which requires the least rotation.
+             * Turn to whichever arc requires the least rotation.
              */
-            Quaternion rotation = cameraNode.getWorldRotation();
+            Quaternion rotation = avatars[0].getWorldRotation();
             Vector3f direction = rotation.mult(Vector3f.UNIT_X);
-            NavArc nextArc = destinationNode.findLeastTurn(direction);
+            NavArc nextArc = destinationVertex.findLeastTurn(direction);
             direction = nextArc.getStartDirection();
             TurnState turnState = stateManager.getState(TurnState.class);
-            turnState.activate(destinationNode, direction);
+            turnState.activate(destinationVertex, direction);
         } else {
             /*
              * Activate the input state to wait for user input.
              */
             InputState inputState = stateManager.getState(InputState.class);
-            inputState.activate(destinationNode);
+            inputState.activate(destinationVertex);
         }
         setEnabled(false);
     }
