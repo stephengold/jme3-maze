@@ -63,6 +63,10 @@ class MoveState
      */
     final private static Logger logger =
             Logger.getLogger(MoveState.class.getName());
+    /**
+     * the avatar's forward direction in local coordinates
+     */
+    final private static Vector3f forwardDirection = Vector3f.UNIT_X;
     // *************************************************************************
     // fields
     /**
@@ -83,9 +87,9 @@ class MoveState
      */
     private NavArc activeArc;
     /**
-     * the player's goal: set by constructor
+     * the player's goals: set by constructor
      */
-    private NavVertex goalVertex;
+    private NavVertex[] goals;
     /**
      * the player's avatars: set by constructor (not null, not empty, all
      * elements not null)
@@ -102,20 +106,25 @@ class MoveState
      * all elements not null)
      * @param moveSpeed movement rate of the avatars (in world units per second,
      * &gt;0)
-     * @param goalVertex (not null)
+     * @param goals the player's goals (not null, not empty, not altered, all
+     * elements not null)
      */
-    MoveState(Spatial[] avatars, float moveSpeed, NavVertex goalVertex) {
+    MoveState(Spatial[] avatars, float moveSpeed, NavVertex[] goals) {
         assert avatars != null;
         assert avatars.length > 0 : avatars.length;
-        for (Spatial a : avatars) {
-            assert a != null;
+        for (Spatial avatar : avatars) {
+            assert avatar != null;
         }
         assert moveSpeed > 0f : moveSpeed;
-        assert goalVertex != null;
+        assert goals != null;
+        assert goals.length > 0 : goals.length;
+        for (NavVertex vertex : goals) {
+            assert vertex != null;
+        }
 
         this.avatars = avatars.clone();
         this.moveSpeed = moveSpeed;
-        this.goalVertex = goalVertex;
+        this.goals = goals.clone();
 
         setEnabled(false);
     }
@@ -125,7 +134,7 @@ class MoveState
     /**
      * Enable this state with the specified the active arc.
      *
-     * @param arc which arc to activate (not null)
+     * @param arc arc to activate (not null)
      */
     void activate(NavArc arc) {
         assert arc != null;
@@ -141,18 +150,19 @@ class MoveState
      *
      * @return number of moves the player has made (&ge;0)
      */
-    public int getMoveCount() {
+    int getMoveCount() {
         return moveCount;
     }
 
     /**
-     * Alter the player's goal.
+     * Alter the player's goals.
      *
-     * @param newGoal goal of the game (not null)
+     * @param newGoals the player's new goals (not null, not empty, not altered,
+     * all elements not null)
      */
-    public void setGoal(NavVertex newGoal) {
-        Validate.nonNull(newGoal, "goal");
-        goalVertex = newGoal;
+    void setGoals(NavVertex[] newGoals) {
+        assert newGoals != null;
+        goals = newGoals.clone();
     }
 
     /**
@@ -181,6 +191,7 @@ class MoveState
         }
         Validate.nonNull(application, "application");
         Validate.nonNull(stateManager, "state manager");
+        super.initialize(stateManager, application);
 
         this.application = application;
     }
@@ -223,26 +234,29 @@ class MoveState
     // private methods
 
     /**
-     * The move is complete.
+     * The current move is complete.
      *
      * @param destinationVertex (not null)
      */
     private void completion(NavVertex destinationVertex) {
         assert destinationVertex != null;
         /*
-         * Check whether the player has reached the goal.
+         * Check whether the player has reached a goal.
          */
-        if (destinationVertex == goalVertex) {
-            if (moveCount == 1) {
-                System.out.printf("Completed the maze in one move!\n");
-            } else {
-                System.out.printf("Completed the maze in %d moves.\n",
-                        moveCount);
+        for (NavVertex goalVertex : goals) {
+            if (destinationVertex == goalVertex) {
+                if (moveCount == 1) {
+                    System.out.printf("You traversed the maze in one move!%n");
+                } else {
+                    System.out.printf("You traversed the maze in %d moves.%n",
+                            moveCount);
+                }
+                setEnabled(false);
+                application.stop();
+                return;
             }
-            setEnabled(false);
-            application.stop();
-            return;
         }
+
         int numArcs = destinationVertex.getNumArcs();
         boolean autoTurn = numArcs <= maxArcsForAutoTurn;
         AppStateManager stateManager = application.getStateManager();
@@ -251,7 +265,7 @@ class MoveState
              * Turn to whichever arc requires the least rotation.
              */
             Quaternion rotation = avatars[0].getWorldRotation();
-            Vector3f direction = rotation.mult(Vector3f.UNIT_X);
+            Vector3f direction = rotation.mult(forwardDirection);
             NavArc nextArc = destinationVertex.findLeastTurn(direction);
             direction = nextArc.getStartDirection();
             TurnState turnState = stateManager.getState(TurnState.class);
