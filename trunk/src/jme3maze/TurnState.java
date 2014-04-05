@@ -110,7 +110,7 @@ class TurnState
     /**
      * Enable this state with the specified the vertex and final direction.
      *
-     * @param vertex which navigation vertex (not null)
+     * @param vertex vertex to activate (not null)
      * @param finalDirection direction when the turn is complete (not null)
      */
     void activate(NavVertex vertex, Vector3f finalDirection) {
@@ -146,6 +146,13 @@ class TurnState
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
+        if (isInitialized()) {
+            throw new IllegalStateException("already initialized");
+        }
+        Validate.nonNull(application, "application");
+        Validate.nonNull(stateManager, "state manager");
+        super.initialize(stateManager, application);
+
         this.application = application;
     }
 
@@ -156,7 +163,8 @@ class TurnState
      */
     @Override
     public void update(float elapsedTime) {
-        Validate.nonNegative(elapsedTime, "elapsed time");
+        Validate.nonNegative(elapsedTime, "interval");
+        super.update(elapsedTime);
 
         Quaternion orientation = MySpatial.getWorldOrientation(avatars[0]);
         Vector3f direction = orientation.mult(Vector3f.UNIT_X);
