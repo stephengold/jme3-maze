@@ -38,15 +38,17 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
+import com.jme3.texture.Texture;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Misc;
-import static jme3utilities.MyAsset.shadedMaterialAssetPath;
+import jme3utilities.MyAsset;
 import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.controls.LightControl;
+import jme3utilities.debug.Printer;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
@@ -78,6 +80,10 @@ public class Maze
      * application name for its window's title bar
      */
     final private static String windowTitle = "Maze";
+    /**
+     * world "up" direction
+     */
+    final private static Vector3f upDirection = Vector3f.UNIT_Y;
     // *************************************************************************
     // fields
     /**
@@ -85,9 +91,9 @@ public class Maze
      */
     private NavArc startArc;
     /**
-     * the player's objective
+     * the player's objectives
      */
-    private NavVertex goalVertex;
+    private NavVertex[] goalVertices;
     /**
      * the player's avatar in the main scene
      */
@@ -145,14 +151,16 @@ public class Maze
         initializeMapLights();
         initializeCameras();
         Node[] avatars = initializeAvatars();
-        initializeGoal();
+        for (NavVertex goalVertex : goalVertices) {
+            initializeGoal(goalVertex);
+        }
         /*
          * Create three application states: input, move, and turn.
          */
         InputState inputState = new InputState(mainAvatar);
 
         float moveSpeed = 50f; // world units per second
-        MoveState moveState = new MoveState(avatars, moveSpeed, goalVertex);
+        MoveState moveState = new MoveState(avatars, moveSpeed, goalVertices);
 
         float turnRate = 5f; // radians per second
         TurnState turnState = new TurnState(avatars, turnRate);
@@ -165,8 +173,10 @@ public class Maze
         Vector3f direction = startArc.getStartDirection();
         turnState.activate(startVertex, direction);
 
-        //new Printer().printSubtree(rootNode);
-        //new Printer().printSubtree(mapRootNode);
+        Printer p = new Printer();
+        p.setPrintTransform(true);
+        //p.printSubtree(rootNode);
+        //p.printSubtree(mapRootNode);
     }
 
     @Override
@@ -178,27 +188,7 @@ public class Maze
     // private methods
 
     /**
-     * Create a shiny lit material with the specified color.
-     *
-     * @param color (not null)
-     * @return a new instance
-     */
-    private Material createShinyMaterial(ColorRGBA color) {
-        assert color != null;
-
-        Material result = new Material(assetManager,
-                shadedMaterialAssetPath);
-        result.setBoolean("UseMaterialColors", true);
-        result.setColor("Ambient", color);
-        result.setColor("Diffuse", color);
-        result.setColor("Specular", ColorRGBA.White);
-        result.setFloat("Shininess", 1f);
-
-        return result;
-    }
-
-    /**
-     * Initialize the player's avatars, one for each scene.
+     * Initialize the player's avatars, one in each scene.
      *
      * @returns a new array of avatar spatials
      */
@@ -217,7 +207,7 @@ public class Maze
         Node sinbad = (Node) assetManager.loadModel(sinbadPath);
         mapAvatar.attachChild(sinbad);
         Quaternion rot = new Quaternion();
-        rot.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_Y);
+        rot.fromAngleAxis(FastMath.HALF_PI, upDirection);
         sinbad.setLocalRotation(rot);
         sinbad.setLocalScale(2f);
         /*
@@ -231,9 +221,8 @@ public class Maze
          * Initialize their orientations.
          */
         Vector3f direction = startArc.getStartDirection();
-        Vector3f up = Vector3f.UNIT_Y;
         Quaternion orientation = new Quaternion();
-        orientation.lookAt(direction, up);
+        orientation.lookAt(direction, upDirection);
         MySpatial.setWorldOrientation(mainAvatar, orientation);
         MySpatial.setWorldOrientation(mapAvatar, orientation);
 
@@ -258,7 +247,7 @@ public class Maze
         float y1 = 0.65f;
         float y2 = 0.95f;
         mapCamera.setViewPort(x1, x2, y1, y2);
-        float tanYfov = 50f;
+        float tanYfov = 50f; // world units
         MyCamera.setYTangent(mapCamera, tanYfov);
 
         ViewPort insetView =
@@ -269,11 +258,10 @@ public class Maze
         /*
          * Add a control for the forward-looking main camera.
          */
-        Vector3f offset2 = new Vector3f(2f, 4f, 0f);
+        Vector3f offset2 = new Vector3f(-8f, 4f, 0f);
         Vector3f forward = Vector3f.UNIT_X;
-        Vector3f up = Vector3f.UNIT_Y;
         CameraControl forwardView =
-                new CameraControl(cam, offset2, forward, up);
+                new CameraControl(cam, offset2, forward, upDirection);
         mainAvatar.addControl(forwardView);
         /*
          * Add a control for the downward-looking map camera.
@@ -286,56 +274,59 @@ public class Maze
     }
 
     /**
-     * Create a goal and attach it to both scenes.
+     * Create a goal spatial in each scene.
+     *
+     * @param goalVertex (not null)
      */
-    private void initializeGoal() {
-        Material goalMaterial = createShinyMaterial(ColorRGBA.Gray);
-
-        Spatial teapot = assetManager.loadModel("Models/Teapot/Teapot.obj");
-        rootNode.attachChild(teapot);
-        teapot.setLocalScale(8f);
-        teapot.setMaterial(goalMaterial);
-
-        Spatial teapot2 = assetManager.loadModel("Models/Teapot/Teapot.obj");
-        mapRootNode.attachChild(teapot2);
-        teapot2.setLocalScale(8f);
-        teapot2.setMaterial(goalMaterial);
-
+    private void initializeGoal(NavVertex goalVertex) {
+        String assetPath = "Models/Teapot/Teapot.obj";
         Vector3f location = goalVertex.getLocation();
-        MySpatial.setWorldLocation(teapot, location);
-        MySpatial.setWorldLocation(teapot2, location);
+        /*
+         * Spatial for the main scene
+         */
+        ColorRGBA mainColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+        Material mainMaterial =
+                MyAsset.createShinyMaterial(assetManager, mainColor);
+        Spatial mainSpatial = assetManager.loadModel(assetPath);
+        rootNode.attachChild(mainSpatial);
+        mainSpatial.setLocalScale(4f);
+        mainSpatial.setMaterial(mainMaterial);
+        MySpatial.setWorldLocation(mainSpatial, location);
+        /*
+         * Spatial for the map scene
+         */
+        ColorRGBA mapColor = new ColorRGBA(0.5f, 0.5f, 0.5f, 1f);
+        Material mapMaterial =
+                MyAsset.createShinyMaterial(assetManager, mapColor);
+        Spatial mapSpatial = assetManager.loadModel(assetPath);
+        mapRootNode.attachChild(mapSpatial);
+        mapSpatial.setLocalScale(8f);
+        mapSpatial.setMaterial(mapMaterial);
+        MySpatial.setWorldLocation(mapSpatial, location);
     }
 
     /**
-     * Add light sources to the main scene.
+     * Add a light source to the main scene.
      */
     private void initializeMainLights() {
         /*
-         * Create a point light.
+         * Create a point light to represent the player's torch.
          */
-        PointLight pointLight = new PointLight();
-        rootNode.addLight(pointLight);
-        float pointIntensity = 1f;
+        PointLight torch = new PointLight();
+        rootNode.addLight(torch);
+        float pointIntensity = 10f;
         ColorRGBA pointColor = ColorRGBA.White.mult(pointIntensity);
-        pointLight.setColor(pointColor);
-        pointLight.setName("torch");
+        torch.setColor(pointColor);
+        torch.setName("torch");
+        float attenuationRadius = 1000f; // world units
+        torch.setRadius(attenuationRadius);
         /*
          * Attach the point light to the avatar using a LightControl.
          */
         Vector3f offset = Vector3f.UNIT_Y;
         Vector3f direction = Vector3f.UNIT_X;
-        LightControl lightControl =
-                new LightControl(pointLight, offset, direction);
+        LightControl lightControl = new LightControl(torch, offset, direction);
         mainAvatar.addControl(lightControl);
-        /*
-         * Add ambient light.
-         */
-        AmbientLight ambientLight = new AmbientLight();
-        //rootNode.addLight(ambientLight);
-        float ambientIntensity = 0.2f;
-        ColorRGBA ambientColor = ColorRGBA.White.mult(ambientIntensity);
-        ambientLight.setColor(ambientColor);
-        ambientLight.setName("main ambient");
     }
 
     /**
@@ -356,41 +347,75 @@ public class Maze
     /**
      * Create a grid-based 2-D maze, determine the player's starting point and
      * goal in it, and generate 3-D representations for it.
+     *
+     * @param rows number of rows on the X-axis of the grid (&gt;1)
+     * @param columns number of columns on the Z-axis of the grid (&gt;1)
      */
     private void initializeMaze(int rows, int columns) {
+        assert rows > 1 : rows;
+        assert columns > 1 : columns;
+
         long seed = 13498675L;
         Random generator = new Random(seed);
 
-        float rowSpacing = 20f;
-        float columnSpacing = rowSpacing;
-        float baseY = 0f;
-        GridGraph graph = new GridGraph(rows, columns, rowSpacing,
-                columnSpacing, generator, baseY);
+        float vertexSpacing = 20f; // world units
+        float baseY = 0f; // world coordinate
+        GridGraph graph = new GridGraph(rows, columns, vertexSpacing, generator,
+                baseY);
         /*
          * Choose a random starting point.
          */
         startArc = graph.randomArc(generator);
         NavVertex startVertex = startArc.getFromVertex();
         /*
-         * Make the furthest vertex be the goal.
+         * Make the furthest vertex be the first (and only) goal.
          */
-        goalVertex = graph.findFurthest(startVertex);
+        NavVertex goal1 = graph.findFurthest(startVertex);
+        goalVertices = new NavVertex[1];
+        goalVertices[0] = goal1;
         /*
-         * Generate visible 3-D representations of the maze, one for each scene.
+         * Generate a visible 3-D representation of the maze in the map scene.
          */
-        float ballRadius = 2f;
-        float stickRadius = 1f;
-        Material ballMaterial = createShinyMaterial(ColorRGBA.Yellow);
-        Material stickMaterial = createShinyMaterial(ColorRGBA.Blue);
+        ColorRGBA ballColor = ColorRGBA.Yellow;
+        Material ballMaterial =
+                MyAsset.createUnshadedMaterial(assetManager, ballColor);
+        ColorRGBA stickColor = ColorRGBA.Blue;
+        Material stickMaterial =
+                MyAsset.createUnshadedMaterial(assetManager, stickColor);
+        Node mapMazeNode = new Node("map maze");
+        mapRootNode.attachChild(mapMazeNode);
+        float ballRadius = 2f; // world units
+        float stickRadius = 1f; // world units
+        graph.makeBallsAndSticks(mapMazeNode, ballRadius, stickRadius,
+                ballMaterial, stickMaterial);
+        /*
+         * Generate a visible 3-D representation of the maze in the main scene.
+         */
+        ColorRGBA ceilingColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+        Material ceilingMaterial =
+                MyAsset.createShinyMaterial(assetManager, ceilingColor);
+
+        String floorAssetPath = "Textures/Terrain/Pond/Pond.jpg";
+        Texture floorTexture =
+                MyAsset.loadTexture(assetManager, floorAssetPath);
+        Material floorMaterial =
+                MyAsset.createShadedMaterial(assetManager, floorTexture);
+
+        String wallAssetPath = "Textures/Terrain/BrickWall/BrickWall.jpg";
+        Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
+        Material wallMaterial =
+                MyAsset.createShadedMaterial(assetManager, wallTexture);
+        wallMaterial.setBoolean("UseMaterialColors", true);
+        ColorRGBA wallColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+        wallMaterial.setColor("Diffuse", wallColor);
 
         Node mazeNode = new Node("main maze");
         rootNode.attachChild(mazeNode);
-        graph.makeBallsAndSticks(mazeNode, ballRadius, stickRadius,
-                ballMaterial, stickMaterial);
-
-        Node mapMazeNode = new Node("map maze");
-        mapRootNode.attachChild(mapMazeNode);
-        graph.makeBallsAndSticks(mapMazeNode, ballRadius, stickRadius,
-                ballMaterial, stickMaterial);
+        float corridorWidth = 10f; // world units
+        float wallHeight = 10f; // world units
+        graph.constructCeiling(mazeNode, baseY + wallHeight, ceilingMaterial);
+        graph.constructFloor(mazeNode, baseY, floorMaterial);
+        graph.constructWalls(mazeNode, baseY, corridorWidth, wallHeight,
+                wallMaterial);
     }
 }
