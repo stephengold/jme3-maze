@@ -79,6 +79,18 @@ class InputState
      * action string for turning one arc to the right
      */
     final private static String rightActionString = "right";
+    /**
+     * the avatar's forward direction in local coordinates
+     */
+    final private static Vector3f forwardDirection = Vector3f.UNIT_X;
+    /**
+     * the avatar's left direction in local coordinates
+     */
+    final private static Vector3f leftDirection = new Vector3f(0f, 0f, -1f);
+    /**
+     * the avatar's right direction in local coordinates
+     */
+    final private static Vector3f rightDirection = Vector3f.UNIT_Z;
     // *************************************************************************
     // fields
     /**
@@ -106,6 +118,7 @@ class InputState
      * @param avatar one of the player's avatars (not null)
      */
     InputState(Spatial avatar) {
+        assert avatar != null;
 
         this.avatar = avatar;
         setEnabled(false);
@@ -116,9 +129,9 @@ class InputState
     /**
      * Enable this method, specifying the active vertex.
      *
-     * @param vertex which vertex the player is at (not null)
+     * @param vertex vertex where the player is (not null)
      */
-    public void activate(NavVertex vertex) {
+    void activate(NavVertex vertex) {
         assert vertex != null;
         logger.log(Level.INFO, "vertex={0}", vertex);
 
@@ -175,15 +188,18 @@ class InputState
          * Map keys to action strings.
          */
         KeyTrigger aTrigger = new KeyTrigger(KeyInput.KEY_A);
-        inputManager.addMapping(leftActionString, aTrigger);
+        KeyTrigger leftTrigger = new KeyTrigger(KeyInput.KEY_LEFT);
+        inputManager.addMapping(leftActionString, aTrigger, leftTrigger);
 
         KeyTrigger sTrigger = new KeyTrigger(KeyInput.KEY_S);
-        inputManager.addMapping(advanceActionString, sTrigger);
+        KeyTrigger upTrigger = new KeyTrigger(KeyInput.KEY_UP);
+        inputManager.addMapping(advanceActionString, sTrigger, upTrigger);
 
         KeyTrigger dTrigger = new KeyTrigger(KeyInput.KEY_D);
-        inputManager.addMapping(rightActionString, dTrigger);
+        KeyTrigger rightTrigger = new KeyTrigger(KeyInput.KEY_RIGHT);
+        inputManager.addMapping(rightActionString, dTrigger, rightTrigger);
         /*
-         * Register listeners for action strings.
+         * Register listeners for the action strings.
          */
         inputManager.addListener(this, advanceActionString);
         inputManager.addListener(this, leftActionString);
@@ -207,7 +223,7 @@ class InputState
         Vector3f direction;
         switch (lastActionString) {
             case advanceActionString:
-                direction = orientation.mult(Vector3f.UNIT_X);
+                direction = orientation.mult(forwardDirection);
                 NavArc arc = activeVertex.findLeastTurn(direction);
                 Vector3f arcDirection = arc.getStartDirection();
                 float dot = direction.dot(arcDirection);
@@ -222,17 +238,17 @@ class InputState
 
             case leftActionString:
                 /*
-                 * Turn the avatar to the left;
+                 * Turn the avatar 90 degrees to the left;
                  */
-                direction = orientation.mult(Vector3f.UNIT_Z.negate());
+                direction = orientation.mult(leftDirection);
                 goTurn(direction);
                 break;
 
             case rightActionString:
                 /*
-                 * Turn the avatar to the right;
+                 * Turn the avatar 90 degrees to the right;
                  */
-                direction = orientation.mult(Vector3f.UNIT_Z);
+                direction = orientation.mult(rightDirection);
                 goTurn(direction);
                 break;
 
@@ -262,7 +278,7 @@ class InputState
             return;
         }
         /*
-         * Ignore actions while the avatar is turning.
+         * Ignore actions requested while the avatar is turning.
          */
         AppStateManager stateManager = application.getStateManager();
         TurnState turnState = stateManager.getState(TurnState.class);
