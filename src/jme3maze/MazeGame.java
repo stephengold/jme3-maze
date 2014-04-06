@@ -190,10 +190,10 @@ public class MazeGame
         /*
          * As a debugging aid, dump the scene graph for each view.
          */
-        Printer p = new Printer();
-        p.setPrintTransform(true);
-        //p.printSubtree(rootNode);
-        //p.printSubtree(mapRootNode);
+        Printer printer = new Printer();
+        printer.setPrintTransform(true);
+        //printer.printSubtree(rootNode);
+        //printer.printSubtree(mapRootNode);
     }
 
     /**
@@ -212,41 +212,39 @@ public class MazeGame
     // private methods
 
     /**
-     * Add a goal to the main view.
+     * Add a 3-D representation of a goal to the main view.
      *
      * @param goal goal to add (not null)
      */
     private void addGoalToMainView(NavVertex goal) {
-        Spatial mainSpatial = assetManager.loadModel(teapotAssetPath);
-        rootNode.attachChild(mainSpatial);
-        mainSpatial.setLocalScale(2f);
+        Spatial spatial = assetManager.loadModel(teapotAssetPath);
+        rootNode.attachChild(spatial);
+        spatial.setLocalScale(2f);
 
-        ColorRGBA color = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
-        Material mainMaterial =
-                MyAsset.createShinyMaterial(assetManager, color);
-        mainSpatial.setMaterial(mainMaterial);
+        ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
+        Material material = MyAsset.createShinyMaterial(assetManager, color);
+        spatial.setMaterial(material);
 
         Vector3f location = goal.getLocation();
-        MySpatial.setWorldLocation(mainSpatial, location);
+        MySpatial.setWorldLocation(spatial, location);
     }
 
     /**
-     * Add a goal to the map view.
+     * Add a 3-D representation of a goal to the map view.
      *
      * @param goal goal to add (not null)
      */
     private void addGoalToMapView(NavVertex goal) {
-        Spatial mapSpatial = assetManager.loadModel(teapotAssetPath);
-        mapRootNode.attachChild(mapSpatial);
-        mapSpatial.setLocalScale(8f);
+        Spatial spatial = assetManager.loadModel(teapotAssetPath);
+        mapRootNode.attachChild(spatial);
+        spatial.setLocalScale(8f);
 
-        ColorRGBA mapColor = new ColorRGBA(0.5f, 0.5f, 0.5f, 1f);
-        Material mapMaterial =
-                MyAsset.createShinyMaterial(assetManager, mapColor);
-        mapSpatial.setMaterial(mapMaterial);
+        ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
+        Material material = MyAsset.createShinyMaterial(assetManager, color);
+        spatial.setMaterial(material);
 
         Vector3f location = goal.getLocation();
-        MySpatial.setWorldLocation(mapSpatial, location);
+        MySpatial.setWorldLocation(spatial, location);
     }
 
     /**
@@ -289,7 +287,7 @@ public class MazeGame
      * Add a 3-D representation of the maze to the map view.
      */
     private void addMazeToMapView() {
-        ColorRGBA ballColor = ColorRGBA.Yellow;
+        ColorRGBA ballColor = ColorRGBA.White;
         Material ballMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, ballColor);
         ColorRGBA stickColor = ColorRGBA.Blue;
