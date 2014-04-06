@@ -53,7 +53,7 @@ import jme3utilities.navigation.NavVertex;
 
 /**
  * Simple desktop application to play a maze game. The application's main entry
- * point is here.
+ * point is in this class.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -214,7 +214,7 @@ public class MazeGame
     /**
      * Add a 3-D representation of a goal to the main view.
      *
-     * @param goal goal to add (not null)
+     * @param goal goal to represent (not null)
      */
     private void addGoalToMainView(NavVertex goal) {
         Spatial spatial = assetManager.loadModel(teapotAssetPath);
@@ -226,13 +226,14 @@ public class MazeGame
         spatial.setMaterial(material);
 
         Vector3f location = goal.getLocation();
+        location.y += 4f; // floating in the air
         MySpatial.setWorldLocation(spatial, location);
     }
 
     /**
      * Add a 3-D representation of a goal to the map view.
      *
-     * @param goal goal to add (not null)
+     * @param goal goal to represent (not null)
      */
     private void addGoalToMapView(NavVertex goal) {
         Spatial spatial = assetManager.loadModel(teapotAssetPath);
@@ -338,9 +339,9 @@ public class MazeGame
         /*
          * Add a control for the forward-looking main camera.
          */
-        Vector3f offset = new Vector3f(0f, 5f, -8f);
-        CameraControl forwardView =
-                new CameraControl(cam, offset, forwardDirection, upDirection);
+        Vector3f localOffset = new Vector3f(0f, 5f, -8f);
+        CameraControl forwardView = new CameraControl(cam, localOffset, 
+                forwardDirection, upDirection);
         mainAvatar.addControl(forwardView);
     }
 
@@ -362,9 +363,9 @@ public class MazeGame
         /*
          * Attach the light source to the avatar using a LightControl.
          */
-        Vector3f offset = new Vector3f(0f, 6f, 0f);
+        Vector3f localOffset = new Vector3f(0f, 6f, -8f);
         LightControl lightControl =
-                new LightControl(torch, offset, forwardDirection);
+                new LightControl(torch, localOffset, forwardDirection);
         mainAvatar.addControl(lightControl);
     }
 
