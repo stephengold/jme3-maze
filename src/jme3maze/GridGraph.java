@@ -268,7 +268,7 @@ class GridGraph
         MySpatial.setWorldLocation(geometry, location);
 
         Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X);
+        rotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
         MySpatial.setWorldOrientation(geometry, rotation);
     }
 
@@ -328,7 +328,7 @@ class GridGraph
         MySpatial.setWorldLocation(geometry, location);
 
         Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
+        rotation.fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X);
         MySpatial.setWorldOrientation(geometry, rotation);
     }
 
