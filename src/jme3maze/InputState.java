@@ -80,7 +80,7 @@ class InputState
     /**
      * the avatar's left direction in local coordinates
      */
-    final private static Vector3f leftDirection = new Vector3f(1f, 0f, 0f);
+    final private static Vector3f leftDirection = Vector3f.UNIT_X;
     /**
      * the avatar's right direction in local coordinates
      */
@@ -186,7 +186,9 @@ class InputState
 
         KeyTrigger sTrigger = new KeyTrigger(KeyInput.KEY_S);
         KeyTrigger upTrigger = new KeyTrigger(KeyInput.KEY_UP);
-        inputManager.addMapping(advanceActionString, sTrigger, upTrigger);
+        KeyTrigger wTrigger = new KeyTrigger(KeyInput.KEY_W);
+        inputManager.addMapping(advanceActionString,
+                sTrigger, upTrigger, wTrigger);
 
         KeyTrigger dTrigger = new KeyTrigger(KeyInput.KEY_D);
         KeyTrigger rightTrigger = new KeyTrigger(KeyInput.KEY_RIGHT);
