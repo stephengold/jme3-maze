@@ -29,18 +29,16 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Spatial;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3utilities.MySpatial;
 import jme3utilities.Validate;
+import jme3utilities.math.MyVector3f;
 import jme3utilities.navigation.NavVertex;
 
 /**
  * Application state to rotate the player's avatars at a constant angular rate
- * until they face a specified navigation.
+ * until they face a specified direction.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -65,19 +63,13 @@ class TurnState
      */
     private Application application = null;
     /**
-     * turn rate of the avatar: set by constructor (in radians per second,
-     * &gt;0)
-     */
-    private float turnRate;
-    /**
      * active vertex: set by activate()
      */
     private NavVertex activeVertex = null;
     /**
-     * the player's avatars: set by constructor (not null, not empty, all
-     * elements not null)
+     * player model instance: set by constructor (not null)
      */
-    final private Spatial[] avatars;
+    final private PlayerModel player;
     /**
      * final direction of turn: set by activate()
      */
@@ -86,22 +78,13 @@ class TurnState
     // constructors
 
     /**
-     * Instantiate a disabled turn state with a specified avatar and turn rate.
+     * Instantiate a disabled turn state for the specified player.
      *
-     * @param avatars the player's avatars (not null, not empty, not altered,
-     * all elements not null)
-     * @param turnRate turn rate of the avatar (in radians per second, &gt;0)
+     * @param player player model instance (not null)
      */
-    TurnState(Spatial[] avatars, float turnRate) {
-        assert avatars != null;
-        assert avatars.length > 0 : avatars.length;
-        for (Spatial a : avatars) {
-            assert a != null;
-        }
-        assert turnRate > 0f : turnRate;
-
-        this.avatars = avatars.clone();
-        this.turnRate = turnRate;
+    TurnState(PlayerModel player) {
+        assert player != null;
+        this.player = player;
         setEnabled(false);
     }
     // *************************************************************************
@@ -111,7 +94,8 @@ class TurnState
      * Enable this state with the specified the vertex and final direction.
      *
      * @param vertex vertex to activate (not null)
-     * @param finalDirection direction when the turn is complete (not null)
+     * @param finalDirection player's direction when the turn is complete (not
+     * null, unaffected)
      */
     void activate(NavVertex vertex, Vector3f finalDirection) {
         assert vertex != null;
@@ -124,16 +108,6 @@ class TurnState
         this.finalDirection = finalDirection.clone();
         setEnabled(true);
     }
-
-    /**
-     * Alter the turn rate.
-     *
-     * @param newRate (in radians per second, &gt;0)
-     */
-    void setSpeed(float newRate) {
-        assert newRate > 0f : newRate;
-        turnRate = newRate;
-    }
     // *************************************************************************
     // AbstractAppState methods
 
@@ -141,7 +115,7 @@ class TurnState
      * Initialize this state prior to its first update.
      *
      * @param stateManager (not null)
-     * @param application (not null)
+     * @param application attaching application (not null)
      */
     @Override
     public void initialize(AppStateManager stateManager,
@@ -164,39 +138,31 @@ class TurnState
     @Override
     public void update(float elapsedTime) {
         Validate.nonNegative(elapsedTime, "interval");
+        assert isEnabled();
         super.update(elapsedTime);
 
-        Quaternion orientation = MySpatial.getWorldOrientation(avatars[0]);
-        Vector3f direction = orientation.mult(Vector3f.UNIT_X);
+        Vector3f direction = player.getDirection();
         float dot = finalDirection.dot(direction);
         if (1f - dot < epsilon) {
+            player.setDirection(finalDirection);
             goInput();
             return;
         }
 
-        Vector3f turnAxis = direction.cross(finalDirection);
-        float length = turnAxis.length();
-        if (length == 0f) {
-            turnAxis = Vector3f.UNIT_Y;
+        Vector3f axis = direction.cross(finalDirection);
+        if (MyVector3f.isZeroLength(axis)) {
+            axis = Vector3f.UNIT_Y;
         } else {
-            turnAxis.normalizeLocal();
+            axis.normalizeLocal();
         }
-        float turnAngle = FastMath.acos(dot); // positive angle
-        float maxTurnAngle = elapsedTime * turnRate;
-        if (turnAngle > maxTurnAngle) {
-            turnAngle = maxTurnAngle;
+        float angle = FastMath.acos(dot); // positive angle
+        float maxTurnAngle = elapsedTime * player.getTurnRate();
+        if (angle > maxTurnAngle) {
+            angle = maxTurnAngle;
         }
-        logger.log(Level.INFO, "turnAngle={0}", turnAngle);
-
-        Quaternion rotation = new Quaternion();
-        rotation.fromAngleNormalAxis(turnAngle, turnAxis);
-        orientation = rotation.mult(orientation);
-        /*
-         * Rotate each avatar to the new orientation.
-         */
-        for (Spatial avatar : avatars) {
-            MySpatial.setWorldOrientation(avatar, orientation);
-        }
+        assert angle > 0f : angle;
+        logger.log(Level.INFO, "turnAngle={0}", angle);
+        player.rotate(angle, axis);
     }
     // *************************************************************************
     // private methods
@@ -205,10 +171,11 @@ class TurnState
      * The turn is complete; activate the input state.
      */
     private void goInput() {
+        setEnabled(false);
+
         AppStateManager stateManager = application.getStateManager();
         InputState inputState = stateManager.getState(InputState.class);
         inputState.activate(activeVertex);
-        setEnabled(false);
         activeVertex = null;
     }
 }

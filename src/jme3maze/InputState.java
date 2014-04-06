@@ -34,10 +34,8 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Spatial;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
@@ -80,17 +78,13 @@ class InputState
      */
     final private static String rightActionString = "right";
     /**
-     * the avatar's forward direction in local coordinates
-     */
-    final private static Vector3f forwardDirection = Vector3f.UNIT_X;
-    /**
      * the avatar's left direction in local coordinates
      */
-    final private static Vector3f leftDirection = new Vector3f(0f, 0f, -1f);
+    final private static Vector3f leftDirection = new Vector3f(1f, 0f, 0f);
     /**
      * the avatar's right direction in local coordinates
      */
-    final private static Vector3f rightDirection = Vector3f.UNIT_Z;
+    final private static Vector3f rightDirection = new Vector3f(-1f, 0f, 0f);
     // *************************************************************************
     // fields
     /**
@@ -102,9 +96,9 @@ class InputState
      */
     private NavVertex activeVertex;
     /**
-     * one of the player's avatars: set by constructor (not null)
+     * player model instance: set by constructor (not null)
      */
-    final private Spatial avatar;
+    final private PlayerModel player;
     /**
      * most recent action string
      */
@@ -113,14 +107,13 @@ class InputState
     // constructors
 
     /**
-     * Instantiate a disabled input state.
+     * Instantiate a disabled input state for the specified player.
      *
-     * @param avatar one of the player's avatars (not null)
+     * @param player player model instance (not null)
      */
-    InputState(Spatial avatar) {
-        assert avatar != null;
-
-        this.avatar = avatar;
+    InputState(PlayerModel player) {
+        assert player != null;
+        this.player = player;
         setEnabled(false);
     }
     // *************************************************************************
@@ -170,7 +163,7 @@ class InputState
      * Initialize this state prior to its first update.
      *
      * @param stateManager (not null)
-     * @param application (not null)
+     * @param application attaching application (not null)
      */
     @Override
     public void initialize(AppStateManager stateManager,
@@ -214,16 +207,17 @@ class InputState
     @Override
     public void update(float elapsedTime) {
         Validate.nonNegative(elapsedTime, "interval");
+        assert isEnabled();
         super.update(elapsedTime);
 
-        Quaternion orientation = MySpatial.getWorldOrientation(avatar);
+        Quaternion orientation = player.getOrientation();
+        Vector3f direction;
         /*
          * Process the most recent action string.
          */
-        Vector3f direction;
         switch (lastActionString) {
             case advanceActionString:
-                direction = orientation.mult(forwardDirection);
+                direction = player.getDirection();
                 NavArc arc = activeVertex.findLeastTurn(direction);
                 Vector3f arcDirection = arc.getStartDirection();
                 float dot = direction.dot(arcDirection);
@@ -238,7 +232,7 @@ class InputState
 
             case leftActionString:
                 /*
-                 * Turn the avatar 90 degrees to the left;
+                 * Turn the player 90 degrees to the left;
                  */
                 direction = orientation.mult(leftDirection);
                 goTurn(direction);
@@ -246,7 +240,7 @@ class InputState
 
             case rightActionString:
                 /*
-                 * Turn the avatar 90 degrees to the right;
+                 * Turn the player 90 degrees to the right;
                  */
                 direction = orientation.mult(rightDirection);
                 goTurn(direction);
@@ -298,26 +292,28 @@ class InputState
     private void goMove(NavArc arc) {
         assert arc != null;
 
+        setEnabled(false);
+
         AppStateManager stateManager = application.getStateManager();
         MoveState moveState = stateManager.getState(MoveState.class);
         moveState.activate(arc);
-        setEnabled(false);
         activeVertex = null;
     }
 
     /**
      * Activate the turn state for a specified direction.
      *
-     * @param newDirection unit vector
+     * @param newDirection unit vector (unaffected)
      */
     private void goTurn(Vector3f newDirection) {
         assert newDirection != null;
         assert newDirection.isUnitVector() : newDirection;
 
+        setEnabled(false);
+
         AppStateManager stateManager = application.getStateManager();
         TurnState turnState = stateManager.getState(TurnState.class);
         turnState.activate(activeVertex, newDirection);
-        setEnabled(false);
         activeVertex = null;
     }
 }

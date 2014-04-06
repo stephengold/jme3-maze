@@ -88,7 +88,7 @@ class GridGraph
      * @param gridColumns number of columns on the Z-axis of the grid (&gt;1)
      * @param vertexSpacing spacing between columns in the Z direction (in world
      * units, &gt;0)
-     * @param generator generator for randomization (not null)
+     * @param generator number generator for randomization (not null)
      * @param yValue y-coordinate of the grid (in world coordinates)
      */
     GridGraph(int gridRows, int gridColumns, float vertexSpacing,
@@ -268,12 +268,12 @@ class GridGraph
         MySpatial.setWorldLocation(geometry, location);
 
         Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
+        rotation.fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X);
         MySpatial.setWorldOrientation(geometry, rotation);
     }
 
     /**
-     * Add a closure wall for a vertex and orientation.
+     * Add a closure wall for the specified vertex and orientation.
      *
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param vertexLocation (not null)
@@ -328,12 +328,12 @@ class GridGraph
         MySpatial.setWorldLocation(geometry, location);
 
         Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X);
+        rotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
         MySpatial.setWorldOrientation(geometry, rotation);
     }
 
     /**
-     * Add an opening wall for a vertex and orientation.
+     * Add an opening wall for the specified vertex and orientation.
      *
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param vertexLocation (not null)
