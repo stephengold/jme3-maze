@@ -44,7 +44,8 @@ class PlayerModel {
     /**
      * message logger for this class
      */
-    final private static Logger logger = Logger.getLogger(MazeGame.class.getName());
+    final private static Logger logger = 
+            Logger.getLogger(PlayerModel.class.getName());
     /**
      * world "up" direction
      */
@@ -75,7 +76,7 @@ class PlayerModel {
      * direction the avatars are facing and moving (unit vector in world
      * coordinates)
      */
-    final private Vector3f direction = Vector3f.UNIT_X;
+    final private Vector3f direction = new Vector3f(1f, 0f, 0f);
     /**
      * location of the avatars (world coordinates)
      */
