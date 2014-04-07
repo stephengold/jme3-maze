@@ -25,34 +25,17 @@
  */
 package jme3maze;
 
+import jme3maze.view.MapState;
+import jme3maze.view.MainState;
 import com.jme3.app.SimpleApplication;
-import com.jme3.light.AmbientLight;
-import com.jme3.light.PointLight;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
-import com.jme3.texture.Texture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.model.GridGraph;
-import jme3maze.model.Item;
 import jme3maze.model.Player;
 import jme3maze.model.World;
 import jme3utilities.Misc;
-import jme3utilities.MyAsset;
-import jme3utilities.MyCamera;
-import jme3utilities.MySpatial;
-import jme3utilities.MyString;
-import jme3utilities.Validate;
-import jme3utilities.controls.CameraControl;
-import jme3utilities.controls.LightControl;
-import jme3utilities.debug.Printer;
-import jme3utilities.navigation.NavVertex;
 
 /**
  * Desktop simple application to play a maze game. The application's main entry
@@ -66,70 +49,35 @@ public class MazeGame
     // constants
 
     /**
-     * background color for the map
-     */
-    final private static ColorRGBA mapBackground =
-            new ColorRGBA(0.3f, 0f, 0f, 1f);
-    /**
      * message logger for this class
      */
     final private static Logger logger =
             Logger.getLogger(MazeGame.class.getName());
     /**
-     * asset path to the "pond" texture asset
-     */
-    final private static String pondAssetPath =
-            "Textures/Terrain/Pond/Pond.jpg";
-    /**
-     * asset path to the "sinbad" 3D model asset
-     */
-    final private static String sinbadPath = "Models/Sinbad/Sinbad.mesh.xml";
-    /**
-     * asset path to the "teapot" 3D model asset
-     */
-    final private static String teapotAssetPath = "Models/Teapot/Teapot.obj";
-    /**
-     * asset path to the "wall" texture asset
-     */
-    final private static String wallAssetPath =
-            "Textures/Terrain/BrickWall/BrickWall.jpg";
-    /**
      * application name for the window's title bar
      */
     final private static String windowTitle = "Maze Game";
-    /**
-     * local "forward" direction (unit vector)
-     */
-    final private static Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
-    /**
-     * world "up" direction (unit vector)
-     */
-    final private static Vector3f upDirection = new Vector3f(0f, 1f, 0f);
     // *************************************************************************
     // fields
     /**
-     *
+     * main view: set by simpleInitApp()
+     */
+    private MainState mainView;
+    /**
+     * map view: set by simpleInitApp()
+     */
+    private MapState mapView;
+    /**
+     * abstract game data (MVC model): set by simpleInitApp()
      */
     private World world;
-    /**
-     * avatar which represents the player in the main view
-     */
-    final private Node mainAvatar = new Node("main avatar");
-    /**
-     * avatar which represents the player in the map view
-     */
-    final private Node mapAvatar = new Node("map avatar");
-    /**
-     * root of the map view's scene graph
-     */
-    final private Node mapRootNode = new Node("map root node");
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Access the world model.
+     * Access the main model.
      */
-    World getWorld() {
+    public World getWorld() {
         assert world != null;
         return world;
     }
@@ -173,173 +121,34 @@ public class MazeGame
          */
         world = new World();
         /*
-         * two views of the model: main and map
+         * view.
          */
-        initializeMainView();
-        initializeMapView();
+        initializeView();
         /*
-         * controllers
+         * controller
          */
-        initializeControllers();
-        /*
-         * As a debugging aid, dump the scene graph of each view.
-         */
-        Printer printer = new Printer();
-        printer.setPrintTransform(true);
-        //printer.printSubtree(rootNode);
-        //printer.printSubtree(mapRootNode);
-    }
-
-    /**
-     * Update the map view before each render.
-     *
-     * @param elapsedTime since previous frame/update (in seconds, &ge;0)
-     */
-    @Override
-    public void simpleUpdate(float elapsedTime) {
-        Validate.nonNegative(elapsedTime, "interval");
-
-        mapRootNode.updateLogicalState(elapsedTime);
-        mapRootNode.updateGeometricState();
+        initializeController();
     }
     // *************************************************************************
     // private methods
 
     /**
-     * Add the 3-D representation of a free item to the main view.
-     *
-     * @param item free item to represent (not null)
+     * Initialize controller app states and controls.
      */
-    private void addFreeItemToMainView(Item item) {
-        assert item != null;
-
-        NavVertex vertex = world.getFreeItems().getVertex(item);
-        Vector3f location = vertex.getLocation();
-        String itemType = item.getTypeName();
-        switch (itemType) {
-            case "McGuffin":
-                /*
-                 * A McGuffin is represented by a gold teapot.
-                 */
-                Spatial spatial = assetManager.loadModel(teapotAssetPath);
-                rootNode.attachChild(spatial);
-                spatial.setLocalScale(2f);
-
-                ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
-                Material material =
-                        MyAsset.createShinyMaterial(assetManager, color);
-                spatial.setMaterial(material);
-
-                location.y += 4f; // floating in the air
-                MySpatial.setWorldLocation(spatial, location);
-                break;
-
-            default:
-                logger.log(Level.WARNING,
-                        "ignored free item with unknown type {0}",
-                        MyString.quote(itemType));
-        }
-    }
-
-    /**
-     * Add a 3-D representation of a free item to the map view.
-     *
-     * @param item free item to represent (not null)
-     */
-    private void addFreeItemToMapView(Item item) {
-        NavVertex vertex = world.getFreeItems().getVertex(item);
-        Vector3f location = vertex.getLocation();
-        String itemType = item.getTypeName();
-        switch (itemType) {
-            case "McGuffin":
-                /*
-                 * A McGuffin is represented by a gold teapot.
-                 */
-                Spatial spatial = assetManager.loadModel(teapotAssetPath);
-                mapRootNode.attachChild(spatial);
-                spatial.setLocalScale(8f);
-
-                ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
-                Material material = MyAsset.createShinyMaterial(assetManager,
-                        color);
-                spatial.setMaterial(material);
-                MySpatial.setWorldLocation(spatial, location);
-        }
-    }
-
-    /**
-     * Add a 3-D representation of the maze to the main view.
-     */
-    private void addMazeToMainView() {
-        ColorRGBA ceilingColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
-        Material ceilingMaterial =
-                MyAsset.createShinyMaterial(assetManager, ceilingColor);
-
-        Texture floorTexture =
-                MyAsset.loadTexture(assetManager, pondAssetPath);
-        Material floorMaterial =
-                MyAsset.createShadedMaterial(assetManager, floorTexture);
-        floorMaterial.setBoolean("UseMaterialColors", true);
-        ColorRGBA floorColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
-        floorMaterial.setColor("Diffuse", floorColor);
-
-        Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
-        Material wallMaterial =
-                MyAsset.createShadedMaterial(assetManager, wallTexture);
-        wallMaterial.setBoolean("UseMaterialColors", true);
-        ColorRGBA wallColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
-        wallMaterial.setColor("Diffuse", wallColor);
-
-        Node mazeNode = new Node("main maze");
-        rootNode.attachChild(mazeNode);
-
-        float floorY = 0f; // world coordinate
-        float corridorWidth = 10f; // world units
-        float wallHeight = 10f; // world units
-        GridGraph maze = world.getMaze();
-        maze.constructFloor(mazeNode, floorY, floorMaterial);
-        maze.constructWalls(mazeNode, floorY, corridorWidth, wallHeight,
-                wallMaterial);
-        maze.constructCeiling(mazeNode, floorY + wallHeight,
-                ceilingMaterial);
-    }
-
-    /**
-     * Add a 3-D representation of the maze to the map view.
-     */
-    private void addMazeToMapView() {
-        ColorRGBA ballColor = ColorRGBA.White;
-        Material ballMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, ballColor);
-        ColorRGBA stickColor = ColorRGBA.Blue;
-        Material stickMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, stickColor);
-        Node mapMazeNode = new Node("map maze");
-        mapRootNode.attachChild(mapMazeNode);
-        float ballRadius = 2f; // world units
-        float stickRadius = 1f; // world units
-        GridGraph maze = world.getMaze();
-        maze.makeBallsAndSticks(mapMazeNode, ballRadius, stickRadius,
-                ballMaterial, stickMaterial);
-    }
-
-    /**
-     * Initialize the control instances of the maze game.
-     */
-    private void initializeControllers() {
+    private void initializeController() {
+        /*
+         * Add a player control to the map's avatar.
+         */
         Player player = world.getPlayer();
+        PlayerControl mapPlayerControl = new PlayerControl(player);
+        mapView.getAvatarNode().addControl(mapPlayerControl);
         /*
          * Add a player control to the main avatar.
          */
         PlayerControl mainPlayerControl = new PlayerControl(player);
-        mainAvatar.addControl(mainPlayerControl);
+        mainView.getAvatarNode().addControl(mainPlayerControl);
         /*
-         * Add a player control to the map avatar.
-         */
-        PlayerControl mapPlayerControl = new PlayerControl(player);
-        mapAvatar.addControl(mapPlayerControl);
-        /*
-         * Attach three app states to the application.
+         * Attach controller app states to the application.
          */
         InputState inputState = new InputState();
         MoveState moveState = new MoveState();
@@ -353,144 +162,15 @@ public class MazeGame
     }
 
     /**
-     * Initialize the camera for the main view.
+     * Initialize view app states.
      */
-    private void initializeMainCamera() {
-        flyCam.setEnabled(false);
+    private void initializeView() {
+        Node mapRootNode = new Node("map root node");
         /*
-         * Add a control for the forward-looking main camera.
+         * Attach view app states to the application.
          */
-        Vector3f localOffset = new Vector3f(0f, 5f, -8f);
-        CameraControl forwardView = new CameraControl(cam, localOffset,
-                forwardDirection, upDirection);
-        mainAvatar.addControl(forwardView);
-    }
-
-    /**
-     * Add a light source to the main scene.
-     */
-    private void initializeMainLights() {
-        /*
-         * Create a point light source to represent the player's torch.
-         */
-        PointLight torch = new PointLight();
-        rootNode.addLight(torch);
-        float pointIntensity = 10f;
-        ColorRGBA pointColor = ColorRGBA.White.mult(pointIntensity);
-        torch.setColor(pointColor);
-        torch.setName("torch");
-        float attenuationRadius = 1000f; // world units
-        torch.setRadius(attenuationRadius);
-        /*
-         * Attach the light source to the avatar using a LightControl.
-         */
-        Vector3f localOffset = new Vector3f(0f, 6f, -8f);
-        LightControl lightControl =
-                new LightControl(torch, localOffset, forwardDirection);
-        mainAvatar.addControl(lightControl);
-    }
-
-    /**
-     * Initialize the main (first-person) view.
-     */
-    private void initializeMainView() {
-        /*
-         * Generate a 3D representation of the maze.
-         */
-        addMazeToMainView();
-        /*
-         * Add an avatar to represent the player.
-         */
-        rootNode.attachChild(mainAvatar);
-        /*
-         * Load assets to represent the free items.
-         */
-        for (Item item : world.getFreeItems().getItems()) {
-            addFreeItemToMainView(item);
-        }
-        /*
-         * Initialize lights and cameras.
-         */
-        initializeMainLights();
-        initializeMainCamera();
-    }
-
-    /**
-     * Initialize the camera and view port for the map view.
-     */
-    private void initializeMapCamera() {
-        /*
-         * Position the inset view port in the upper left corner
-         * of the main view port.
-         */
-        Camera mapCamera = cam.clone();
-        mapCamera.setParallelProjection(true);
-        float x1 = 0.05f;
-        float x2 = 0.35f;
-        float y1 = 0.65f;
-        float y2 = 0.95f;
-        mapCamera.setViewPort(x1, x2, y1, y2);
-        float tanYfov = 50f; // world units
-        MyCamera.setYTangent(mapCamera, tanYfov);
-
-        ViewPort insetView =
-                renderManager.createMainView("inset", mapCamera);
-        insetView.attachScene(mapRootNode);
-        insetView.setBackgroundColor(mapBackground);
-        insetView.setClearFlags(true, true, true);
-        /*
-         * Add a control for the downward-looking map camera.
-         */
-        Vector3f offset = new Vector3f(0f, 20f, 0f);
-        Vector3f down = new Vector3f(0f, -1f, 0f);
-        CameraControl downView =
-                new CameraControl(mapCamera, offset, down, forwardDirection);
-        mapAvatar.addControl(downView);
-    }
-
-    /**
-     * Add ambient light to the map scene.
-     */
-    private void initializeMapLights() {
-        AmbientLight ambientLight = new AmbientLight();
-        mapRootNode.addLight(ambientLight);
-        float ambientIntensity = 1f;
-        ColorRGBA ambientColor = ColorRGBA.White.mult(ambientIntensity);
-        ambientLight.setColor(ambientColor);
-        ambientLight.setName("map ambient");
-    }
-
-    /**
-     * Initialize the (inset) map view.
-     */
-    private void initializeMapView() {
-        /*
-         * Generate a 3D representation of the maze.
-         */
-        addMazeToMapView();
-        /*
-         * Add an avatar to represent the player.
-         */
-        mapRootNode.attachChild(mapAvatar);
-        /*
-         * Load the "sinbad" asset and attach it to the avatar.
-         */
-        Logger loaderLogger = Logger.getLogger(
-                "com.jme3.scene.plugins.ogre.MeshLoader");
-        loaderLogger.setLevel(Level.SEVERE);
-        Node sinbad = (Node) assetManager.loadModel(sinbadPath);
-        mapAvatar.attachChild(sinbad);
-        sinbad.setLocalScale(2f);
-        /*
-         * Load assets to represent the free items.
-         */
-        for (Item item : world.getFreeItems().getItems()) {
-            addFreeItemToMapView(item);
-        }
-        /*
-         * Initialize lights and cameras.
-         */
-        initializeMapLights();
-        initializeMapCamera();
+        mapView = new MapState(mapRootNode);
+        mainView = new MainState(rootNode);
+        stateManager.attachAll(mapView, mainView);
     }
 }

@@ -53,7 +53,7 @@ public class World {
     /**
      * "up" direction in world coordinates
      */
-    final static Vector3f upDirection = Vector3f.UNIT_Y;
+    final public static Vector3f upDirection = Vector3f.UNIT_Y;
     // *************************************************************************
     // fields
     /**
