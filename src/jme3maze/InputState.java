@@ -34,17 +34,17 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.model.Player;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * The application state for getting player input, enabled when the avatar is
- * stationary. Input is ignored while the avatar is turning. Input during avatar
- * translation is processed when the state is re-enabled, in other words, when
- * the avatar reaches the destination vertex.
+ * The application state for getting player input, enabled when the player is
+ * stationary. Input is ignored while the player is turning. Input during player
+ * moves is processed when the state is re-enabled, in other words, when the
+ * player reaches the destination vertex.
  * <p>
  * Each instance is disabled at creation.
  *
@@ -90,15 +90,7 @@ class InputState
     /**
      * attaching application: set by initialize()
      */
-    private Application application = null;
-    /**
-     * active vertex: set by activate()
-     */
-    private NavVertex activeVertex;
-    /**
-     * player model instance: set by constructor (not null)
-     */
-    final private PlayerModel player;
+    private MazeGame application = null;
     /**
      * most recent action string
      */
@@ -107,29 +99,12 @@ class InputState
     // constructors
 
     /**
-     * Instantiate a disabled input state for the specified player.
+     * Instantiate a disabled input state.
      *
      * @param player player model instance (not null)
      */
-    InputState(PlayerModel player) {
-        assert player != null;
-        this.player = player;
+    InputState() {
         setEnabled(false);
-    }
-    // *************************************************************************
-    // new methods exposed
-
-    /**
-     * Enable this method, specifying the active vertex.
-     *
-     * @param vertex vertex where the player is (not null)
-     */
-    void activate(NavVertex vertex) {
-        assert vertex != null;
-        logger.log(Level.INFO, "vertex={0}", vertex);
-
-        activeVertex = vertex;
-        setEnabled(true);
     }
     // *************************************************************************
     // AbstractAppState methods
@@ -175,7 +150,7 @@ class InputState
         Validate.nonNull(stateManager, "state manager");
 
         super.initialize(stateManager, application);
-        this.application = application;
+        this.application = (MazeGame) application;
         InputManager inputManager = application.getInputManager();
         /*
          * Map keys to action strings.
@@ -212,6 +187,7 @@ class InputState
         assert isEnabled();
         super.update(elapsedTime);
 
+        Player player = application.getWorld().getPlayer();
         Quaternion orientation = player.getOrientation();
         Vector3f direction;
         /*
@@ -219,8 +195,9 @@ class InputState
          */
         switch (lastActionString) {
             case advanceActionString:
+                NavVertex vertex = player.getVertex();
                 direction = player.getDirection();
-                NavArc arc = activeVertex.findLeastTurn(direction);
+                NavArc arc = vertex.findLeastTurn(direction);
                 Vector3f arcDirection = arc.getStartDirection();
                 float dot = direction.dot(arcDirection);
                 if (1f - dot < epsilon) {
@@ -296,10 +273,11 @@ class InputState
 
         setEnabled(false);
 
+        application.getWorld().getPlayer().setArc(arc);
+
         AppStateManager stateManager = application.getStateManager();
         MoveState moveState = stateManager.getState(MoveState.class);
-        moveState.activate(arc);
-        activeVertex = null;
+        moveState.setEnabled(true);
     }
 
     /**
@@ -315,7 +293,6 @@ class InputState
 
         AppStateManager stateManager = application.getStateManager();
         TurnState turnState = stateManager.getState(TurnState.class);
-        turnState.activate(activeVertex, newDirection);
-        activeVertex = null;
+        turnState.activate(newDirection);
     }
 }

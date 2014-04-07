@@ -37,22 +37,25 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.model.GridGraph;
+import jme3maze.model.Item;
+import jme3maze.model.Player;
+import jme3maze.model.World;
 import jme3utilities.Misc;
 import jme3utilities.MyAsset;
 import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
+import jme3utilities.MyString;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.controls.LightControl;
 import jme3utilities.debug.Printer;
-import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Simple desktop application to play a maze game. The application's main entry
+ * Desktop simple application to play a maze game. The application's main entry
  * point is in this class.
  *
  * @author Stephen Gold <sgold@sonic.net>
@@ -72,10 +75,6 @@ public class MazeGame
      */
     final private static Logger logger =
             Logger.getLogger(MazeGame.class.getName());
-    /**
-     * default seed for pseudo-random number generator
-     */
-    final private static long defaultSeed = 13498675L;
     /**
      * asset path to the "pond" texture asset
      */
@@ -109,13 +108,9 @@ public class MazeGame
     // *************************************************************************
     // fields
     /**
-     * maze model instance
+     *
      */
-    private GridGraph mazeModel;
-    /**
-     * the player's starting point
-     */
-    private NavArc startArc;
+    private World world;
     /**
      * avatar which represents the player in the main view
      */
@@ -128,16 +123,16 @@ public class MazeGame
      * root of the map view's scene graph
      */
     final private Node mapRootNode = new Node("map root node");
-    /**
-     * player model instance
-     */
-    private PlayerModel playerModel;
-    /**
-     * pseudo-random number generator
-     */
-    final private Random generator = new Random(defaultSeed);
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Access the world model.
+     */
+    World getWorld() {
+        assert world != null;
+        return world;
+    }
 
     /**
      * Main entry point for the maze game.
@@ -174,12 +169,11 @@ public class MazeGame
     @Override
     public void simpleInitApp() {
         /*
-         * models
+         * model
          */
-        initializeMazeModel();
-        initializePlayerModel();
+        world = new World();
         /*
-         * views
+         * two views of the model: main and map
          */
         initializeMainView();
         initializeMapView();
@@ -188,7 +182,7 @@ public class MazeGame
          */
         initializeControllers();
         /*
-         * As a debugging aid, dump the scene graph for each view.
+         * As a debugging aid, dump the scene graph of each view.
          */
         Printer printer = new Printer();
         printer.setPrintTransform(true);
@@ -212,40 +206,65 @@ public class MazeGame
     // private methods
 
     /**
-     * Add a 3-D representation of a goal to the main view.
+     * Add the 3-D representation of a free item to the main view.
      *
-     * @param goal goal to represent (not null)
+     * @param item free item to represent (not null)
      */
-    private void addGoalToMainView(NavVertex goal) {
-        Spatial spatial = assetManager.loadModel(teapotAssetPath);
-        rootNode.attachChild(spatial);
-        spatial.setLocalScale(2f);
+    private void addFreeItemToMainView(Item item) {
+        assert item != null;
 
-        ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
-        Material material = MyAsset.createShinyMaterial(assetManager, color);
-        spatial.setMaterial(material);
+        NavVertex vertex = world.getFreeItems().getVertex(item);
+        Vector3f location = vertex.getLocation();
+        String itemType = item.getTypeName();
+        switch (itemType) {
+            case "McGuffin":
+                /*
+                 * A McGuffin is represented by a gold teapot.
+                 */
+                Spatial spatial = assetManager.loadModel(teapotAssetPath);
+                rootNode.attachChild(spatial);
+                spatial.setLocalScale(2f);
 
-        Vector3f location = goal.getLocation();
-        location.y += 4f; // floating in the air
-        MySpatial.setWorldLocation(spatial, location);
+                ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
+                Material material =
+                        MyAsset.createShinyMaterial(assetManager, color);
+                spatial.setMaterial(material);
+
+                location.y += 4f; // floating in the air
+                MySpatial.setWorldLocation(spatial, location);
+                break;
+
+            default:
+                logger.log(Level.WARNING,
+                        "ignored free item with unknown type {0}",
+                        MyString.quote(itemType));
+        }
     }
 
     /**
-     * Add a 3-D representation of a goal to the map view.
+     * Add a 3-D representation of a free item to the map view.
      *
-     * @param goal goal to represent (not null)
+     * @param item free item to represent (not null)
      */
-    private void addGoalToMapView(NavVertex goal) {
-        Spatial spatial = assetManager.loadModel(teapotAssetPath);
-        mapRootNode.attachChild(spatial);
-        spatial.setLocalScale(8f);
+    private void addFreeItemToMapView(Item item) {
+        NavVertex vertex = world.getFreeItems().getVertex(item);
+        Vector3f location = vertex.getLocation();
+        String itemType = item.getTypeName();
+        switch (itemType) {
+            case "McGuffin":
+                /*
+                 * A McGuffin is represented by a gold teapot.
+                 */
+                Spatial spatial = assetManager.loadModel(teapotAssetPath);
+                mapRootNode.attachChild(spatial);
+                spatial.setLocalScale(8f);
 
-        ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
-        Material material = MyAsset.createShinyMaterial(assetManager, color);
-        spatial.setMaterial(material);
-
-        Vector3f location = goal.getLocation();
-        MySpatial.setWorldLocation(spatial, location);
+                ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
+                Material material = MyAsset.createShinyMaterial(assetManager,
+                        color);
+                spatial.setMaterial(material);
+                MySpatial.setWorldLocation(spatial, location);
+        }
     }
 
     /**
@@ -277,10 +296,11 @@ public class MazeGame
         float floorY = 0f; // world coordinate
         float corridorWidth = 10f; // world units
         float wallHeight = 10f; // world units
-        mazeModel.constructFloor(mazeNode, floorY, floorMaterial);
-        mazeModel.constructWalls(mazeNode, floorY, corridorWidth, wallHeight,
+        GridGraph maze = world.getMaze();
+        maze.constructFloor(mazeNode, floorY, floorMaterial);
+        maze.constructWalls(mazeNode, floorY, corridorWidth, wallHeight,
                 wallMaterial);
-        mazeModel.constructCeiling(mazeNode, floorY + wallHeight,
+        maze.constructCeiling(mazeNode, floorY + wallHeight,
                 ceilingMaterial);
     }
 
@@ -298,7 +318,8 @@ public class MazeGame
         mapRootNode.attachChild(mapMazeNode);
         float ballRadius = 2f; // world units
         float stickRadius = 1f; // world units
-        mazeModel.makeBallsAndSticks(mapMazeNode, ballRadius, stickRadius,
+        GridGraph maze = world.getMaze();
+        maze.makeBallsAndSticks(mapMazeNode, ballRadius, stickRadius,
                 ballMaterial, stickMaterial);
     }
 
@@ -306,29 +327,29 @@ public class MazeGame
      * Initialize the control instances of the maze game.
      */
     private void initializeControllers() {
+        Player player = world.getPlayer();
         /*
          * Add a player control to the main avatar.
          */
-        PlayerControl mainPlayerControl = new PlayerControl(playerModel);
+        PlayerControl mainPlayerControl = new PlayerControl(player);
         mainAvatar.addControl(mainPlayerControl);
         /*
          * Add a player control to the map avatar.
          */
-        PlayerControl mapPlayerControl = new PlayerControl(playerModel);
+        PlayerControl mapPlayerControl = new PlayerControl(player);
         mapAvatar.addControl(mapPlayerControl);
         /*
          * Attach three app states to the application.
          */
-        InputState inputState = new InputState(playerModel);
-        MoveState moveState = new MoveState(playerModel);
-        TurnState turnState = new TurnState(playerModel);
+        InputState inputState = new InputState();
+        MoveState moveState = new MoveState();
+        TurnState turnState = new TurnState();
         stateManager.attachAll(inputState, moveState, turnState);
         /*
          * Activate the turn app state.
          */
-        NavVertex startVertex = startArc.getFromVertex();
-        Vector3f direction = startArc.getStartDirection();
-        turnState.activate(startVertex, direction);
+        Vector3f direction = player.getArc().getStartDirection();
+        turnState.activate(direction);
     }
 
     /**
@@ -340,7 +361,7 @@ public class MazeGame
          * Add a control for the forward-looking main camera.
          */
         Vector3f localOffset = new Vector3f(0f, 5f, -8f);
-        CameraControl forwardView = new CameraControl(cam, localOffset, 
+        CameraControl forwardView = new CameraControl(cam, localOffset,
                 forwardDirection, upDirection);
         mainAvatar.addControl(forwardView);
     }
@@ -382,11 +403,10 @@ public class MazeGame
          */
         rootNode.attachChild(mainAvatar);
         /*
-         * Load assets to represent the player's goals.
+         * Load assets to represent the free items.
          */
-        NavVertex[] goals = playerModel.getGoals();
-        for (NavVertex goal : goals) {
-            addGoalToMainView(goal);
+        for (Item item : world.getFreeItems().getItems()) {
+            addFreeItemToMainView(item);
         }
         /*
          * Initialize lights and cameras.
@@ -462,49 +482,15 @@ public class MazeGame
         mapAvatar.attachChild(sinbad);
         sinbad.setLocalScale(2f);
         /*
-         * Load assets to represent the player's goals.
+         * Load assets to represent the free items.
          */
-        NavVertex[] goals = playerModel.getGoals();
-        for (NavVertex goal : goals) {
-            addGoalToMapView(goal);
+        for (Item item : world.getFreeItems().getItems()) {
+            addFreeItemToMapView(item);
         }
         /*
          * Initialize lights and cameras.
          */
         initializeMapLights();
         initializeMapCamera();
-    }
-
-    /**
-     * Create the model instance for the maze.
-     */
-    private void initializeMazeModel() {
-        int mazeColumns = 12;
-        int mazeRows = 12;
-        float vertexSpacing = 20f; // world units
-        float baseY = 0f; // world coordinate
-        mazeModel = new GridGraph(mazeRows, mazeColumns, vertexSpacing,
-                generator, baseY);
-    }
-
-    /**
-     * Initialize the model data for the player.
-     */
-    private void initializePlayerModel() {
-        /*
-         * Choose a random starting point.
-         */
-        startArc = mazeModel.randomArc(generator);
-        NavVertex startVertex = startArc.getFromVertex();
-        /*
-         * Let the vertex furthest from the starting point
-         * be the first (and only) goal.
-         */
-        NavVertex[] goalVertices = new NavVertex[1];
-        goalVertices[0] = mazeModel.findFurthest(startVertex);
-        /*
-         * Create the player model instance.
-         */
-        playerModel = new PlayerModel(startArc, goalVertices);
     }
 }

@@ -32,9 +32,9 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.model.Player;
 import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
-import jme3utilities.navigation.NavVertex;
 
 /**
  * Application state to rotate the player's avatars at a constant angular rate
@@ -61,15 +61,7 @@ class TurnState
     /**
      * attaching application: set by initialize()
      */
-    private Application application = null;
-    /**
-     * active vertex: set by activate()
-     */
-    private NavVertex activeVertex = null;
-    /**
-     * player model instance: set by constructor (not null)
-     */
-    final private PlayerModel player;
+    private MazeGame application = null;
     /**
      * final direction of turn: set by activate()
      */
@@ -78,33 +70,25 @@ class TurnState
     // constructors
 
     /**
-     * Instantiate a disabled turn state for the specified player.
-     *
-     * @param player player model instance (not null)
+     * Instantiate a disabled turn state.
      */
-    TurnState(PlayerModel player) {
-        assert player != null;
-        this.player = player;
+    TurnState() {
         setEnabled(false);
     }
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Enable this state with the specified the vertex and final direction.
+     * Enable this state with the specified final direction.
      *
-     * @param vertex vertex to activate (not null)
-     * @param finalDirection player's direction when the turn is complete (not
-     * null, unaffected)
+     * @param finalDirection player's direction when the turn is complete
+     * (length=1, unaffected)
      */
-    void activate(NavVertex vertex, Vector3f finalDirection) {
-        assert vertex != null;
+    void activate(Vector3f finalDirection) {
         assert finalDirection != null;
         assert finalDirection.isUnitVector() : finalDirection;
-        logger.log(Level.INFO, "vertex={0}, direction={1}",
-                new Object[]{vertex, finalDirection});
+        logger.log(Level.INFO, "finalDirection={0}", finalDirection);
 
-        activeVertex = vertex;
         this.finalDirection = finalDirection.clone();
         setEnabled(true);
     }
@@ -127,7 +111,7 @@ class TurnState
         Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
 
-        this.application = application;
+        this.application = (MazeGame) application;
     }
 
     /**
@@ -141,6 +125,7 @@ class TurnState
         assert isEnabled();
         super.update(elapsedTime);
 
+        Player player = application.getWorld().getPlayer();
         Vector3f direction = player.getDirection();
         float dot = finalDirection.dot(direction);
         if (1f - dot < epsilon) {
@@ -156,7 +141,7 @@ class TurnState
             axis.normalizeLocal();
         }
         float angle = FastMath.acos(dot); // positive angle
-        float maxTurnAngle = elapsedTime * player.getTurnRate();
+        float maxTurnAngle = elapsedTime * player.getMaxTurnRate();
         if (angle > maxTurnAngle) {
             angle = maxTurnAngle;
         }
@@ -175,7 +160,6 @@ class TurnState
 
         AppStateManager stateManager = application.getStateManager();
         InputState inputState = stateManager.getState(InputState.class);
-        inputState.activate(activeVertex);
-        activeVertex = null;
+        inputState.setEnabled(true);
     }
 }

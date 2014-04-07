@@ -23,7 +23,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze;
+package jme3maze.model;
 
 import com.jme3.material.Material;
 import com.jme3.math.FastMath;
@@ -45,7 +45,7 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-class GridGraph
+public class GridGraph
         extends NavGraph {
     // *************************************************************************
     // constants
@@ -126,7 +126,8 @@ class GridGraph
      * @param floorY world Y-coordinate of the floor
      * @param material material for the ceiling (not null)
      */
-    void constructCeiling(Node parentNode, float floorY, Material material) {
+    public void constructCeiling(Node parentNode, float floorY,
+            Material material) {
         assert parentNode != null;
         assert material != null;
 
@@ -151,7 +152,8 @@ class GridGraph
      * @param floorY world Y-coordinate of the floor
      * @param material material for the floor (not null)
      */
-    void constructFloor(Node parentNode, float floorY, Material material) {
+    public void constructFloor(Node parentNode, float floorY,
+            Material material) {
         assert parentNode != null;
         assert material != null;
 
@@ -177,8 +179,8 @@ class GridGraph
      * @param wallHeight height of walls (in world units, &gt;0)
      * @param material material for walls (not null)
      */
-    void constructWalls(Node parentNode, float floorY, float corridorWidth,
-            float wallHeight, Material material) {
+    public void constructWalls(Node parentNode, float floorY,
+            float corridorWidth, float wallHeight, Material material) {
         assert parentNode != null;
         assert corridorWidth > 0f : corridorWidth;
         assert wallHeight > 0f : wallHeight;
