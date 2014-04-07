@@ -29,15 +29,18 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.model.FreeItems;
+import jme3maze.model.Item;
+import jme3maze.model.Player;
+import jme3maze.model.World;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Application state to translate the player's avatars on a constant-velocity
- * trajectory until they reach the end of a specified navigation arc.
+ * Application state to translate the player on a constant-velocity trajectory
+ * to the endpoint of a specified navigation arc.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -65,43 +68,15 @@ class MoveState
     /**
      * attaching application: set by initialize()
      */
-    private Application application;
-    /**
-     * active arc: set by activate()
-     */
-    private NavArc activeArc;
-    /**
-     * player model instance: set by constructor (not null)
-     */
-    final private PlayerModel player;
+    private MazeGame application;
     // *************************************************************************
     // constructors
 
     /**
-     * Instantiate a disabled move state for the specified player.
-     *
-     * @param player player model instance (not null)
+     * Instantiate a disabled move state.
      */
-    MoveState(PlayerModel player) {
-        assert player != null;
-        this.player = player;
+    MoveState() {
         setEnabled(false);
-    }
-    // *************************************************************************
-    // new methods exposed
-
-    /**
-     * Enable this state with the specified active arc.
-     *
-     * @param arc arc to activate (not null)
-     */
-    void activate(NavArc arc) {
-        assert arc != null;
-        logger.log(Level.INFO, "arc={0}", arc);
-        player.startMove();
-
-        activeArc = arc;
-        setEnabled(true);
     }
     // *************************************************************************
     // AbstractAppState methods
@@ -122,7 +97,19 @@ class MoveState
         Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
 
-        this.application = application;
+        this.application = (MazeGame) application;
+    }
+
+    /**
+     * Enable this state.
+     */
+    @Override
+    final public void setEnabled(boolean newState) {
+        if (newState && !isEnabled()) {
+            Player player = application.getWorld().getPlayer();
+            player.incrementMoveCount();
+        }
+        super.setEnabled(newState);
     }
 
     /**
@@ -136,31 +123,33 @@ class MoveState
         assert isEnabled();
         super.update(elapsedTime);
 
-        Vector3f location = player.getLocation();
-        NavVertex destinationVertex = activeArc.getToVertex();
+        Player player = application.getWorld().getPlayer();
+        NavArc arc = player.getArc();
+        NavVertex destinationVertex = arc.getToVertex();
         Vector3f destination = destinationVertex.getLocation();
+        Vector3f location = player.getLocation();
         Vector3f offset = destination.subtract(location);
-        float distance = offset.length();
-        if (distance <= epsilon) {
-            player.setLocation(destination);
+        float distanceRemaining = offset.length();
+        if (distanceRemaining <= epsilon) {
             movementComplete(destinationVertex);
             return;
         }
         /*
-         * Compute the player's new location.
+         * Update the player's location.
          */
-        float maxDistance = elapsedTime * player.getMoveSpeed();
-        if (distance > maxDistance) {
-            offset.multLocal(maxDistance / distance);
+        float maxDistance = elapsedTime * player.getMaxMoveSpeed();
+        if (distanceRemaining > maxDistance) {
+            offset.multLocal(maxDistance / distanceRemaining);
         }
         Vector3f newLocation = location.add(offset);
         player.setLocation(newLocation);
+        player.setVertex(null);
     }
     // *************************************************************************
     // private methods
 
     /**
-     * The current movement is complete.
+     * The current move is complete.
      *
      * @param destinationVertex (not null)
      */
@@ -168,19 +157,30 @@ class MoveState
         assert destinationVertex != null;
 
         setEnabled(false);
+        World world = application.getWorld();
+        Player player = world.getPlayer();
+        player.setVertex(destinationVertex);
         /*
-         * Check whether the player has reached a goal.
+         * Check whether the player has reached a free item.
          */
-        if (player.isGoal(destinationVertex)) {
-            int moveCount = player.getMoveCount();
-            if (moveCount == 1) {
-                System.out.printf("You traversed the maze in one move!%n");
-            } else {
-                System.out.printf("You traversed the maze in %d moves.%n",
-                        moveCount);
+        FreeItems freeItems = world.getFreeItems();
+        Item[] items = freeItems.getItems(destinationVertex);
+        for (Item item : items) {
+            String typeName = item.getTypeName();
+            switch (typeName) {
+                case "McGuffin":
+                    int moveCount = player.getMoveCount();
+                    if (moveCount == 1) {
+                        System.out.printf(
+                                "You traversed the maze in one move!%n");
+                    } else {
+                        System.out.printf(
+                                "You traversed the maze in %d moves.%n",
+                                moveCount);
+                    }
+                    application.stop();
+                    return;
             }
-            application.stop();
-            return;
         }
 
         int numArcs = destinationVertex.getNumArcs();
@@ -188,19 +188,20 @@ class MoveState
         AppStateManager stateManager = application.getStateManager();
         if (autoTurn) {
             /*
-             * Turn to whichever arc requires the least rotation.
+             * Turn to the arc which requires the least rotation.
              */
             Vector3f direction = player.getDirection();
             NavArc nextArc = destinationVertex.findLeastTurn(direction);
-            direction = nextArc.getStartDirection();
+            Vector3f newDirection = nextArc.getStartDirection();
             TurnState turnState = stateManager.getState(TurnState.class);
-            turnState.activate(destinationVertex, direction);
+            turnState.activate(newDirection);
+
         } else {
             /*
              * Activate the input state to wait for user input.
              */
             InputState inputState = stateManager.getState(InputState.class);
-            inputState.activate(destinationVertex);
+            inputState.setEnabled(true);
         }
     }
 }

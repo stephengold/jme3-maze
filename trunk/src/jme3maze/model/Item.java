@@ -23,71 +23,71 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze;
+package jme3maze.model;
 
-import jme3maze.model.Player;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
-import jme3utilities.MySpatial;
-import jme3utilities.SimpleControl;
 
 /**
- * A simple control to update an avatar node based on a player model instance.
- * <p>
- * Each instance is enabled at creation.
+ * A collectible item. Each item has a named type.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class PlayerControl
-        extends SimpleControl {
+public class Item
+        implements Comparable {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(PlayerControl.class.getName());
+    final private static Logger logger = Logger.getLogger(Item.class.getName());
     // *************************************************************************
     // fields
     /**
-     * player model instance: set by constructor
+     * name of this item's type
      */
-    final private Player player;
+    private String typeName;
     // *************************************************************************
     // constructors
 
     /**
-     * Instantiate an enabled control for the specified player.
+     * Instantiate an item with a named type.
      *
-     * @param player player model instance (not null)
+     * @param typeName (not null, not empty)
      */
-    PlayerControl(Player player) {
-        assert player != null;
-        this.player = player;
-        assert isEnabled();
+    Item(String typeName) {
+        assert typeName != null;
+        assert typeName.length() > 0 : typeName;
+
+        this.typeName = typeName;
     }
     // *************************************************************************
-    // SimpleControl methods
+    // new methods exposed
 
     /**
-     * Update the avatar's location and direction. Invoked when the avatar's
-     * geometric state is about to be updated, once per frame while this control
-     * attached and enabled.
+     * Read the type name of this item.
      *
-     * @param updateInterval time interval between updates (in seconds, &ge;0)
+     * @return (not null, not empty)
+     */
+    public String getTypeName() {
+        assert typeName != null;
+        assert typeName.length() > 0 : typeName;
+
+        return typeName;
+    }
+    // *************************************************************************
+    // Comparable methods
+
+    /**
+     * Compare with another item.
+     *
+     * @param object (instance of Item)
+     * @return 0 if the items have the same type name
      */
     @Override
-    protected void controlUpdate(float updateInterval) {
-        super.controlUpdate(updateInterval);
-        if (spatial == null) {
-            return;
-        }
-        Vector3f location = player.getLocation();
-        MySpatial.setWorldLocation(spatial, location);
-
-        Quaternion orientation = player.getOrientation();
-        MySpatial.setWorldOrientation(spatial, orientation);
+    public int compareTo(Object object) {
+        Item otherItem = (Item) object;
+        String otherName = otherItem.typeName;
+        return typeName.compareTo(otherName);
     }
 }
