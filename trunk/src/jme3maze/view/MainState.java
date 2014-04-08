@@ -264,11 +264,17 @@ public class MainState
         float floorY = 0f; // world coordinate
         float corridorWidth = 10f; // world units
         float wallHeight = 10f; // world units
-        maze.constructFloor(mazeNode, floorY, floorMaterial);
-        maze.constructWalls(mazeNode, floorY, corridorWidth, wallHeight,
-                wallMaterial);
-        maze.constructCeiling(mazeNode, floorY + wallHeight,
-                ceilingMaterial);
+        float ceilingY = floorY + wallHeight; // world coordinate
+
+        FloorView floorView = new FloorView(floorY, floorMaterial);
+        floorView.visualize(maze, mazeNode);
+
+        WallsView wallsView =
+                new WallsView(floorY, corridorWidth, wallHeight, wallMaterial);
+        wallsView.visualize(maze, mazeNode);
+
+        CeilingView ceilingView = new CeilingView(ceilingY, ceilingMaterial);
+        ceilingView.visualize(maze, mazeNode);
     }
 
     /**
