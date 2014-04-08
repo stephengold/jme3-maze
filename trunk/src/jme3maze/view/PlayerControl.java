@@ -23,17 +23,17 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze;
+package jme3maze.view;
 
-import jme3maze.model.Player;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
+import jme3maze.model.Player;
 import jme3utilities.MySpatial;
 import jme3utilities.SimpleControl;
 
 /**
- * A simple control to update an avatar node based on a player model instance.
+ * Simple control to update an avatar node based on the player model.
  * <p>
  * Each instance is enabled at creation.
  *
@@ -63,7 +63,7 @@ public class PlayerControl
      *
      * @param player player model instance (not null)
      */
-    PlayerControl(Player player) {
+    public PlayerControl(Player player) {
         assert player != null;
         this.player = player;
         assert isEnabled();

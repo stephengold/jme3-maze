@@ -25,8 +25,7 @@
  */
 package jme3maze;
 
-import jme3maze.view.MapState;
-import jme3maze.view.MainState;
+import jme3maze.view.PlayerControl;
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
@@ -35,6 +34,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.model.Player;
 import jme3maze.model.World;
+import jme3maze.view.MainState;
+import jme3maze.view.MapState;
 import jme3utilities.Misc;
 
 /**
@@ -121,7 +122,7 @@ public class MazeGame
          */
         world = new World();
         /*
-         * view.
+         * view
          */
         initializeView();
         /*
@@ -137,17 +138,6 @@ public class MazeGame
      */
     private void initializeController() {
         /*
-         * Add a player control to the map's avatar.
-         */
-        Player player = world.getPlayer();
-        PlayerControl mapPlayerControl = new PlayerControl(player);
-        mapView.getAvatarNode().addControl(mapPlayerControl);
-        /*
-         * Add a player control to the main avatar.
-         */
-        PlayerControl mainPlayerControl = new PlayerControl(player);
-        mainView.getAvatarNode().addControl(mainPlayerControl);
-        /*
          * Attach controller app states to the application.
          */
         InputState inputState = new InputState();
@@ -155,8 +145,9 @@ public class MazeGame
         TurnState turnState = new TurnState();
         stateManager.attachAll(inputState, moveState, turnState);
         /*
-         * Activate the turn app state.
+         * Activate the "turn" app state.
          */
+        Player player = world.getPlayer();
         Vector3f direction = player.getArc().getStartDirection();
         turnState.activate(direction);
     }
@@ -172,5 +163,16 @@ public class MazeGame
         mapView = new MapState(mapRootNode);
         mainView = new MainState(rootNode);
         stateManager.attachAll(mapView, mainView);
+        /*
+         * Add a player control to the map's avatar.
+         */
+        Player player = world.getPlayer();
+        PlayerControl mapPlayerControl = new PlayerControl(player);
+        mapView.getAvatarNode().addControl(mapPlayerControl);
+        /*
+         * Add a player control to the main avatar.
+         */
+        PlayerControl mainPlayerControl = new PlayerControl(player);
+        mainView.getAvatarNode().addControl(mainPlayerControl);
     }
 }
