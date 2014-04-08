@@ -25,16 +25,10 @@
  */
 package jme3maze.model;
 
-import com.jme3.material.Material;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
-import com.jme3.scene.shape.Quad;
 import java.util.Random;
 import java.util.logging.Logger;
-import jme3utilities.MySpatial;
+import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -55,14 +49,6 @@ public class GridGraph
      */
     final private static Logger logger =
             Logger.getLogger(GridGraph.class.getName());
-    /**
-     * a unit square mesh
-     */
-    final private static Quad unitSquare = new Quad(1f, 1f);
-    /**
-     * world "up" direction
-     */
-    final private static Vector3f upDirection = Vector3f.UNIT_Y;
     // *************************************************************************
     // fields
     /**
@@ -120,80 +106,49 @@ public class GridGraph
     // new methods exposed
 
     /**
-     * Add a ceiling to a scene.
+     * Read the number of columns on the Z-axis of the grid.
      *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param floorY world Y-coordinate of the floor
-     * @param material material for the ceiling (not null)
+     * @return count (&gt;1)
      */
-    public void constructCeiling(Node parentNode, float floorY,
-            Material material) {
-        assert parentNode != null;
-        assert material != null;
-
-        int gridRows = grid.length;
-        int gridColumns = grid[0].length;
-        for (int row = 0; row < gridRows; row++) {
-            float x = vertexSpacing * (row - 0.5f);
-            for (int column = 0; column < gridColumns; column++) {
-                float z = vertexSpacing * (column - 0.5f);
-                Vector3f location = new Vector3f(x, floorY, z);
-                String description = String.format("ceiling%d,%d", row, column);
-                constructCeilingTile(parentNode, location, material,
-                        description);
-            }
-        }
+    public int getColumns() {
+        int result = grid[0].length;
+        assert result > 1 : result;
+        return result;
     }
 
     /**
-     * Add a floor to a scene.
+     * Read the number of rows on the X-axis of the grid.
      *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param floorY world Y-coordinate of the floor
-     * @param material material for the floor (not null)
+     * @return count (&gt;1)
      */
-    public void constructFloor(Node parentNode, float floorY,
-            Material material) {
-        assert parentNode != null;
-        assert material != null;
-
-        int gridRows = grid.length;
-        int gridColumns = grid[0].length;
-        for (int row = 0; row < gridRows; row++) {
-            float x = vertexSpacing * (row - 0.5f);
-            for (int column = 0; column < gridColumns; column++) {
-                float z = vertexSpacing * (column + 0.5f);
-                Vector3f location = new Vector3f(x, floorY, z);
-                String description = String.format("floor%d,%d", row, column);
-                constructFloorTile(parentNode, location, material, description);
-            }
-        }
+    public int getRows() {
+        int result = grid.length;
+        assert result > 1 : result;
+        return result;
     }
 
     /**
-     * Add walls to a scene.
+     * Access the vertex in the specified row and column.
      *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param floorY world Y-coordinate of the floor
-     * @param corridorWidth width of corridors (in world units, &gt;0)
-     * @param wallHeight height of walls (in world units, &gt;0)
-     * @param material material for walls (not null)
+     * @param row (&ge;0)
+     * @param column (&ge;0)
+     * @return pre-existing instance
      */
-    public void constructWalls(Node parentNode, float floorY,
-            float corridorWidth, float wallHeight, Material material) {
-        assert parentNode != null;
-        assert corridorWidth > 0f : corridorWidth;
-        assert wallHeight > 0f : wallHeight;
-        assert material != null;
+    public NavVertex getVertex(int row, int column) {
+        Validate.nonNegative(row, "row");
+        Validate.nonNegative(column, "column");
 
-        int gridRows = grid.length;
-        int gridColumns = grid[0].length;
-        for (int row = 0; row < gridRows; row++) {
-            for (int column = 0; column < gridColumns; column++) {
-                constructWalls(parentNode, row, column, floorY, corridorWidth,
-                        wallHeight, material);
-            }
-        }
+        NavVertex result = grid[row][column];
+        return result;
+    }
+
+    /**
+     * Read the spacing between vertices in the X and Z directions.
+     *
+     * @return distance (in world units, &gt;0)
+     */
+    public float getVertexSpacing() {
+        return vertexSpacing;
     }
     // *************************************************************************
     // private methods
@@ -247,291 +202,6 @@ public class GridGraph
                 }
             }
         }
-    }
-
-    /**
-     * Add a square ceiling tile to a scene.
-     *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param location world coordinates of tile's main corner (not null)
-     * @param material material for the ceiling (not null)
-     * @param description name for the geometry (not null)
-     */
-    private void constructCeilingTile(Node parentNode, Vector3f location,
-            Material material, String description) {
-        assert location != null;
-        assert material != null;
-        assert description != null;
-
-        Geometry geometry = new Geometry(description, unitSquare);
-        parentNode.attachChild(geometry);
-        geometry.setLocalScale(vertexSpacing, vertexSpacing, 1f);
-        geometry.setMaterial(material);
-        MySpatial.setWorldLocation(geometry, location);
-
-        Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
-        MySpatial.setWorldOrientation(geometry, rotation);
-    }
-
-    /**
-     * Add a closure wall for the specified vertex and orientation.
-     *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param vertexLocation (not null)
-     * @param orientation relative to the world's +Z direction (not null)
-     * @param floorY world Y-coordinate of the floor
-     * @param corridorWidth width of corridors (in world units, &gt;0)
-     * @param wallHeight height of walls (in world units, &gt;0)
-     * @param material material for walls (not null)
-     */
-    private void constructClosure(Node parentNode, Vector3f vertexLocation,
-            Quaternion orientation, float floorY, float corridorWidth,
-            float wallHeight, Material material) {
-        assert parentNode != null;
-        assert vertexLocation != null;
-        assert corridorWidth > 0f : corridorWidth;
-        assert wallHeight > 0f : wallHeight;
-        assert material != null;
-
-        float halfWidth = corridorWidth / 2f;
-
-        Vector3f lowerLeftCorner = new Vector3f(halfWidth, floorY, halfWidth);
-        lowerLeftCorner = orientation.mult(lowerLeftCorner);
-        lowerLeftCorner.addLocal(vertexLocation);
-
-        Vector3f lowerRightCorner = new Vector3f(-halfWidth, floorY, halfWidth);
-        lowerRightCorner = orientation.mult(lowerRightCorner);
-        lowerRightCorner.addLocal(vertexLocation);
-
-        String description = "closure wall";
-        constructWallSegment(parentNode, lowerLeftCorner, lowerRightCorner,
-                wallHeight, material, description);
-    }
-
-    /**
-     * Add a square floor tile to a scene.
-     *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param location world coordinates of tile's main corner (not null)
-     * @param material material for the floor (not null)
-     * @param description name for the geometry (not null)
-     */
-    private void constructFloorTile(Node parentNode, Vector3f location,
-            Material material, String description) {
-        assert location != null;
-        assert material != null;
-        assert description != null;
-
-        Geometry geometry = new Geometry(description, unitSquare);
-        parentNode.attachChild(geometry);
-        geometry.setLocalScale(vertexSpacing, vertexSpacing, 1f);
-        geometry.setMaterial(material);
-        MySpatial.setWorldLocation(geometry, location);
-
-        Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X);
-        MySpatial.setWorldOrientation(geometry, rotation);
-    }
-
-    /**
-     * Add an opening wall for the specified vertex and orientation.
-     *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param vertexLocation (not null)
-     * @param orientation relative to the world's +Z direction (not null)
-     * @param floorY world Y-coordinate of the floor
-     * @param corridorWidth width of corridors (in world units, &gt;0)
-     * @param wallHeight height of walls (in world units, &gt;0)
-     * @param material material for walls (not null)
-     */
-    private void constructOpening(Node parentNode, Vector3f vertexLocation,
-            Quaternion orientation, float floorY, float corridorWidth,
-            float wallHeight, Material material) {
-        assert parentNode != null;
-        assert vertexLocation != null;
-        assert corridorWidth > 0f : corridorWidth;
-        assert wallHeight > 0f : wallHeight;
-        assert material != null;
-
-        float halfSpacing = vertexSpacing / 2f;
-        float halfWidth = corridorWidth / 2f;
-
-        Vector3f corner1 = new Vector3f(halfSpacing, floorY, halfWidth);
-        corner1 = orientation.mult(corner1);
-        corner1.addLocal(vertexLocation);
-
-        Vector3f corner2 = new Vector3f(halfWidth, floorY, halfWidth);
-        corner2 = orientation.mult(corner2);
-        corner2.addLocal(vertexLocation);
-
-        Vector3f corner3 = new Vector3f(halfWidth, floorY, halfSpacing);
-        corner3 = orientation.mult(corner3);
-        corner3.addLocal(vertexLocation);
-
-        Vector3f corner4 = new Vector3f(-halfWidth, floorY, halfSpacing);
-        corner4 = orientation.mult(corner4);
-        corner4.addLocal(vertexLocation);
-
-        Vector3f corner5 = new Vector3f(-halfWidth, floorY, halfWidth);
-        corner5 = orientation.mult(corner5);
-        corner5.addLocal(vertexLocation);
-
-        Vector3f corner6 = new Vector3f(-halfSpacing, floorY, halfWidth);
-        corner6 = orientation.mult(corner6);
-        corner6.addLocal(vertexLocation);
-
-        String description = "opening wall 1";
-        constructWallSegment(parentNode, corner1, corner2, wallHeight,
-                material, description);
-        description = "opening wall 2";
-        constructWallSegment(parentNode, corner2, corner3, wallHeight,
-                material, description);
-        description = "opening wall 3";
-        constructWallSegment(parentNode, corner4, corner5, wallHeight,
-                material, description);
-        description = "opening wall 4";
-        constructWallSegment(parentNode, corner5, corner6, wallHeight,
-                material, description);
-    }
-
-    /**
-     * Add walls for a particular pair of adjacent vertices.
-     *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param fromVertex (not null)
-     * @param toVertex (not null)
-     * @param floorY world Y-coordinate of the floor
-     * @param corridorWidth width of corridors (in world units, &gt;0)
-     * @param wallHeight height of walls (in world units, &gt;0)
-     * @param material material for walls (not null)
-     */
-    private void constructWall(Node parentNode, NavVertex fromVertex,
-            NavVertex toVertex, float floorY, float corridorWidth,
-            float wallHeight, Material material) {
-        assert parentNode != null;
-        assert fromVertex != null;
-        assert toVertex != null;
-        assert corridorWidth > 0f : corridorWidth;
-        assert wallHeight > 0f : wallHeight;
-        assert material != null;
-
-        Vector3f fromLocation = fromVertex.getLocation();
-        Vector3f toLocation = toVertex.getLocation();
-        Vector3f offset = toLocation.subtract(fromLocation);
-        Quaternion orientation = new Quaternion();
-        orientation.lookAt(offset, upDirection);
-        NavArc arc = fromVertex.findArcTo(toVertex);
-        if (arc == null) {
-            constructClosure(parentNode, fromLocation, orientation, floorY,
-                    corridorWidth, wallHeight, material);
-        } else {
-            constructOpening(parentNode, fromLocation, orientation, floorY,
-                    corridorWidth, wallHeight, material);
-        }
-    }
-
-    /**
-     * Add walls for the specified vertex.
-     *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param row (&ge;0)
-     * @param column (&ge;0)
-     * @param floorY world Y-coordinate of the floor
-     * @param corridorWidth width of corridors (in world units, &gt;0)
-     * @param wallHeight height of walls (in world units, &gt;0)
-     * @param material material for walls (not null)
-     */
-    private void constructWalls(Node parentNode, int row, int column,
-            float floorY, float corridorWidth, float wallHeight,
-            Material material) {
-        assert parentNode != null;
-        assert row >= 0 : row;
-        assert column >= 0 : column;
-        assert corridorWidth > 0f : corridorWidth;
-        assert wallHeight > 0f : wallHeight;
-        assert material != null;
-
-        int gridRows = grid.length;
-        int gridColumns = grid[0].length;
-        NavVertex fromVertex = grid[row][column];
-        Vector3f vertexLocation = fromVertex.getLocation();
-        Quaternion orientation = new Quaternion();
-
-        if (row + 1 < gridRows) {
-            NavVertex north = grid[row + 1][column];
-            constructWall(parentNode, fromVertex, north, floorY, corridorWidth,
-                    wallHeight, material);
-        } else {
-            orientation.lookAt(Vector3f.UNIT_X, upDirection);
-            constructClosure(parentNode, vertexLocation, orientation, floorY,
-                    corridorWidth, wallHeight, material);
-        }
-
-        if (column + 1 < gridColumns) {
-            NavVertex east = grid[row][column + 1];
-            constructWall(parentNode, fromVertex, east, floorY, corridorWidth,
-                    wallHeight, material);
-        } else {
-            orientation.lookAt(Vector3f.UNIT_Z, upDirection);
-            constructClosure(parentNode, vertexLocation, orientation, floorY,
-                    corridorWidth, wallHeight, material);
-        }
-
-        if (row - 1 >= 0) {
-            NavVertex south = grid[row - 1][column];
-            constructWall(parentNode, fromVertex, south, floorY, corridorWidth,
-                    wallHeight, material);
-        } else {
-            orientation.lookAt(new Vector3f(-1f, 0f, 0f), upDirection);
-            constructClosure(parentNode, vertexLocation, orientation, floorY,
-                    corridorWidth, wallHeight, material);
-        }
-
-        if (column - 1 >= 0) {
-            NavVertex west = grid[row][column - 1];
-            constructWall(parentNode, fromVertex, west, floorY, corridorWidth,
-                    wallHeight, material);
-        } else {
-            orientation.lookAt(new Vector3f(0f, 0f, -1f), upDirection);
-            constructClosure(parentNode, vertexLocation, orientation, floorY,
-                    corridorWidth, wallHeight, material);
-        }
-    }
-
-    /**
-     * Add a single wall segment (quad) to a scene.
-     *
-     * @param parentNode where in the scene to attach the geometries (not null)
-     * @param lowerLeftCorner world coordinates of lower left (not null)
-     * @param lowerRightCorner world coordinates of lower right (not null)
-     * @param height height of the wall (in world units, &gt;0)
-     * @param material material for walls (not null)
-     * @param description name for the geometry (not null)
-     */
-    private void constructWallSegment(Node parentNode, Vector3f lowerLeftCorner,
-            Vector3f lowerRightCorner, float height, Material material,
-            String description) {
-        assert lowerLeftCorner != null;
-        assert lowerRightCorner != null;
-        assert lowerLeftCorner.y == lowerRightCorner.y;
-        assert height > 0f : height;
-        assert material != null;
-        assert description != null;
-
-        Geometry geometry = new Geometry(description, unitSquare);
-        parentNode.attachChild(geometry);
-        Vector3f baseOffset = lowerRightCorner.subtract(lowerLeftCorner);
-        float width = baseOffset.length();
-        Vector3f scale = new Vector3f(width, height, 1f);
-        geometry.setLocalScale(scale);
-        geometry.setMaterial(material);
-        MySpatial.setWorldLocation(geometry, lowerLeftCorner);
-
-        Vector3f direction = baseOffset.cross(upDirection);
-        Quaternion orientation = new Quaternion();
-        orientation.lookAt(direction, upDirection);
-        MySpatial.setWorldOrientation(geometry, orientation);
     }
 
     /**
