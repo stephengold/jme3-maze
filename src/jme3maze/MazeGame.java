@@ -25,17 +25,14 @@
  */
 package jme3maze;
 
-import jme3maze.view.PlayerControl;
 import com.jme3.app.SimpleApplication;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.model.Player;
-import jme3maze.model.World;
-import jme3maze.view.MainState;
-import jme3maze.view.MapState;
+import jme3maze.model.FreeItemsState;
+import jme3maze.model.PlayerState;
+import jme3maze.model.WorldState;
+import jme3maze.view.MainViewState;
 import jme3utilities.Misc;
 
 /**
@@ -59,29 +56,7 @@ public class MazeGame
      */
     final private static String windowTitle = "Maze Game";
     // *************************************************************************
-    // fields
-    /**
-     * main view: set by simpleInitApp()
-     */
-    private MainState mainView;
-    /**
-     * map view: set by simpleInitApp()
-     */
-    private MapState mapView;
-    /**
-     * abstract game data (MVC model): set by simpleInitApp()
-     */
-    private World world;
-    // *************************************************************************
     // new methods exposed
-
-    /**
-     * Access the main model.
-     */
-    public World getWorld() {
-        assert world != null;
-        return world;
-    }
 
     /**
      * Main entry point for the maze game.
@@ -118,25 +93,17 @@ public class MazeGame
     @Override
     public void simpleInitApp() {
         /*
-         * model
+         * Attach model app states to the application.
          */
-        world = new World();
+        WorldState worldState = new WorldState();
+        PlayerState playerState = new PlayerState();
+        FreeItemsState freeItemsState = new FreeItemsState();
+        stateManager.attachAll(worldState, playerState, freeItemsState);
         /*
-         * view
+         * Attach main view app state to the application.
          */
-        initializeView();
-        /*
-         * controller
-         */
-        initializeController();
-    }
-    // *************************************************************************
-    // private methods
-
-    /**
-     * Initialize controller app states and controls.
-     */
-    private void initializeController() {
+        MainViewState mainViewState = new MainViewState();
+        stateManager.attach(mainViewState);
         /*
          * Attach controller app states to the application.
          */
@@ -144,35 +111,5 @@ public class MazeGame
         MoveState moveState = new MoveState();
         TurnState turnState = new TurnState();
         stateManager.attachAll(inputState, moveState, turnState);
-        /*
-         * Activate the "turn" app state.
-         */
-        Player player = world.getPlayer();
-        Vector3f direction = player.getArc().getStartDirection();
-        turnState.activate(direction);
-    }
-
-    /**
-     * Initialize view app states.
-     */
-    private void initializeView() {
-        Node mapRootNode = new Node("map root node");
-        /*
-         * Attach view app states to the application.
-         */
-        mapView = new MapState(mapRootNode);
-        mainView = new MainState(rootNode);
-        stateManager.attachAll(mapView, mainView);
-        /*
-         * Add a player control to the map's avatar.
-         */
-        Player player = world.getPlayer();
-        PlayerControl mapPlayerControl = new PlayerControl(player);
-        mapView.getAvatarNode().addControl(mapPlayerControl);
-        /*
-         * Add a player control to the main avatar.
-         */
-        PlayerControl mainPlayerControl = new PlayerControl(player);
-        mainView.getAvatarNode().addControl(mainPlayerControl);
     }
 }
