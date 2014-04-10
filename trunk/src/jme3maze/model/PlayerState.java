@@ -25,22 +25,31 @@
  */
 package jme3maze.model;
 
+import com.jme3.app.Application;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Logger;
+import jme3maze.view.MainViewState;
+import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * A player in the Maze Game. Each player has a position in the world and an
- * inventory of items.
+ * App state to manage the player in the Maze Game. The player has a position in
+ * the world and an inventory of items.
+ * <p>
+ * Each instance is enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class Player {
+public class PlayerState
+        extends AbstractAppState {
     // *************************************************************************
     // constants
 
@@ -48,9 +57,13 @@ public class Player {
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(Player.class.getName());
+            Logger.getLogger(PlayerState.class.getName());
     // *************************************************************************
     // fields
+    /**
+     * state manager: set by initialize()
+     */
+    private AppStateManager stateManager;
     /**
      * items collected but not yet consumed or dropped
      */
@@ -89,18 +102,6 @@ public class Player {
      */
     final private Vector3f location = new Vector3f();
     // *************************************************************************
-    // constructors
-
-    /**
-     * Instantiate a player with an empty inventory.
-     *
-     * @param initialArc (not null)
-     */
-    Player(NavArc initialArc) {
-        assert initialArc != null;
-        setArc(initialArc);
-    }
-    // *************************************************************************
     // new methods exposed
 
     /**
@@ -121,15 +122,6 @@ public class Player {
     public Vector3f getDirection() {
         assert direction.isUnitVector() : direction;
         return direction.clone();
-    }
-
-    /**
-     * Access this player's current navigation vertex, if any.
-     *
-     * @return pre-existing instance (or null if not at a vertex)
-     */
-    public NavVertex getVertex() {
-        return vertex;
     }
 
     /**
@@ -179,6 +171,15 @@ public class Player {
     public Quaternion getOrientation() {
         assert orientation != null;
         return orientation.clone();
+    }
+
+    /**
+     * Access this player's current navigation vertex, if any.
+     *
+     * @return pre-existing instance (or null if not at a vertex)
+     */
+    public NavVertex getVertex() {
+        return vertex;
     }
 
     /**
@@ -235,7 +236,17 @@ public class Player {
 
         Vector3f norm = newDirection.normalize();
         direction.set(norm);
-        orientation.lookAt(direction, World.upDirection);
+        orientation.lookAt(direction, WorldState.upDirection);
+        /*
+         * Visualize the rotation.
+         */
+        MainViewState mainViewState =
+                stateManager.getState(MainViewState.class);
+        mainViewState.setPlayerOrientation(orientation);
+        MapViewState mapViewState = stateManager.getState(MapViewState.class);
+        if (mapViewState != null) {
+            mapViewState.setPlayerOrientation(orientation);
+        }
     }
 
     /**
@@ -246,6 +257,16 @@ public class Player {
     public void setLocation(Vector3f newLocation) {
         Validate.nonNull(newLocation, "location");
         location.set(newLocation);
+        /*
+         * Visualize the translation.
+         */
+        MainViewState mainViewState =
+                stateManager.getState(MainViewState.class);
+        mainViewState.setPlayerLocation(location);
+        MapViewState mapViewState = stateManager.getState(MapViewState.class);
+        if (mapViewState != null) {
+            mapViewState.setPlayerLocation(location);
+        }
     }
 
     /**
@@ -279,5 +300,34 @@ public class Player {
             Vector3f newLocation = vertex.getLocation();
             setLocation(newLocation);
         }
+    }
+    // *************************************************************************
+    // AbstractAppState methods
+
+    /**
+     * Initialize this state prior to its first update.
+     *
+     * @param stateManager (not null)
+     * @param application attaching application (not null)
+     */
+    @Override
+    public void initialize(AppStateManager stateManager,
+            Application application) {
+        if (isInitialized()) {
+            throw new IllegalStateException("already initialized");
+        }
+        Validate.nonNull(application, "application");
+        Validate.nonNull(stateManager, "state manager");
+        super.initialize(stateManager, application);
+
+        this.stateManager = stateManager;
+        /*
+         * Choose a random starting arc.
+         */
+        WorldState worldState = stateManager.getState(WorldState.class);
+        GridGraph maze = worldState.getMaze();
+        Random generator = worldState.getGenerator();
+        NavArc playerStartArc = maze.randomArc(generator);
+        setArc(playerStartArc);
     }
 }

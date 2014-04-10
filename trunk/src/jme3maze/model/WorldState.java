@@ -25,19 +25,23 @@
  */
 package jme3maze.model;
 
+import com.jme3.app.Application;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import java.util.Random;
 import java.util.logging.Logger;
-import jme3utilities.navigation.NavArc;
-import jme3utilities.navigation.NavVertex;
+import jme3utilities.Validate;
 
 /**
- * The complete abstract game data (MVC model) for the Maze Game, including a
- * player, a maze, and a set of free items.
+ * App state to manage mazes in the Maze Game.
+ * <p>
+ * Each instance is enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class World {
+public class WorldState
+        extends AbstractAppState {
     // *************************************************************************
     // constants
 
@@ -45,7 +49,7 @@ public class World {
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(World.class.getName());
+            Logger.getLogger(WorldState.class.getName());
     /**
      * default seed for pseudo-random number generator
      */
@@ -57,21 +61,9 @@ public class World {
     // *************************************************************************
     // fields
     /**
-     * free items
-     */
-    final private FreeItems freeItems = new FreeItems();
-    /**
-     * maze model instance: set by constructor
+     * maze topology: set by initialize()
      */
     private GridGraph maze;
-    /**
-     * player's starting point: set by constructor
-     */
-    private NavArc playerStartArc;
-    /**
-     * player model instance: set by constructor
-     */
-    private Player player;
     /**
      * pseudo-random number generator: set by constructor
      */
@@ -82,34 +74,31 @@ public class World {
     /**
      * Instantiate a world using the default seed.
      */
-    public World() {
+    public WorldState() {
         this(defaultSeed);
     }
 
     /**
      * Instantiate a world using the specified seed.
      */
-    World(long seed) {
+    WorldState(long seed) {
         generator = new Random(seed);
-        initializeMaze();
-        initializePlayer();
-        initializeItems();
     }
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Access the free items.
+     * Access the number generator.
      *
      * @return pre-existing instance
      */
-    public FreeItems getFreeItems() {
-        assert freeItems != null;
-        return freeItems;
+    public Random getGenerator() {
+        assert generator != null;
+        return generator;
     }
 
     /**
-     * Access the maze.
+     * Access the maze topology.
      *
      * @return pre-existing instance
      */
@@ -117,32 +106,29 @@ public class World {
         assert maze != null;
         return maze;
     }
+    // *************************************************************************
+    // AbstractAppState methods
 
     /**
-     * Access the player.
+     * Initialize this state prior to its first update.
      *
-     * @return pre-existing instance
+     * @param stateManager (not null)
+     * @param application attaching application (not null)
      */
-    public Player getPlayer() {
-        assert player != null;
-        return player;
+    @Override
+    public void initialize(AppStateManager stateManager,
+            Application application) {
+        if (isInitialized()) {
+            throw new IllegalStateException("already initialized");
+        }
+        Validate.nonNull(application, "application");
+        Validate.nonNull(stateManager, "state manager");
+        super.initialize(stateManager, application);
+
+        initializeMaze();
     }
     // *************************************************************************
     // private methods
-
-    /**
-     * Add items to the world. Assumes that the player has been initialized.
-     */
-    private void initializeItems() {
-        /*
-         * Place the McGuffin (game-ending goal) at the vertex
-         * furthest from the starting point.
-         */
-        NavVertex startVertex = playerStartArc.getFromVertex();
-        NavVertex goalVertex = maze.findFurthest(startVertex);
-        Item mcGuffin = new Item("McGuffin");
-        freeItems.add(mcGuffin, goalVertex);
-    }
 
     /**
      * Initialize the maze.
@@ -154,19 +140,5 @@ public class World {
         float baseY = 0f; // world coordinate
         maze = new GridGraph(mazeRows, mazeColumns, vertexSpacing,
                 generator, baseY);
-    }
-
-    /**
-     * Initialize the player. Assumes that the maze has been initialized.
-     */
-    private void initializePlayer() {
-        /*
-         * Choose a random starting arc.
-         */
-        playerStartArc = maze.randomArc(generator);
-        /*
-         * Create the player at the start of the chosen arc.
-         */
-        player = new Player(playerStartArc);
     }
 }

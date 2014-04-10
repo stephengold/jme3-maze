@@ -35,16 +35,16 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
-import jme3maze.model.Player;
+import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * The application state for getting player input, enabled when the player is
- * stationary. Input is ignored while the player is turning. Input during player
- * moves is processed when the state is re-enabled, in other words, when the
- * player reaches the destination vertex.
+ * App state for getting player input, enabled when the player is stationary.
+ * Input is ignored while the player is turning. Input during player moves is
+ * processed when the state is re-enabled, in other words, when the player
+ * reaches the destination vertex.
  * <p>
  * Each instance is disabled at creation.
  *
@@ -78,21 +78,25 @@ class InputState
      */
     final private static String rightActionString = "right";
     /**
-     * the avatar's left direction in local coordinates
+     * the player's left direction in local coordinates
      */
     final private static Vector3f leftDirection = Vector3f.UNIT_X;
     /**
-     * the avatar's right direction in local coordinates
+     * the player's right direction in local coordinates
      */
     final private static Vector3f rightDirection = new Vector3f(-1f, 0f, 0f);
     // *************************************************************************
     // fields
     /**
-     * attaching application: set by initialize()
+     * state manager: set by initialize()
      */
-    private MazeGame application = null;
+    private AppStateManager stateManager;
     /**
-     * most recent action string
+     * input manager: set by initialize()
+     */
+    private InputManager inputManager;
+    /**
+     * name of the most recent action
      */
     private String lastActionString = "";
     // *************************************************************************
@@ -115,7 +119,6 @@ class InputState
     @Override
     public void cleanup() {
         super.cleanup();
-        InputManager inputManager = application.getInputManager();
         /*
          * Unmap action strings.
          */
@@ -148,10 +151,10 @@ class InputState
         }
         Validate.nonNull(application, "application");
         Validate.nonNull(stateManager, "state manager");
-
         super.initialize(stateManager, application);
-        this.application = (MazeGame) application;
-        InputManager inputManager = application.getInputManager();
+
+        inputManager = application.getInputManager();
+        this.stateManager = stateManager;
         /*
          * Map keys to action strings.
          */
@@ -187,22 +190,22 @@ class InputState
         assert isEnabled();
         super.update(elapsedTime);
 
-        Player player = application.getWorld().getPlayer();
-        Quaternion orientation = player.getOrientation();
+        PlayerState playerState = stateManager.getState(PlayerState.class);
+        Quaternion orientation = playerState.getOrientation();
         Vector3f direction;
         /*
          * Process the most recent action string.
          */
         switch (lastActionString) {
             case advanceActionString:
-                NavVertex vertex = player.getVertex();
-                direction = player.getDirection();
+                NavVertex vertex = playerState.getVertex();
+                direction = playerState.getDirection();
                 NavArc arc = vertex.findLeastTurn(direction);
                 Vector3f arcDirection = arc.getStartDirection();
                 float dot = direction.dot(arcDirection);
                 if (1f - dot < epsilon) {
                     /*
-                     * The avatar's direction closely matches an arc, so
+                     * The player's direction closely matches an arc, so
                      * follow that arc.
                      */
                     goMove(arc);
@@ -251,9 +254,8 @@ class InputState
             return;
         }
         /*
-         * Ignore actions requested while the avatar is turning.
+         * Ignore actions requested while the player is turning.
          */
-        AppStateManager stateManager = application.getStateManager();
         TurnState turnState = stateManager.getState(TurnState.class);
         if (turnState.isEnabled()) {
             return;
@@ -273,9 +275,9 @@ class InputState
 
         setEnabled(false);
 
-        application.getWorld().getPlayer().setArc(arc);
+        PlayerState playerState = stateManager.getState(PlayerState.class);
+        playerState.setArc(arc);
 
-        AppStateManager stateManager = application.getStateManager();
         MoveState moveState = stateManager.getState(MoveState.class);
         moveState.setEnabled(true);
     }
@@ -291,7 +293,6 @@ class InputState
 
         setEnabled(false);
 
-        AppStateManager stateManager = application.getStateManager();
         TurnState turnState = stateManager.getState(TurnState.class);
         turnState.activate(newDirection);
     }

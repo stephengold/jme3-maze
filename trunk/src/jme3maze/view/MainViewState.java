@@ -26,23 +26,31 @@
 package jme3maze.view;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.MazeGame;
+import jme3maze.model.FreeItemsState;
 import jme3maze.model.GridGraph;
 import jme3maze.model.Item;
-import jme3maze.model.World;
+import jme3maze.model.PlayerState;
+import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MySpatial;
 import jme3utilities.MyString;
@@ -53,11 +61,11 @@ import jme3utilities.debug.Printer;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Application state to update the (1st-person) main view in the Maze Game.
+ * App state to manage the (1st-person) main view in the Maze Game.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class MainState
+public class MainViewState
         extends AbstractAppState {
     // *************************************************************************
     // constants
@@ -66,7 +74,7 @@ public class MainState
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(MainState.class.getName());
+            Logger.getLogger(MainViewState.class.getName());
     /**
      * asset path to the "pond" texture asset in jME3-testdata.jar
      */
@@ -88,40 +96,115 @@ public class MainState
     // *************************************************************************
     // fields
     /**
-     * attaching application: set by initialize()
+     * app state manager: set by initialize()
      */
-    private MazeGame application = null;
+    private AppStateManager stateManager;
+    /**
+     * asset manager: set by initialize()
+     */
+    private AssetManager assetManager;
+    /**
+     * map free items to their spatials
+     */
+    private Map<Item, Spatial> itemSpatial = new TreeMap<>();
+    /**
+     * root of this view's scene graph: set by initialize()
+     */
+    private Node rootNode;
     /**
      * node which represents the player in this view
      */
     final private Node avatarNode = new Node("main avatar node");
     /**
-     * root of this view's scene graph: set by constructor
+     * attaching application: set by initialize()
      */
-    final private Node rootNode;
-    // *************************************************************************
-    // constructor
-
-    /**
-     * Instantiate an enabled view.
-     *
-     * @param rootNode (not null)
-     */
-    public MainState(Node rootNode) {
-        assert rootNode != null;
-        this.rootNode = rootNode;
-    }
+    private SimpleApplication application;
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Access the node which represents the player in this view.
+     * Add 3-D representation of a free item to the scene.
      *
-     * @return (not null)
+     * @param item free item to represent (not null)
      */
-    public Node getAvatarNode() {
-        assert avatarNode != null;
-        return avatarNode;
+    public void addFreeItem(Item item) {
+        FreeItemsState freeItemsState =
+                stateManager.getState(FreeItemsState.class);
+        NavVertex vertex = freeItemsState.getVertex(item);
+        Vector3f location = vertex.getLocation();
+        String itemType = item.getTypeName();
+        Material material;
+        ColorRGBA color;
+        switch (itemType) {
+            case "Mapper":
+                /*
+                 * A Mapper is represented by a green cube.
+                 */
+                Mesh mesh = new Box(1f, 1f, 1f);
+                Geometry cube = new Geometry("mapper", mesh);
+                itemSpatial.put(item, cube);
+                rootNode.attachChild(cube);
+                cube.setLocalScale(0.5f);
+                color = new ColorRGBA(0f, 0.05f, 0f, 1f);
+                material = MyAsset.createShinyMaterial(assetManager, color);
+                cube.setMaterial(material);
+
+                location.y += 4f; // floating in the air
+                MySpatial.setWorldLocation(cube, location);
+                break;
+
+            case "McGuffin":
+                /*
+                 * A McGuffin is represented by a gold teapot.
+                 */
+                Spatial spatial = assetManager.loadModel(teapotAssetPath);
+                itemSpatial.put(item, spatial);
+                rootNode.attachChild(spatial);
+                spatial.setLocalScale(2f);
+
+                color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
+                material = MyAsset.createShinyMaterial(assetManager, color);
+                spatial.setMaterial(material);
+
+                location.y += 4f; // floating in the air
+                MySpatial.setWorldLocation(spatial, location);
+                break;
+
+            default:
+                logger.log(Level.WARNING,
+                        "ignored free item with unknown type {0}",
+                        MyString.quote(itemType));
+        }
+    }
+
+    /**
+     * Remove 3-D representation of a free item from the scene.
+     *
+     * @param item free item to remove (not null)
+     */
+    public void removeFreeItem(Item item) {
+        Spatial spatial = itemSpatial.remove(item);
+        spatial.removeFromParent();
+    }
+
+    /**
+     * Alter the location of the player's avatar.
+     *
+     * @param location world coordinates (not null)
+     */
+    public void setPlayerLocation(Vector3f location) {
+        Validate.nonNull(location, "location");
+        MySpatial.setWorldLocation(avatarNode, location);
+    }
+
+    /**
+     * Alter the orientation of the player's avatar.
+     *
+     * @param orientation orientation in world coordinate system (not null)
+     */
+    public void setPlayerOrientation(Quaternion orientation) {
+        Validate.nonNull(orientation, "orientation");
+        MySpatial.setWorldOrientation(avatarNode, orientation);
     }
     // *************************************************************************
     // AbstractAppState methods
@@ -142,8 +225,39 @@ public class MainState
         Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
 
-        this.application = (MazeGame) application;
-        initializeView();
+        this.application = (SimpleApplication) application;
+        this.stateManager = stateManager;
+
+        assetManager = application.getAssetManager();
+        rootNode = this.application.getRootNode();
+        /*
+         * Generate a 3D representation of the maze.
+         */
+        WorldState worldState = stateManager.getState(WorldState.class);
+        GridGraph maze = worldState.getMaze();
+        addMaze(maze);
+        /*
+         * Add free items.
+         */
+        FreeItemsState freeItemsState =
+                stateManager.getState(FreeItemsState.class);
+        for (Item item : freeItemsState.getAll()) {
+            addFreeItem(item);
+        }
+        /*
+         * Add avatar to represent the player.
+         */
+        rootNode.attachChild(avatarNode);
+        PlayerState playerState = stateManager.getState(PlayerState.class);
+        Vector3f location = playerState.getLocation();
+        MySpatial.setWorldLocation(avatarNode, location);
+        Quaternion orientation = playerState.getOrientation();
+        MySpatial.setWorldOrientation(avatarNode, orientation);
+        /*
+         * Add lights and camera.
+         */
+        addLights();
+        addCamera();
         /*
          * As a debugging aid, dump the scene graph of this view.
          */
@@ -169,44 +283,8 @@ public class MainState
         Camera cam = application.getCamera();
         Vector3f localOffset = new Vector3f(0f, 5f, -8f);
         CameraControl forwardView = new CameraControl(cam, localOffset,
-                forwardDirection, World.upDirection);
+                forwardDirection, WorldState.upDirection);
         avatarNode.addControl(forwardView);
-    }
-
-    /**
-     * Add a 3-D representation of a free item to the scene.
-     *
-     * @param item free item to represent (not null)
-     */
-    private void addFreeItem(Item item) {
-        AssetManager assetManager = application.getAssetManager();
-        World world = application.getWorld();
-        NavVertex vertex = world.getFreeItems().getVertex(item);
-        Vector3f location = vertex.getLocation();
-        String itemType = item.getTypeName();
-        switch (itemType) {
-            case "McGuffin":
-                /*
-                 * A McGuffin is represented by a gold teapot.
-                 */
-                Spatial spatial = assetManager.loadModel(teapotAssetPath);
-                rootNode.attachChild(spatial);
-                spatial.setLocalScale(2f);
-
-                ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
-                Material material =
-                        MyAsset.createShinyMaterial(assetManager, color);
-                spatial.setMaterial(material);
-
-                location.y += 4f; // floating in the air
-                MySpatial.setWorldLocation(spatial, location);
-                break;
-
-            default:
-                logger.log(Level.WARNING,
-                        "ignored free item with unknown type {0}",
-                        MyString.quote(itemType));
-        }
     }
 
     /**
@@ -237,8 +315,6 @@ public class MainState
      * Add 3-D representation of a maze to the scene.
      */
     private void addMaze(GridGraph maze) {
-        AssetManager assetManager = application.getAssetManager();
-
         ColorRGBA ceilingColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
         Material ceilingMaterial =
                 MyAsset.createShinyMaterial(assetManager, ceilingColor);
@@ -275,32 +351,5 @@ public class MainState
 
         CeilingView ceilingView = new CeilingView(ceilingY, ceilingMaterial);
         ceilingView.visualize(maze, mazeNode);
-    }
-
-    /**
-     * Initialize this view.
-     */
-    private void initializeView() {
-        /*
-         * Generate a 3D representation of the maze.
-         */
-        GridGraph maze = application.getWorld().getMaze();
-        addMaze(maze);
-        /*
-         * Add an avatar to represent the player.
-         */
-        rootNode.attachChild(avatarNode);
-        /*
-         * Add the free items.
-         */
-        World world = application.getWorld();
-        for (Item item : world.getFreeItems().getItems()) {
-            addFreeItem(item);
-        }
-        /*
-         * Add lights and camera.
-         */
-        addLights();
-        addCamera();
     }
 }

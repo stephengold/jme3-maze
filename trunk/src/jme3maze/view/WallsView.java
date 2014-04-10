@@ -33,7 +33,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
 import java.util.logging.Logger;
 import jme3maze.model.GridGraph;
-import jme3maze.model.World;
+import jme3maze.model.WorldState;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
@@ -224,9 +224,9 @@ class WallsView {
         geometry.setMaterial(material);
         MySpatial.setWorldLocation(geometry, lowerLeftCorner);
 
-        Vector3f direction = baseOffset.cross(World.upDirection);
+        Vector3f direction = baseOffset.cross(WorldState.upDirection);
         Quaternion orientation = new Quaternion();
-        orientation.lookAt(direction, World.upDirection);
+        orientation.lookAt(direction, WorldState.upDirection);
         MySpatial.setWorldOrientation(geometry, orientation);
     }
 
@@ -238,17 +238,18 @@ class WallsView {
      * @param fromVertex (not null)
      * @param toVertex (not null)
      */
-    public void addWallsBetween(GridGraph maze, Node parentNode,
+    private void addWallsBetween(GridGraph maze, Node parentNode,
             NavVertex fromVertex, NavVertex toVertex) {
-        Validate.nonNull(parentNode, "node");
-        Validate.nonNull(fromVertex, "from vertex");
-        Validate.nonNull(toVertex, "to vertex");
+        assert maze != null;
+        assert parentNode != null;
+        assert fromVertex != null;
+        assert toVertex != null;
 
         Vector3f fromLocation = fromVertex.getLocation();
         Vector3f toLocation = toVertex.getLocation();
         Vector3f offset = toLocation.subtract(fromLocation);
         Quaternion orientation = new Quaternion();
-        orientation.lookAt(offset, World.upDirection);
+        orientation.lookAt(offset, WorldState.upDirection);
         NavArc arc = fromVertex.findArcTo(toVertex);
         if (arc == null) {
             addClosure(parentNode, fromLocation, orientation);
@@ -267,10 +268,10 @@ class WallsView {
      */
     private void visualize(GridGraph maze, Node parentNode, int row,
             int column) {
-        Validate.nonNull(maze, "maze");
-        Validate.nonNull(parentNode, "node");
-        Validate.nonNegative(row, "row");
-        Validate.nonNegative(column, "column");
+        assert maze != null;
+        assert parentNode != null;
+        assert row >= 0 : row;
+        assert column >= 0 : column;
 
         int gridRows = maze.getRows();
         int gridColumns = maze.getColumns();
@@ -282,7 +283,7 @@ class WallsView {
             NavVertex north = maze.getVertex(row + 1, column);
             addWallsBetween(maze, parentNode, fromVertex, north);
         } else {
-            orientation.lookAt(Vector3f.UNIT_X, World.upDirection);
+            orientation.lookAt(Vector3f.UNIT_X, WorldState.upDirection);
             addClosure(parentNode, vertexLocation, orientation);
         }
 
@@ -290,7 +291,7 @@ class WallsView {
             NavVertex east = maze.getVertex(row, column + 1);
             addWallsBetween(maze, parentNode, fromVertex, east);
         } else {
-            orientation.lookAt(Vector3f.UNIT_Z, World.upDirection);
+            orientation.lookAt(Vector3f.UNIT_Z, WorldState.upDirection);
             addClosure(parentNode, vertexLocation, orientation);
         }
 
@@ -298,7 +299,7 @@ class WallsView {
             NavVertex south = maze.getVertex(row - 1, column);
             addWallsBetween(maze, parentNode, fromVertex, south);
         } else {
-            orientation.lookAt(new Vector3f(-1f, 0f, 0f), World.upDirection);
+            orientation.lookAt(new Vector3f(-1f, 0f, 0f), WorldState.upDirection);
             addClosure(parentNode, vertexLocation, orientation);
         }
 
@@ -306,7 +307,7 @@ class WallsView {
             NavVertex west = maze.getVertex(row, column - 1);
             addWallsBetween(maze, parentNode, fromVertex, west);
         } else {
-            orientation.lookAt(new Vector3f(0f, 0f, -1f), World.upDirection);
+            orientation.lookAt(new Vector3f(0f, 0f, -1f), WorldState.upDirection);
             addClosure(parentNode, vertexLocation, orientation);
         }
     }

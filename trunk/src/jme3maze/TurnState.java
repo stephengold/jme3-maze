@@ -32,13 +32,15 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.model.Player;
+import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
 
 /**
- * Application state to rotate the player's avatars at a constant angular rate
- * until they face a specified direction.
+ * App state to rotate the player at a constant angular rate to a specified
+ * direction.
+ * <p>
+ * Each instance is disabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -59,13 +61,17 @@ class TurnState
     // *************************************************************************
     // fields
     /**
-     * attaching application: set by initialize()
+     * app state for getting player input: set by initialize()
      */
-    private MazeGame application = null;
+    private InputState inputState;
+    /**
+     * app state to manage the player: set by initialize()
+     */
+    private PlayerState playerState;
     /**
      * final direction of turn: set by activate()
      */
-    private Vector3f finalDirection = null;
+    private Vector3f finalDirection;
     // *************************************************************************
     // constructors
 
@@ -111,7 +117,13 @@ class TurnState
         Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
 
-        this.application = (MazeGame) application;
+        inputState = stateManager.getState(InputState.class);
+        playerState = stateManager.getState(PlayerState.class);
+        /*
+         * Activate the "turn" app state.
+         */
+        Vector3f direction = playerState.getArc().getStartDirection();
+        activate(direction);
     }
 
     /**
@@ -125,12 +137,12 @@ class TurnState
         assert isEnabled();
         super.update(elapsedTime);
 
-        Player player = application.getWorld().getPlayer();
-        Vector3f direction = player.getDirection();
+        Vector3f direction = playerState.getDirection();
         float dot = finalDirection.dot(direction);
         if (1f - dot < epsilon) {
-            player.setDirection(finalDirection);
-            goInput();
+            playerState.setDirection(finalDirection);
+            setEnabled(false);
+            inputState.setEnabled(true);
             return;
         }
 
@@ -141,25 +153,12 @@ class TurnState
             axis.normalizeLocal();
         }
         float angle = FastMath.acos(dot); // positive angle
-        float maxTurnAngle = elapsedTime * player.getMaxTurnRate();
+        float maxTurnAngle = elapsedTime * playerState.getMaxTurnRate();
         if (angle > maxTurnAngle) {
             angle = maxTurnAngle;
         }
         assert angle > 0f : angle;
         logger.log(Level.INFO, "turnAngle={0}", angle);
-        player.rotate(angle, axis);
-    }
-    // *************************************************************************
-    // private methods
-
-    /**
-     * The turn is complete; activate the input state.
-     */
-    private void goInput() {
-        setEnabled(false);
-
-        AppStateManager stateManager = application.getStateManager();
-        InputState inputState = stateManager.getState(InputState.class);
-        inputState.setEnabled(true);
+        playerState.rotate(angle, axis);
     }
 }

@@ -26,24 +26,32 @@
 package jme3maze.view;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Box;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.MazeGame;
+import jme3maze.model.FreeItemsState;
 import jme3maze.model.GridGraph;
 import jme3maze.model.Item;
-import jme3maze.model.World;
+import jme3maze.model.PlayerState;
+import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
@@ -54,17 +62,17 @@ import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Application state to update the (inset) map view in the Maze Game.
+ * App state to manager the (inset) map view in the Maze Game.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class MapState
+public class MapViewState
         extends AbstractAppState {
     // *************************************************************************
     // constants
 
     /**
-     * background color for the map
+     * background color for the map; dark red
      */
     final private static ColorRGBA mapBackground =
             new ColorRGBA(0.3f, 0f, 0f, 1f);
@@ -72,7 +80,7 @@ public class MapState
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(MapState.class.getName());
+            Logger.getLogger(MapViewState.class.getName());
     /**
      * asset path to the "sinbad" 3D model asset in jME3-testdata.jar
      */
@@ -84,17 +92,25 @@ public class MapState
     /**
      * local "forward" direction (unit vector)
      */
-    final private static Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
+    final private static Vector3f forwardDirection = Vector3f.UNIT_Z;
     // *************************************************************************
     // fields
+    /**
+     * app state manager: set by initialize()
+     */
+    private AppStateManager stateManager;
+    /**
+     * asset manager: set by initialize()
+     */
+    private AssetManager assetManager;
     /**
      * interval between updates (in seconds, &ge;0)
      */
     private float updateInterval = 0f;
     /**
-     * attaching application: set by initialize()
+     * map free items to their spatials
      */
-    private MazeGame application = null;
+    private Map<Item, Spatial> itemSpatial = new TreeMap<>();
     /**
      * node which represents the player in this view
      */
@@ -102,30 +118,89 @@ public class MapState
     /**
      * root of this view's scene graph
      */
-    final private Node rootNode;
-    // *************************************************************************
-    // constructor
-
+    final private Node rootNode = new Node("map root node");
     /**
-     * Instantiate an enabled view.
-     *
-     * @param rootNode (not null)
+     * attaching application: set by initialize()
      */
-    public MapState(Node rootNode) {
-        assert rootNode != null;
-        this.rootNode = rootNode;
-    }
+    private SimpleApplication application;
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Access the node which represents the player in this view.
+     * Add 3-D representation of a free item to the scene.
      *
-     * @return (not null)
+     * @param item free item to represent (not null)
      */
-    public Node getAvatarNode() {
-        assert avatarNode != null;
-        return avatarNode;
+    public void addFreeItem(Item item) {
+        FreeItemsState freeItemsState =
+                stateManager.getState(FreeItemsState.class);
+        NavVertex vertex = freeItemsState.getVertex(item);
+        Vector3f location = vertex.getLocation();
+        String itemType = item.getTypeName();
+        ColorRGBA color;
+        Material material;
+        switch (itemType) {
+            case "Mapper":
+                /*
+                 * A Mapper is represented by a green cube.
+                 */
+                Mesh mesh = new Box(1f, 1f, 1f);
+                Geometry cube = new Geometry("mapper", mesh);
+                itemSpatial.put(item, cube);
+                rootNode.attachChild(cube);
+                cube.setLocalScale(0.5f);
+                color = new ColorRGBA(0f, 0.05f, 0f, 1f);
+                material = MyAsset.createShinyMaterial(assetManager, color);
+                cube.setMaterial(material);
+
+                location.y += 4f; // floating in the air
+                MySpatial.setWorldLocation(cube, location);
+                break;
+
+            case "McGuffin":
+                /*
+                 * A McGuffin is represented by a gold teapot.
+                 */
+                Spatial spatial = assetManager.loadModel(teapotAssetPath);
+                itemSpatial.put(item, spatial);
+                rootNode.attachChild(spatial);
+                spatial.setLocalScale(8f);
+
+                color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
+                material = MyAsset.createShinyMaterial(assetManager, color);
+                spatial.setMaterial(material);
+                MySpatial.setWorldLocation(spatial, location);
+        }
+    }
+
+    /**
+     * Remove 3-D representation of a free item from the scene.
+     *
+     * @param item free item to remove (not null)
+     */
+    public void removeFreeItem(Item item) {
+        Spatial spatial = itemSpatial.remove(item);
+        spatial.removeFromParent();
+    }
+
+    /**
+     * Alter the location of the player's avatar.
+     *
+     * @param location world coordinates (not null)
+     */
+    public void setPlayerLocation(Vector3f location) {
+        Validate.nonNull(location, "location");
+        MySpatial.setWorldLocation(avatarNode, location);
+    }
+
+    /**
+     * Alter the orientation of the player's avatar.
+     *
+     * @param orientation orientation in world coordinate system (not null)
+     */
+    public void setPlayerOrientation(Quaternion orientation) {
+        Validate.nonNull(orientation, "orientation");
+        MySpatial.setWorldOrientation(avatarNode, orientation);
     }
     // *************************************************************************
     // AbstractAppState methods
@@ -146,7 +221,10 @@ public class MapState
         Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
 
-        this.application = (MazeGame) application;
+        this.application = (SimpleApplication) application;
+        assetManager = application.getAssetManager();
+        this.stateManager = stateManager;
+
         initializeView();
         /*
          * As a debugging aid, dump the scene graph of this view.
@@ -159,10 +237,11 @@ public class MapState
     /**
      * Update this view before each render.
      *
-     * @param renderManager
+     * @param renderManager (not null)
      */
     @Override
     public void render(RenderManager renderManager) {
+        Validate.nonNull(renderManager, "render manager");
         /*
          * Update logical state here where we can be sure all controls
          * have been updated.
@@ -178,6 +257,7 @@ public class MapState
      */
     @Override
     public void update(float elapsedTime) {
+        Validate.nonNegative(elapsedTime, "interval");
         updateInterval = elapsedTime;
     }
     // *************************************************************************
@@ -217,34 +297,6 @@ public class MapState
     }
 
     /**
-     * Add a 3-D representation of a free item to the scene.
-     *
-     * @param item free item to represent (not null)
-     */
-    private void addFreeItem(Item item) {
-        AssetManager assetManager = application.getAssetManager();
-        World world = application.getWorld();
-        NavVertex vertex = world.getFreeItems().getVertex(item);
-        Vector3f location = vertex.getLocation();
-        String itemType = item.getTypeName();
-        switch (itemType) {
-            case "McGuffin":
-                /*
-                 * A McGuffin is represented by a gold teapot.
-                 */
-                Spatial spatial = assetManager.loadModel(teapotAssetPath);
-                rootNode.attachChild(spatial);
-                spatial.setLocalScale(8f);
-
-                ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
-                Material material = MyAsset.createShinyMaterial(assetManager,
-                        color);
-                spatial.setMaterial(material);
-                MySpatial.setWorldLocation(spatial, location);
-        }
-    }
-
-    /**
      * Add ambient light to the scene.
      */
     private void addLight() {
@@ -260,7 +312,6 @@ public class MapState
      * Add 3-D representation of a maze to the scene.
      */
     private void addMaze(GridGraph maze) {
-        AssetManager assetManager = application.getAssetManager();
         ColorRGBA ballColor = ColorRGBA.White;
         Material ballMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, ballColor);
@@ -283,24 +334,33 @@ public class MapState
         /*
          * Generate a 3D representation of the maze.
          */
-        GridGraph maze = application.getWorld().getMaze();
+        WorldState worldState = stateManager.getState(WorldState.class);
+        GridGraph maze = worldState.getMaze();
         addMaze(maze);
         /*
-         * Load the "sinbad" asset and attach it to the scene.
+         * Add avatar to represent the player.
          */
         rootNode.attachChild(avatarNode);
+        PlayerState playerState = stateManager.getState(PlayerState.class);
+        Vector3f location = playerState.getLocation();
+        MySpatial.setWorldLocation(avatarNode, location);
+        Quaternion orientation = playerState.getOrientation();
+        MySpatial.setWorldOrientation(avatarNode, orientation);
+        /*
+         * Load the "sinbad" asset and attach it to the avatar.
+         */
         Logger loaderLogger = Logger.getLogger(
                 "com.jme3.scene.plugins.ogre.MeshLoader");
         loaderLogger.setLevel(Level.SEVERE);
-        AssetManager assetManager = application.getAssetManager();
         Node sinbad = (Node) assetManager.loadModel(sinbadPath);
         avatarNode.attachChild(sinbad);
         sinbad.setLocalScale(2f);
         /*
          * Add the free items.
          */
-        World world = application.getWorld();
-        for (Item item : world.getFreeItems().getItems()) {
+        FreeItemsState freeItemsState =
+                stateManager.getState(FreeItemsState.class);
+        for (Item item : freeItemsState.getAll()) {
             addFreeItem(item);
         }
         /*
