@@ -27,14 +27,12 @@ package jme3maze;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
-import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
+import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
-import jme3maze.model.Item;
 import jme3maze.model.PlayerState;
-import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
@@ -179,36 +177,11 @@ class MoveState
         setEnabled(false);
         playerState.setVertex(destinationVertex);
         /*
-         * Check whether the player has reached a free item.
+         * Encounter any free items at the destination.
          */
         Item[] items = freeItemsState.getItems(destinationVertex);
         for (Item item : items) {
-            String typeName = item.getTypeName();
-            switch (typeName) {
-                case "Mapper":
-                    freeItemsState.remove(item);
-                    AppState mapViewState =
-                            stateManager.getState(MapViewState.class);
-                    if (mapViewState == null) {
-                        mapViewState = new MapViewState();
-                        stateManager.attach(mapViewState);
-                        System.out.printf("You acquired a mapper!%n");
-                    }
-                    break;
-
-                case "McGuffin":
-                    int moveCount = playerState.getMoveCount();
-                    if (moveCount == 1) {
-                        System.out.printf(
-                                "You traversed the maze in one move!%n");
-                    } else {
-                        System.out.printf(
-                                "You traversed the maze in %d moves.%n",
-                                moveCount);
-                    }
-                    application.stop();
-                    return;
-            }
+            item.encounter();
         }
 
         int numArcs = destinationVertex.getNumArcs();

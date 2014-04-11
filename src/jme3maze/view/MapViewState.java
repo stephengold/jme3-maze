@@ -30,26 +30,26 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
+import com.jme3.scene.shape.Quad;
+import com.jme3.texture.Texture;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.GridGraph;
-import jme3maze.model.Item;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
@@ -58,11 +58,14 @@ import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.debug.Printer;
+import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to manager the (inset) map view in the Maze Game.
+ * App state to manage the (inset) map view in the Maze Game.
+ * <p>
+ * Each instance is disabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -72,23 +75,27 @@ public class MapViewState
     // constants
 
     /**
-     * background color for the map; dark red
+     * background color for the map: light gray
      */
     final private static ColorRGBA mapBackground =
-            new ColorRGBA(0.3f, 0f, 0f, 1f);
+            new ColorRGBA(0.6f, 0.6f, 0.6f, 1f);
+    /**
+     * ball radius (world units)
+     */
+    final private static float ballRadius = 3f;
+    /**
+     * stick radius (world units)
+     */
+    final private static float stickRadius = 1f;
     /**
      * message logger for this class
      */
     final private static Logger logger =
             Logger.getLogger(MapViewState.class.getName());
     /**
-     * asset path to the "sinbad" 3D model asset in jME3-testdata.jar
+     * asset path to the "eye" icon asset
      */
-    final private static String sinbadPath = "Models/Sinbad/Sinbad.mesh.xml";
-    /**
-     * asset path to the "teapot" 3D model asset in jME3-testdata.jar
-     */
-    final private static String teapotAssetPath = "Models/Teapot/Teapot.obj";
+    final private static String eyeAssetPath = "Textures/map-icons/eye.png";
     /**
      * local "forward" direction (unit vector)
      */
@@ -110,11 +117,31 @@ public class MapViewState
     /**
      * map free items to their spatials
      */
-    private Map<Item, Spatial> itemSpatial = new TreeMap<>();
+    final private Map<Item, Spatial> itemSpatial = new TreeMap<>();
+    /**
+     * map maze arcs to their spatials
+     */
+    final private Map<NavArc, Spatial> arcSpatial = new TreeMap<>();
+    /**
+     * map maze vertices to their spatials
+     */
+    final private Map<NavVertex, Spatial> vertexSpatial = new TreeMap<>();
+    /**
+     * ball material: set by initialize()
+     */
+    private Material ballMaterial;
+    /**
+     * stick material: set by initialize()
+     */
+    private Material stickMaterial;
     /**
      * node which represents the player in this view
      */
     final private Node avatarNode = new Node("map avatar node");
+    /**
+     * node which represents the maze in this view
+     */
+    final private Node mazeNode = new Node("map maze node");
     /**
      * root of this view's scene graph
      */
@@ -123,64 +150,128 @@ public class MapViewState
      * attaching application: set by initialize()
      */
     private SimpleApplication application;
+    /**
+     * map icon which represents the player
+     */
+    private Spatial eyeIcon;
+    // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate a disabled map view state.
+     */
+    public MapViewState() {
+        setEnabled(false);
+    }
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Add 3-D representation of a free item to the scene.
+     * Visualize a free item in the scene, if it isn't already visualized.
      *
      * @param item free item to represent (not null)
      */
     public void addFreeItem(Item item) {
+        Validate.nonNull(item, "item");
+
+        Spatial spatial = itemSpatial.get(item);
+        if (spatial != null) {
+            return;
+        }
+        spatial = item.visualizeMap();
+
         FreeItemsState freeItemsState =
                 stateManager.getState(FreeItemsState.class);
         NavVertex vertex = freeItemsState.getVertex(item);
         Vector3f location = vertex.getLocation();
-        String itemType = item.getTypeName();
-        ColorRGBA color;
-        Material material;
-        switch (itemType) {
-            case "Mapper":
-                /*
-                 * A Mapper is represented by a green cube.
-                 */
-                Mesh mesh = new Box(1f, 1f, 1f);
-                Geometry cube = new Geometry("mapper", mesh);
-                itemSpatial.put(item, cube);
-                rootNode.attachChild(cube);
-                cube.setLocalScale(0.5f);
-                color = new ColorRGBA(0f, 0.05f, 0f, 1f);
-                material = MyAsset.createShinyMaterial(assetManager, color);
-                cube.setMaterial(material);
+        spatial.move(location);
 
-                location.y += 4f; // floating in the air
-                MySpatial.setWorldLocation(cube, location);
-                break;
+        itemSpatial.put(item, spatial);
+        rootNode.attachChild(spatial);
+    }
 
-            case "McGuffin":
-                /*
-                 * A McGuffin is represented by a gold teapot.
-                 */
-                Spatial spatial = assetManager.loadModel(teapotAssetPath);
-                itemSpatial.put(item, spatial);
-                rootNode.attachChild(spatial);
-                spatial.setLocalScale(8f);
+    /**
+     * Visualize vertices on the specified line of sight, and all arcs from
+     * those vertices.
+     *
+     * @param startVertex (not null)
+     * @param direction (unit vector, not zero)
+     */
+    public void addMazeLineOfSight(NavVertex startVertex, Vector3f direction) {
+        int rowIncrement = 0;
+        int columnIncrement = 0;
+        float absX = Math.abs(direction.x);
+        float absZ = Math.abs(direction.z);
+        if (absX > absZ) {
+            if (direction.x > 0f) {
+                rowIncrement = 1;
+            } else {
+                rowIncrement = -1;
+            }
+        } else {
+            if (direction.z > 0f) {
+                columnIncrement = 1;
+            } else {
+                columnIncrement = -1;
+            }
+        }
 
-                color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
-                material = MyAsset.createShinyMaterial(assetManager, color);
-                spatial.setMaterial(material);
-                MySpatial.setWorldLocation(spatial, location);
+        WorldState worldState = stateManager.getState(WorldState.class);
+        GridGraph maze = worldState.getMaze();
+
+        for (NavVertex vertex = startVertex; vertex != null;) {
+            addMazeVertex(vertex);
+            for (NavArc arc : vertex.getArcs()) {
+                addMazeArc(arc);
+            }
+            vertex = maze.findNextLineOfSight(vertex, rowIncrement,
+                    columnIncrement);
         }
     }
 
     /**
-     * Remove 3-D representation of a free item from the scene.
+     * Load an icon from a texture asset.
+     *
+     * @param textureAssetPath (not null)
+     * @param matchEye true to match rotation of the "eye" icon, otherwise false
+     */
+    public Spatial loadIcon(String textureAssetPath, boolean matchEye) {
+        Texture texture = assetManager.loadTexture(textureAssetPath);
+        Material material =
+                MyAsset.createUnshadedMaterial(assetManager, texture);
+        material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+
+        Node node = new Node("icon node");
+
+        Quad unitSquare = new Quad(1f, 1f);
+        Geometry geometry = new Geometry("icon", unitSquare);
+        node.attachChild(geometry);
+        Quaternion rotation = new Quaternion();
+        rotation.lookAt(Vector3f.UNIT_Y, Vector3f.UNIT_Z);
+        geometry.setLocalRotation(rotation);
+        geometry.setLocalScale(16f);
+        geometry.setLocalTranslation(8f, 3f, -8f);
+        geometry.setMaterial(material);
+        geometry.setQueueBucket(Bucket.Transparent);
+
+        if (matchEye) {
+            IconControl control = new IconControl(eyeIcon);
+            node.addControl(control);
+        }
+
+        return node;
+    }
+
+    /**
+     * Remove a free item's visualization from the scene.
      *
      * @param item free item to remove (not null)
      */
     public void removeFreeItem(Item item) {
         Spatial spatial = itemSpatial.remove(item);
-        spatial.removeFromParent();
+        if (spatial != null) {
+            spatial.removeFromParent();
+        }
     }
 
     /**
@@ -225,7 +316,8 @@ public class MapViewState
         assetManager = application.getAssetManager();
         this.stateManager = stateManager;
 
-        initializeView();
+        initializeMaze();
+        addPlayer();
         /*
          * As a debugging aid, dump the scene graph of this view.
          */
@@ -248,6 +340,20 @@ public class MapViewState
          */
         rootNode.updateLogicalState(updateInterval);
         rootNode.updateGeometricState();
+    }
+
+    /**
+     * Enable or disable this state.
+     *
+     * @param newState true to enable, false to disable
+     */
+    @Override
+    final public void setEnabled(boolean newState) {
+        if (newState && !isEnabled()) {
+            addCamera();
+        }
+
+        super.setEnabled(newState);
     }
 
     /**
@@ -297,48 +403,52 @@ public class MapViewState
     }
 
     /**
-     * Add ambient light to the scene.
+     * Visualize a maze arc to the scene, if it isn't already visualized.
+     *
+     * @param arc (not null)
      */
-    private void addLight() {
-        AmbientLight ambientLight = new AmbientLight();
-        rootNode.addLight(ambientLight);
-        float ambientIntensity = 1f;
-        ColorRGBA ambientColor = ColorRGBA.White.mult(ambientIntensity);
-        ambientLight.setColor(ambientColor);
-        ambientLight.setName("map ambient");
+    private void addMazeArc(NavArc arc) {
+        assert arc != null;
+
+        Spatial spatial = arcSpatial.get(arc);
+        if (spatial != null) {
+            return;
+        }
+        spatial = NavDebug.makeStick(arc, stickRadius, stickMaterial);
+        arcSpatial.put(arc, spatial);
+        mazeNode.attachChild(spatial);
     }
 
     /**
-     * Add 3-D representation of a maze to the scene.
+     * Visualize a maze vertex to the scene, if it isn't already visualized.
+     *
+     * @param vertex (not null)
      */
-    private void addMaze(GridGraph maze) {
-        ColorRGBA ballColor = ColorRGBA.White;
-        Material ballMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, ballColor);
-        ColorRGBA stickColor = ColorRGBA.Blue;
-        Material stickMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, stickColor);
-        Node mapMazeNode = new Node("map maze");
-        rootNode.attachChild(mapMazeNode);
+    private void addMazeVertex(NavVertex vertex) {
+        assert vertex != null;
 
-        float ballRadius = 2f; // world units
-        float stickRadius = 1f; // world units
-        NavDebug.makeBalls(maze, mapMazeNode, ballRadius, ballMaterial);
-        NavDebug.makeSticks(maze, mapMazeNode, stickRadius, stickMaterial);
+        FreeItemsState freeItemsState =
+                stateManager.getState(FreeItemsState.class);
+        Item[] items = freeItemsState.getItems(vertex);
+        for (Item item : items) {
+            addFreeItem(item);
+        }
+
+        Spatial spatial = vertexSpatial.get(vertex);
+        if (spatial != null) {
+            return;
+        }
+        spatial = NavDebug.makeBall(vertex, ballRadius, ballMaterial);
+        vertexSpatial.put(vertex, spatial);
+        mazeNode.attachChild(spatial);
     }
 
     /**
-     * Initialize this view.
+     * Visualize the player.
      */
-    private void initializeView() {
+    private void addPlayer() {
         /*
-         * Generate a 3D representation of the maze.
-         */
-        WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph maze = worldState.getMaze();
-        addMaze(maze);
-        /*
-         * Add avatar to represent the player.
+         * Add avatar node.
          */
         rootNode.attachChild(avatarNode);
         PlayerState playerState = stateManager.getState(PlayerState.class);
@@ -347,26 +457,21 @@ public class MapViewState
         Quaternion orientation = playerState.getOrientation();
         MySpatial.setWorldOrientation(avatarNode, orientation);
         /*
-         * Load the "sinbad" asset and attach it to the avatar.
+         * Load the "eye" icon and attach it to the avatar.
          */
-        Logger loaderLogger = Logger.getLogger(
-                "com.jme3.scene.plugins.ogre.MeshLoader");
-        loaderLogger.setLevel(Level.SEVERE);
-        Node sinbad = (Node) assetManager.loadModel(sinbadPath);
-        avatarNode.attachChild(sinbad);
-        sinbad.setLocalScale(2f);
-        /*
-         * Add the free items.
-         */
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
-        for (Item item : freeItemsState.getAll()) {
-            addFreeItem(item);
-        }
-        /*
-         * Add light and camera.
-         */
-        addLight();
-        addCamera();
+        eyeIcon = loadIcon(eyeAssetPath, false);
+        avatarNode.attachChild(eyeIcon);
+    }
+
+    /**
+     * Initialize maze materials and maze node.
+     */
+    private void initializeMaze() {
+        ColorRGBA ballColor = ColorRGBA.Yellow;
+        ballMaterial = MyAsset.createUnshadedMaterial(assetManager, ballColor);
+        ColorRGBA stickColor = ColorRGBA.Blue;
+        stickMaterial =
+                MyAsset.createUnshadedMaterial(assetManager, stickColor);
+        rootNode.attachChild(mazeNode);
     }
 }

@@ -36,24 +36,19 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.GridGraph;
-import jme3maze.model.Item;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MySpatial;
-import jme3utilities.MyString;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.controls.LightControl;
@@ -62,6 +57,8 @@ import jme3utilities.navigation.NavVertex;
 
 /**
  * App state to manage the (1st-person) main view in the Maze Game.
+ * <p>
+ * Each instance is enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -80,10 +77,6 @@ public class MainViewState
      */
     final private static String pondAssetPath =
             "Textures/Terrain/Pond/Pond.jpg";
-    /**
-     * asset path to the "teapot" 3D model asset in jME3-testdata.jar
-     */
-    final private static String teapotAssetPath = "Models/Teapot/Teapot.obj";
     /**
      * asset path to the "wall" texture asset in jME3-testdata.jar
      */
@@ -128,53 +121,15 @@ public class MainViewState
      * @param item free item to represent (not null)
      */
     public void addFreeItem(Item item) {
+        Spatial spatial = item.visualizeMain();
         FreeItemsState freeItemsState =
                 stateManager.getState(FreeItemsState.class);
         NavVertex vertex = freeItemsState.getVertex(item);
         Vector3f location = vertex.getLocation();
-        String itemType = item.getTypeName();
-        Material material;
-        ColorRGBA color;
-        switch (itemType) {
-            case "Mapper":
-                /*
-                 * A Mapper is represented by a green cube.
-                 */
-                Mesh mesh = new Box(1f, 1f, 1f);
-                Geometry cube = new Geometry("mapper", mesh);
-                itemSpatial.put(item, cube);
-                rootNode.attachChild(cube);
-                cube.setLocalScale(0.5f);
-                color = new ColorRGBA(0f, 0.05f, 0f, 1f);
-                material = MyAsset.createShinyMaterial(assetManager, color);
-                cube.setMaterial(material);
+        spatial.move(location);
 
-                location.y += 4f; // floating in the air
-                MySpatial.setWorldLocation(cube, location);
-                break;
-
-            case "McGuffin":
-                /*
-                 * A McGuffin is represented by a gold teapot.
-                 */
-                Spatial spatial = assetManager.loadModel(teapotAssetPath);
-                itemSpatial.put(item, spatial);
-                rootNode.attachChild(spatial);
-                spatial.setLocalScale(2f);
-
-                color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
-                material = MyAsset.createShinyMaterial(assetManager, color);
-                spatial.setMaterial(material);
-
-                location.y += 4f; // floating in the air
-                MySpatial.setWorldLocation(spatial, location);
-                break;
-
-            default:
-                logger.log(Level.WARNING,
-                        "ignored free item with unknown type {0}",
-                        MyString.quote(itemType));
-        }
+        itemSpatial.put(item, spatial);
+        rootNode.attachChild(spatial);
     }
 
     /**
@@ -183,6 +138,7 @@ public class MainViewState
      * @param item free item to remove (not null)
      */
     public void removeFreeItem(Item item) {
+        Validate.nonNull(item, "item");
         Spatial spatial = itemSpatial.remove(item);
         spatial.removeFromParent();
     }

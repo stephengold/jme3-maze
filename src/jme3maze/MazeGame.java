@@ -33,6 +33,7 @@ import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
+import jme3maze.view.MapViewState;
 import jme3utilities.Misc;
 
 /**
@@ -100,10 +101,11 @@ public class MazeGame
         FreeItemsState freeItemsState = new FreeItemsState();
         stateManager.attachAll(worldState, playerState, freeItemsState);
         /*
-         * Attach main view app state to the application.
+         * Attach view app states to the application.
          */
         MainViewState mainViewState = new MainViewState();
-        stateManager.attach(mainViewState);
+        MapViewState mapViewState = new MapViewState();
+        stateManager.attachAll(mainViewState, mapViewState);
         /*
          * Attach controller app states to the application.
          */

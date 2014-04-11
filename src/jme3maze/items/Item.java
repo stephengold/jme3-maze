@@ -23,12 +23,16 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze.model;
+package jme3maze.items;
 
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3utilities.MyString;
 
 /**
- * A collectible item. Each item has a named type.
+ * Collectible item in the Maze Game. Each item has a named type.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -44,7 +48,7 @@ public class Item
     // *************************************************************************
     // fields
     /**
-     * name of this item's type
+     * name of this item's type: set by constructor
      */
     private String typeName;
     // *************************************************************************
@@ -65,6 +69,14 @@ public class Item
     // new methods exposed
 
     /**
+     * Encounter this item free in the world.
+     */
+    public void encounter() {
+        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
+                MyString.quote(typeName));
+    }
+
+    /**
      * Read the type name of this item.
      *
      * @return (not null, not empty)
@@ -74,6 +86,42 @@ public class Item
         assert typeName.length() > 0 : typeName;
 
         return typeName;
+    }
+
+    /**
+     * Visualize this item in the inventory view.
+     *
+     * @return new unparented instance
+     */
+    public Spatial visualizeInventory() {
+        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
+                MyString.quote(typeName));
+        Node result = new Node();
+        return result;
+    }
+
+    /**
+     * Visualize this item in the main view.
+     *
+     * @return new unparented instance
+     */
+    public Spatial visualizeMain() {
+        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
+                MyString.quote(typeName));
+        Node result = new Node();
+        return result;
+    }
+
+    /**
+     * Visualize this item in the map view.
+     *
+     * @return new unparented instance
+     */
+    public Spatial visualizeMap() {
+        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
+                MyString.quote(typeName));
+        Node result = new Node();
+        return result;
     }
     // *************************************************************************
     // Comparable methods
