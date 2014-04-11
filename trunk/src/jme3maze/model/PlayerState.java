@@ -33,6 +33,7 @@ import com.jme3.math.Vector3f;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Logger;
+import jme3maze.items.Item;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
@@ -221,6 +222,12 @@ public class PlayerState
 
         Vector3f startDirection = arc.getStartDirection();
         setDirection(startDirection);
+
+        MapViewState mapViewState = stateManager.getState(MapViewState.class);
+        if (mapViewState.isEnabled()) {
+            mapViewState.addMazeLineOfSight(vertex, direction);
+        }
+
     }
 
     /**
@@ -244,7 +251,7 @@ public class PlayerState
                 stateManager.getState(MainViewState.class);
         mainViewState.setPlayerOrientation(orientation);
         MapViewState mapViewState = stateManager.getState(MapViewState.class);
-        if (mapViewState != null) {
+        if (mapViewState.isEnabled()) {
             mapViewState.setPlayerOrientation(orientation);
         }
     }
@@ -264,7 +271,7 @@ public class PlayerState
                 stateManager.getState(MainViewState.class);
         mainViewState.setPlayerLocation(location);
         MapViewState mapViewState = stateManager.getState(MapViewState.class);
-        if (mapViewState != null) {
+        if (mapViewState.isEnabled()) {
             mapViewState.setPlayerLocation(location);
         }
     }
@@ -299,6 +306,12 @@ public class PlayerState
         if (vertex != null) {
             Vector3f newLocation = vertex.getLocation();
             setLocation(newLocation);
+
+            MapViewState mapViewState =
+                    stateManager.getState(MapViewState.class);
+            if (mapViewState.isEnabled()) {
+                mapViewState.addMazeLineOfSight(vertex, direction);
+            }
         }
     }
     // *************************************************************************

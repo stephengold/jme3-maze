@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
+import jme3utilities.navigation.NavArc;
+import jme3utilities.navigation.NavVertex;
 
 /**
  * App state to rotate the player at a constant angular rate to a specified
@@ -140,9 +142,7 @@ class TurnState
         Vector3f direction = playerState.getDirection();
         float dot = finalDirection.dot(direction);
         if (1f - dot < epsilon) {
-            playerState.setDirection(finalDirection);
-            setEnabled(false);
-            inputState.setEnabled(true);
+            turnComplete();
             return;
         }
 
@@ -160,5 +160,25 @@ class TurnState
         assert angle > 0f : angle;
         logger.log(Level.INFO, "turnAngle={0}", angle);
         playerState.rotate(angle, axis);
+    }
+    // *************************************************************************
+    // private methods
+
+    /**
+     * The current turn is complete.
+     */
+    private void turnComplete() {
+        setEnabled(false);
+
+        NavVertex vertex = playerState.getVertex();
+        NavArc arc = vertex.findLeastTurn(finalDirection);
+        Vector3f arcDirection = arc.getStartDirection();
+        float dot = finalDirection.dot(arcDirection);
+        if (1f - dot < epsilon) {
+            playerState.setArc(arc);
+        } else {
+            playerState.setDirection(finalDirection);
+        }
+        inputState.setEnabled(true);
     }
 }

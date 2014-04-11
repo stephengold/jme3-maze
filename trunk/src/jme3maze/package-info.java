@@ -25,6 +25,6 @@
  */
 /**
  * Maze Game built on jMonkeyEngine3: a single player explores a maze in search
- * of The McGuffin, collecting items and gaining abilities along the way.
+ * of the crown, collecting items and gaining abilities along the way.
  */
 package jme3maze;

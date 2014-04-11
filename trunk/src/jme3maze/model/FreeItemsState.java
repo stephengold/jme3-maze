@@ -34,6 +34,10 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import jme3maze.items.Crown;
+import jme3maze.items.Item;
+import jme3maze.items.Mapmaker;
+import jme3maze.items.Torch;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
@@ -102,10 +106,6 @@ public class FreeItemsState
                 stateManager.getState(MainViewState.class);
         if (mainViewState != null && mainViewState.isInitialized()) {
             mainViewState.addFreeItem(item);
-        }
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
-        if (mapViewState != null && mapViewState.isInitialized()) {
-            mapViewState.addFreeItem(item);
         }
     }
 
@@ -184,9 +184,7 @@ public class FreeItemsState
         MainViewState mainState = stateManager.getState(MainViewState.class);
         mainState.removeFreeItem(item);
         MapViewState mapState = stateManager.getState(MapViewState.class);
-        if (mapState != null) {
-            mapState.removeFreeItem(item);
-        }
+        mapState.removeFreeItem(item);
     }
     // *************************************************************************
     // AbstractAppState methods
@@ -209,7 +207,7 @@ public class FreeItemsState
 
         this.stateManager = stateManager;
         /*
-         * Place the McGuffin (game-ending goal) at the vertex
+         * Place the crown (game-ending goal) at the vertex
          * furthest from the starting point.
          */
         PlayerState playerState = stateManager.getState(PlayerState.class);
@@ -217,18 +215,30 @@ public class FreeItemsState
         WorldState worldState = stateManager.getState(WorldState.class);
         GridGraph maze = worldState.getMaze();
         NavVertex goalVertex = maze.findFurthest(startVertex);
-        Item mcGuffin = new Item("McGuffin");
-        add(mcGuffin, goalVertex);
+        Crown crown = new Crown(application);
+        add(crown, goalVertex);
         /*
-         * Place the Mapper item at a random vertex one hop
-         * from the starting point.
+         * Place the torch item at a random vertex one hop from the
+         * starting point.
          */
         List<NavVertex> options = maze.findByHops(1, startVertex);
+        options.remove(goalVertex);
         Random generator = worldState.getGenerator();
-        NavVertex mapperVertex = (NavVertex) Noise.pick(options, generator);
-        if (mapperVertex != null) {
-            Item mapper = new Item("Mapper");
-            add(mapper, mapperVertex);
+        NavVertex torchVertex = (NavVertex) Noise.pick(options, generator);
+        if (torchVertex != null) {
+            Torch torch = new Torch(application);
+            add(torch, torchVertex);
+        }
+        /*
+         * Place the mapmaker item at a random vertex exactly three hops
+         * from the starting point.
+         */
+        options = maze.findByHops(3, startVertex);
+        options.remove(goalVertex);
+        NavVertex mapmakerVertex = (NavVertex) Noise.pick(options, generator);
+        if (mapmakerVertex != null) {
+            Mapmaker mapmaker = new Mapmaker(application);
+            add(mapmaker, mapmakerVertex);
         }
     }
 }
