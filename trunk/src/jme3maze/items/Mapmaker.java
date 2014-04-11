@@ -127,7 +127,7 @@ public class Mapmaker
         Vector3f offset = new Vector3f(0f, 4f, 0f); // floating in the air
         cube.setLocalTranslation(offset);
 
-        ColorRGBA color = new ColorRGBA(0f, 0.05f, 0f, 1f);
+        ColorRGBA color = new ColorRGBA(0f, 0.5f, 0f, 1f);
         AssetManager assetManager = application.getAssetManager();
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         cube.setMaterial(material);

@@ -37,8 +37,11 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.texture.Texture;
 import java.util.Map;
 import java.util.TreeMap;
@@ -179,7 +182,7 @@ public class MainViewState
      * Attach the light source to the avatar using a LightControl.
      */
     public void takeTorch() {
-        Vector3f localOffset = new Vector3f(0f, 6f, -8f);
+        Vector3f localOffset = new Vector3f(0f, 6f, -2f);
         LightControl lightControl =
                 new LightControl(torch, localOffset, forwardDirection);
         avatarNode.addControl(lightControl);
@@ -208,6 +211,7 @@ public class MainViewState
 
         assetManager = application.getAssetManager();
         rootNode = this.application.getRootNode();
+        rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
          * Generate a 3D representation of the maze.
          */
@@ -266,23 +270,31 @@ public class MainViewState
     }
 
     /**
-     * Add a point light source to represent a torch.
+     * Add the point light source (with shadows) to represent a torch.
      */
     private void addLight() {
         rootNode.addLight(torch);
-        float pointIntensity = 10f;
-        ColorRGBA pointColor = ColorRGBA.White.mult(pointIntensity);
+        
+        float lightIntensity = 1f;
+        ColorRGBA pointColor = ColorRGBA.White.mult(lightIntensity);
         torch.setColor(pointColor);
         torch.setName("torch");
         float attenuationRadius = 1000f; // world units
         torch.setRadius(attenuationRadius);
+        
+        int shadowMapSize = 4096; // pixels
+        PointLightShadowRenderer plsr = 
+                new PointLightShadowRenderer(assetManager, shadowMapSize);
+        plsr.setLight(torch);
+        ViewPort viewPort = application.getViewPort();
+        viewPort.addProcessor(plsr);
     }
 
     /**
      * Add 3-D representation of a maze to the scene.
      */
     private void addMaze(GridGraph maze) {
-        ColorRGBA ceilingColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+        ColorRGBA ceilingColor = new ColorRGBA(1f, 1f, 1f, 1f);
         Material ceilingMaterial =
                 MyAsset.createShinyMaterial(assetManager, ceilingColor);
 
@@ -291,14 +303,14 @@ public class MainViewState
         Material floorMaterial =
                 MyAsset.createShadedMaterial(assetManager, floorTexture);
         floorMaterial.setBoolean("UseMaterialColors", true);
-        ColorRGBA floorColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+        ColorRGBA floorColor = new ColorRGBA(1f, 1f, 1f, 1f);
         floorMaterial.setColor("Diffuse", floorColor);
 
         Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
         Material wallMaterial =
                 MyAsset.createShadedMaterial(assetManager, wallTexture);
         wallMaterial.setBoolean("UseMaterialColors", true);
-        ColorRGBA wallColor = new ColorRGBA(0.1f, 0.1f, 0.1f, 1f);
+        ColorRGBA wallColor = new ColorRGBA(1f, 1f, 1f, 1f);
         wallMaterial.setColor("Diffuse", wallColor);
 
         Node mazeNode = new Node("main maze");

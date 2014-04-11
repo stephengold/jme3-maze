@@ -125,7 +125,7 @@ public class Torch
         Spatial spatial = assetManager.loadModel(modelAssetPath);
         node.attachChild(spatial);
         spatial.setLocalScale(0.2f);
-        ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
+        ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
         /*
@@ -141,10 +141,10 @@ public class Torch
         MainViewState mainViewState =
                 stateManager.getState(MainViewState.class);
         Light torch = mainViewState.getLight();
-        Vector3f localOffset = new Vector3f(0f, 0f, 0f);
-        Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
+        Vector3f lightOffset = new Vector3f(0f, 2f, 0f);
+        Vector3f lightDirection = new Vector3f(0f, 0f, 1f);
         LightControl lightControl =
-                new LightControl(torch, localOffset, forwardDirection);
+                new LightControl(torch, lightOffset, lightDirection);
         node.addControl(lightControl);
 
         return node;
