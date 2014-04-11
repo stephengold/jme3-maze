@@ -124,7 +124,6 @@ public class Torch
         AssetManager assetManager = application.getAssetManager();
         Spatial spatial = assetManager.loadModel(modelAssetPath);
         node.attachChild(spatial);
-        spatial.setLocalScale(0.2f);
         ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
