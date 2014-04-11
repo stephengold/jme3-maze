@@ -28,16 +28,24 @@ package jme3maze.items;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
+import com.jme3.effect.influencers.ParticleInfluencer;
+import com.jme3.light.Light;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.texture.Texture;
 import java.util.logging.Logger;
 import jme3maze.model.FreeItemsState;
-import jme3maze.model.PlayerState;
+import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.MyAsset;
 import jme3utilities.Validate;
+import jme3utilities.controls.LightControl;
 
 /**
  * Torch item in the Maze Game. Provides illumination.
@@ -94,7 +102,9 @@ public class Torch
                 stateManager.getState(FreeItemsState.class);
         freeItemsState.remove(this);
 
-        PlayerState playerState = stateManager.getState(PlayerState.class);
+        MainViewState mainViewState =
+                stateManager.getState(MainViewState.class);
+        mainViewState.takeTorch();
 
         System.out.printf("You acquired a %s!%n", getTypeName());
     }
@@ -106,19 +116,38 @@ public class Torch
      */
     @Override
     public Spatial visualizeMain() {
+        Node node = new Node("torch node");
+        node.setLocalTranslation(0f, 4f, 0f); // floating in midair
+        /*
+         * Attach the torch model to the node.
+         */
         AssetManager assetManager = application.getAssetManager();
         Spatial spatial = assetManager.loadModel(modelAssetPath);
-
+        node.attachChild(spatial);
         spatial.setLocalScale(0.2f);
-
-        Vector3f offset = new Vector3f(0f, 6f, 0f); // floating in the air
-        spatial.setLocalTranslation(offset);
-
         ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
+        /*
+         * Attach an emitter to the node.
+         */
+        ParticleEmitter emitter = createEmitter();
+        emitter.setLocalTranslation(0f, 1f, 0f);
+        node.attachChild(emitter);
+        /*
+         * Attach the light source to the node using a LightControl.
+         */
+        AppStateManager stateManager = application.getStateManager();
+        MainViewState mainViewState =
+                stateManager.getState(MainViewState.class);
+        Light torch = mainViewState.getLight();
+        Vector3f localOffset = new Vector3f(0f, 0f, 0f);
+        Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
+        LightControl lightControl =
+                new LightControl(torch, localOffset, forwardDirection);
+        node.addControl(lightControl);
 
-        return spatial;
+        return node;
     }
 
     /**
@@ -133,5 +162,55 @@ public class Torch
         Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
 
         return icon;
+    }
+    // *************************************************************************
+    // private methods
+
+    /**
+     * Create the emitter for the flame of this torch.
+     */
+    private ParticleEmitter createEmitter() {
+        /*
+         * Create material for particles.
+         */
+        AssetManager assetManager = application.getAssetManager();
+        String texturePath = "Effects/Explosion/flame.png";
+        Texture texture = MyAsset.loadTexture(assetManager, texturePath);
+        Material material =
+                MyAsset.createParticleMaterial(assetManager, texture);
+        /*
+         * Create the emitter.
+         */
+        ParticleMesh.Type meshType = ParticleMesh.Type.Triangle;
+        int maxParticleCount = 25;
+        ParticleEmitter emitter = new ParticleEmitter("torch emitter",
+                meshType, maxParticleCount);
+        /*
+         * Configure the emitter.
+         */
+        ColorRGBA particleEndColor = ColorRGBA.Red;
+        emitter.setEndColor(particleEndColor);
+        float particleMaxLife = 1f; // seconds
+        emitter.setHighLife(particleMaxLife);
+        emitter.setImagesX(2);
+        emitter.setImagesY(2); // 2x2 texture animation
+        emitter.setInWorldSpace(true);
+        float particleMinLife = 0.5f; // seconds
+        emitter.setLowLife(particleMinLife);
+        emitter.setMaterial(material);
+        emitter.setSelectRandomImage(true);
+        emitter.setShadowMode(RenderQueue.ShadowMode.Off);
+        ColorRGBA particleStartColor = new ColorRGBA(1f, 0.9f, 0.3f, 0.3f);
+        emitter.setStartColor(particleStartColor);
+        /*
+         * Configure the influencer.
+         */
+        ParticleInfluencer influencer = emitter.getParticleInfluencer();
+        Vector3f initialVelocity = new Vector3f(0f, 3f, 0f);
+        influencer.setInitialVelocity(initialVelocity);
+        float percentRandom = 40f;
+        influencer.setVelocityVariation(percentRandom / 100f);
+
+        return emitter;
     }
 }

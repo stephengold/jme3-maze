@@ -30,6 +30,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -109,6 +110,10 @@ public class MainViewState
      */
     final private Node avatarNode = new Node("main avatar node");
     /**
+     * point light source for this view
+     */
+    final private PointLight torch = new PointLight();
+    /**
      * attaching application: set by initialize()
      */
     private SimpleApplication application;
@@ -130,6 +135,13 @@ public class MainViewState
 
         itemSpatial.put(item, spatial);
         rootNode.attachChild(spatial);
+    }
+
+    /**
+     * Access the scene's light source.
+     */
+    public Light getLight() {
+        return torch;
     }
 
     /**
@@ -161,6 +173,16 @@ public class MainViewState
     public void setPlayerOrientation(Quaternion orientation) {
         Validate.nonNull(orientation, "orientation");
         MySpatial.setWorldOrientation(avatarNode, orientation);
+    }
+
+    /**
+     * Attach the light source to the avatar using a LightControl.
+     */
+    public void takeTorch() {
+        Vector3f localOffset = new Vector3f(0f, 6f, -8f);
+        LightControl lightControl =
+                new LightControl(torch, localOffset, forwardDirection);
+        avatarNode.addControl(lightControl);
     }
     // *************************************************************************
     // AbstractAppState methods
@@ -212,7 +234,7 @@ public class MainViewState
         /*
          * Add lights and camera.
          */
-        addLights();
+        addLight();
         addCamera();
         /*
          * As a debugging aid, dump the scene graph of this view.
@@ -244,13 +266,9 @@ public class MainViewState
     }
 
     /**
-     * Add light sources to the scene.
+     * Add a point light source to represent a torch.
      */
-    private void addLights() {
-        /*
-         * Create a point light source to represent the player's torch.
-         */
-        PointLight torch = new PointLight();
+    private void addLight() {
         rootNode.addLight(torch);
         float pointIntensity = 10f;
         ColorRGBA pointColor = ColorRGBA.White.mult(pointIntensity);
@@ -258,13 +276,6 @@ public class MainViewState
         torch.setName("torch");
         float attenuationRadius = 1000f; // world units
         torch.setRadius(attenuationRadius);
-        /*
-         * Attach the light source to the avatar using a LightControl.
-         */
-        Vector3f localOffset = new Vector3f(0f, 6f, -8f);
-        LightControl lightControl =
-                new LightControl(torch, localOffset, forwardDirection);
-        avatarNode.addControl(lightControl);
     }
 
     /**
