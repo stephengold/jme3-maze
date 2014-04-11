@@ -225,8 +225,7 @@ class WallsView {
         MySpatial.setWorldLocation(geometry, lowerLeftCorner);
 
         Vector3f direction = baseOffset.cross(WorldState.upDirection);
-        Quaternion orientation = new Quaternion();
-        orientation.lookAt(direction, WorldState.upDirection);
+        Quaternion orientation = WorldState.toOrientation(direction);
         MySpatial.setWorldOrientation(geometry, orientation);
     }
 
@@ -248,8 +247,7 @@ class WallsView {
         Vector3f fromLocation = fromVertex.getLocation();
         Vector3f toLocation = toVertex.getLocation();
         Vector3f offset = toLocation.subtract(fromLocation);
-        Quaternion orientation = new Quaternion();
-        orientation.lookAt(offset, WorldState.upDirection);
+        Quaternion orientation = WorldState.toOrientation(offset);
         NavArc arc = fromVertex.findArcTo(toVertex);
         if (arc == null) {
             addClosure(parentNode, fromLocation, orientation);
@@ -277,13 +275,12 @@ class WallsView {
         int gridColumns = maze.getColumns();
         NavVertex fromVertex = maze.getVertex(row, column);
         Vector3f vertexLocation = fromVertex.getLocation();
-        Quaternion orientation = new Quaternion();
 
         if (row + 1 < gridRows) {
             NavVertex north = maze.getVertex(row + 1, column);
             addWallsBetween(maze, parentNode, fromVertex, north);
         } else {
-            orientation.lookAt(Vector3f.UNIT_X, WorldState.upDirection);
+            Quaternion orientation = WorldState.toOrientation(Vector3f.UNIT_X);
             addClosure(parentNode, vertexLocation, orientation);
         }
 
@@ -291,7 +288,7 @@ class WallsView {
             NavVertex east = maze.getVertex(row, column + 1);
             addWallsBetween(maze, parentNode, fromVertex, east);
         } else {
-            orientation.lookAt(Vector3f.UNIT_Z, WorldState.upDirection);
+            Quaternion orientation = WorldState.toOrientation(Vector3f.UNIT_Z);
             addClosure(parentNode, vertexLocation, orientation);
         }
 
@@ -299,7 +296,8 @@ class WallsView {
             NavVertex south = maze.getVertex(row - 1, column);
             addWallsBetween(maze, parentNode, fromVertex, south);
         } else {
-            orientation.lookAt(new Vector3f(-1f, 0f, 0f), WorldState.upDirection);
+            Quaternion orientation =
+                    WorldState.toOrientation(new Vector3f(-1f, 0f, 0f));
             addClosure(parentNode, vertexLocation, orientation);
         }
 
@@ -307,7 +305,8 @@ class WallsView {
             NavVertex west = maze.getVertex(row, column - 1);
             addWallsBetween(maze, parentNode, fromVertex, west);
         } else {
-            orientation.lookAt(new Vector3f(0f, 0f, -1f), WorldState.upDirection);
+            Quaternion orientation =
+                    WorldState.toOrientation(new Vector3f(0f, 0f, -1f));
             addClosure(parentNode, vertexLocation, orientation);
         }
     }

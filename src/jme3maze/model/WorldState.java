@@ -28,6 +28,7 @@ package jme3maze.model;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -105,6 +106,20 @@ public class WorldState
     public GridGraph getMaze() {
         assert maze != null;
         return maze;
+    }
+
+    /**
+     * Convert the specified direction to a quaternion.
+     *
+     * @param direction (not null, not zero)
+     * @return new instance
+     */
+    public static Quaternion toOrientation(Vector3f direction) {
+        Validate.nonNull(direction, "direction");
+
+        Quaternion result = new Quaternion();
+        result.lookAt(direction, upDirection);
+        return result;
     }
     // *************************************************************************
     // AbstractAppState methods
