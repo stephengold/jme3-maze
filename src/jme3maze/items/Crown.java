@@ -120,7 +120,7 @@ public class Crown
         Vector3f offset = new Vector3f(0f, 4f, 0f); // floating in the air
         spatial.setLocalTranslation(offset);
 
-        ColorRGBA color = new ColorRGBA(0.09f, 0.08f, 0.05f, 1f);
+        ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
 
