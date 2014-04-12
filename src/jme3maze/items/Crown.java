@@ -31,12 +31,14 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.logging.Logger;
 import jme3maze.model.PlayerState;
 import jme3maze.view.MapViewState;
 import jme3utilities.MyAsset;
 import jme3utilities.Validate;
+import jme3utilities.controls.RotationControl;
 
 /**
  * Crown item in the Maze Game. Ends the game.
@@ -58,9 +60,9 @@ public class Crown
      */
     final private static String iconAssetPath = "Textures/map-icons/crown.png";
     /**
-     * asset path to the "teapot" 3D model asset in jME3-testdata.jar
+     * asset path to the "crown" 3D model asset
      */
-    final private static String teapotAssetPath = "Models/Teapot/Teapot.obj";
+    final private static String modelAssetPath = "Models/items/crown/crown.j3o";
     // *************************************************************************
     // fields
     /**
@@ -113,18 +115,29 @@ public class Crown
          * A crown is represented by a gold teapot.
          */
         AssetManager assetManager = application.getAssetManager();
-        Spatial spatial = assetManager.loadModel(teapotAssetPath);
+        Node node = (Node) assetManager.loadModel(modelAssetPath);
 
-        spatial.setLocalScale(2f);
+        Vector3f offset = new Vector3f(0f, 5f, 0f); // floating in the air
+        node.setLocalTranslation(offset);
 
-        Vector3f offset = new Vector3f(0f, 4f, 0f); // floating in the air
-        spatial.setLocalTranslation(offset);
+        ColorRGBA hedjetColor = ColorRGBA.White;
+        Material hedjetMaterial =
+                MyAsset.createShinyMaterial(assetManager, hedjetColor);
+        Spatial hedjet = node.getChild("Hedjet");
+        hedjet.setMaterial(hedjetMaterial);
 
-        ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
-        Material material = MyAsset.createShinyMaterial(assetManager, color);
-        spatial.setMaterial(material);
+        ColorRGBA deshretColor = ColorRGBA.Red;
+        Material deshretMaterial =
+                MyAsset.createShinyMaterial(assetManager, deshretColor);
+        Spatial deshret = node.getChild("Deshret");
+        deshret.setMaterial(deshretMaterial);
 
-        return spatial;
+        Vector3f axis = Vector3f.UNIT_Y;
+        float rate = 0.5f; // radians per second
+        RotationControl rotationControl = new RotationControl(rate, axis);
+        node.addControl(rotationControl);
+
+        return node;
     }
 
     /**
