@@ -84,26 +84,26 @@ class FloorView {
     // new methods exposed
 
     /**
-     * Visualize the floor of the specified maze at the specified location in
-     * the scene.
+     * Visualize the floor of the specified maze level at the specified location
+     * in the scene.
      *
-     * @param maze maze to visualize (not null)
+     * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      */
-    public void visualize(GridGraph maze, Node parentNode) {
-        Validate.nonNull(maze, "maze");
+    public void visualize(GridGraph level, Node parentNode) {
+        Validate.nonNull(level, "level");
         Validate.nonNull(parentNode, "node");
 
-        int gridRows = maze.getRows();
-        int gridColumns = maze.getColumns();
-        float vertexSpacing = maze.getVertexSpacing();
+        int gridRows = level.getRows();
+        int gridColumns = level.getColumns();
+        float vertexSpacing = level.getVertexSpacing();
         for (int row = 0; row < gridRows; row++) {
             float x = vertexSpacing * (row - 0.5f);
             for (int column = 0; column < gridColumns; column++) {
                 float z = vertexSpacing * (column + 0.5f);
                 Vector3f location = new Vector3f(x, floorY, z);
                 String description = String.format("floor%d,%d", row, column);
-                addTile(maze, parentNode, location, description);
+                addTile(level, parentNode, location, description);
             }
         }
     }
@@ -113,18 +113,19 @@ class FloorView {
     /**
      * Add a square floor tile to a scene.
      *
+     * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param location world coordinates of tile's main corner (not null)
      * @param description name for the geometry (not null)
      */
-    private void addTile(GridGraph maze, Node parentNode, Vector3f location,
+    private void addTile(GridGraph level, Node parentNode, Vector3f location,
             String description) {
         assert location != null;
         assert description != null;
 
         Geometry geometry = new Geometry(description, unitSquare);
         parentNode.attachChild(geometry);
-        float vertexSpacing = maze.getVertexSpacing();
+        float vertexSpacing = level.getVertexSpacing();
         geometry.setLocalScale(vertexSpacing, vertexSpacing, 1f);
         geometry.setMaterial(material);
         MySpatial.setWorldLocation(geometry, location);

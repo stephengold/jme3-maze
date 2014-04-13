@@ -101,21 +101,21 @@ class WallsView {
     // new methods exposed
 
     /**
-     * Visualize the walls of the specified maze at the specified location in
-     * the scene.
+     * Visualize the walls of the specified maze level at the specified location
+     * in the scene.
      *
-     * @param maze maze to visualize (not null)
+     * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      */
-    public void visualize(GridGraph maze, Node parentNode) {
-        Validate.nonNull(maze, "maze");
+    public void visualize(GridGraph level, Node parentNode) {
+        Validate.nonNull(level, "level");
         Validate.nonNull(parentNode, "node");
 
-        int gridRows = maze.getRows();
-        int gridColumns = maze.getColumns();
+        int gridRows = level.getRows();
+        int gridColumns = level.getColumns();
         for (int row = 0; row < gridRows; row++) {
             for (int column = 0; column < gridColumns; column++) {
-                visualize(maze, parentNode, row, column);
+                visualize(level, parentNode, row, column);
             }
         }
     }
@@ -125,7 +125,6 @@ class WallsView {
     /**
      * Add a closure wall for the specified vertex and orientation.
      *
-     * @param maze maze to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param vertexLocation (not null)
      * @param orientation relative to the world's +Z direction (not null)
@@ -152,16 +151,17 @@ class WallsView {
     /**
      * Add an opening wall for the specified vertex and orientation.
      *
+     * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param vertexLocation (not null)
      * @param orientation relative to the world's +Z direction (not null)
      */
-    private void addOpening(GridGraph maze, Node parentNode,
+    private void addOpening(GridGraph level, Node parentNode,
             Vector3f vertexLocation, Quaternion orientation) {
         assert parentNode != null;
         assert vertexLocation != null;
 
-        float vertexSpacing = maze.getVertexSpacing();
+        float vertexSpacing = level.getVertexSpacing();
         float halfSpacing = vertexSpacing / 2f;
         float halfWidth = corridorWidth / 2f;
 
@@ -202,7 +202,6 @@ class WallsView {
     /**
      * Add a single wall segment (quad) to a scene.
      *
-     * @param maze maze to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param lowerLeftCorner world coordinates of lower left (not null)
      * @param lowerRightCorner world coordinates of lower right (not null)
@@ -232,14 +231,14 @@ class WallsView {
     /**
      * Add walls between a particular pair of adjacent vertices.
      *
-     * @param maze maze to visualize (not null)
+     * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param fromVertex (not null)
      * @param toVertex (not null)
      */
-    private void addWallsBetween(GridGraph maze, Node parentNode,
+    private void addWallsBetween(GridGraph level, Node parentNode,
             NavVertex fromVertex, NavVertex toVertex) {
-        assert maze != null;
+        assert level != null;
         assert parentNode != null;
         assert fromVertex != null;
         assert toVertex != null;
@@ -252,49 +251,49 @@ class WallsView {
         if (arc == null) {
             addClosure(parentNode, fromLocation, orientation);
         } else {
-            addOpening(maze, parentNode, fromLocation, orientation);
+            addOpening(level, parentNode, fromLocation, orientation);
         }
     }
 
     /**
      * Visualize walls for the specified vertex.
      *
-     * @param maze maze to visualize (not null)
+     * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      * @param row (&ge;0)
      * @param column (&ge;0)
      */
-    private void visualize(GridGraph maze, Node parentNode, int row,
+    private void visualize(GridGraph level, Node parentNode, int row,
             int column) {
-        assert maze != null;
+        assert level != null;
         assert parentNode != null;
         assert row >= 0 : row;
         assert column >= 0 : column;
 
-        int gridRows = maze.getRows();
-        int gridColumns = maze.getColumns();
-        NavVertex fromVertex = maze.getVertex(row, column);
+        int gridRows = level.getRows();
+        int gridColumns = level.getColumns();
+        NavVertex fromVertex = level.getVertex(row, column);
         Vector3f vertexLocation = fromVertex.getLocation();
 
         if (row + 1 < gridRows) {
-            NavVertex north = maze.getVertex(row + 1, column);
-            addWallsBetween(maze, parentNode, fromVertex, north);
+            NavVertex north = level.getVertex(row + 1, column);
+            addWallsBetween(level, parentNode, fromVertex, north);
         } else {
             Quaternion orientation = WorldState.toOrientation(Vector3f.UNIT_X);
             addClosure(parentNode, vertexLocation, orientation);
         }
 
         if (column + 1 < gridColumns) {
-            NavVertex east = maze.getVertex(row, column + 1);
-            addWallsBetween(maze, parentNode, fromVertex, east);
+            NavVertex east = level.getVertex(row, column + 1);
+            addWallsBetween(level, parentNode, fromVertex, east);
         } else {
             Quaternion orientation = WorldState.toOrientation(Vector3f.UNIT_Z);
             addClosure(parentNode, vertexLocation, orientation);
         }
 
         if (row - 1 >= 0) {
-            NavVertex south = maze.getVertex(row - 1, column);
-            addWallsBetween(maze, parentNode, fromVertex, south);
+            NavVertex south = level.getVertex(row - 1, column);
+            addWallsBetween(level, parentNode, fromVertex, south);
         } else {
             Quaternion orientation =
                     WorldState.toOrientation(new Vector3f(-1f, 0f, 0f));
@@ -302,8 +301,8 @@ class WallsView {
         }
 
         if (column - 1 >= 0) {
-            NavVertex west = maze.getVertex(row, column - 1);
-            addWallsBetween(maze, parentNode, fromVertex, west);
+            NavVertex west = level.getVertex(row, column - 1);
+            addWallsBetween(level, parentNode, fromVertex, west);
         } else {
             Quaternion orientation =
                     WorldState.toOrientation(new Vector3f(0f, 0f, -1f));

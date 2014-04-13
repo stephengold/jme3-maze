@@ -33,9 +33,10 @@ import com.jme3.math.Vector3f;
 import java.util.Random;
 import java.util.logging.Logger;
 import jme3utilities.Validate;
+import jme3utilities.navigation.NavGraph;
 
 /**
- * App state to manage mazes in the Maze Game.
+ * App state to manage the maze in the Maze Game.
  * <p>
  * Each instance is enabled at creation.
  *
@@ -62,9 +63,13 @@ public class WorldState
     // *************************************************************************
     // fields
     /**
-     * maze topology: set by initialize()
+     * levels of the maze: set by initialize()
      */
-    private GridGraph maze;
+    private GridGraph[] levels;
+    /**
+     * topology of the complete maze
+     */
+    final private NavGraph graph = new NavGraph();
     /**
      * pseudo-random number generator: set by constructor
      */
@@ -99,13 +104,37 @@ public class WorldState
     }
 
     /**
+     * Access a maze level specified by its index.
+     *
+     * @param levelIndex index of the level (&ge;0)
+     * @return pre-existing instance
+     */
+    public GridGraph getLevel(int levelIndex) {
+        Validate.nonNegative(levelIndex, "level");
+        GridGraph level = levels[levelIndex];
+
+        assert level != null;
+        return level;
+    }
+
+    /**
      * Access the maze topology.
      *
      * @return pre-existing instance
      */
-    public GridGraph getMaze() {
-        assert maze != null;
-        return maze;
+    public NavGraph getGraph() {
+        assert graph != null;
+        return graph;
+    }
+
+    /**
+     * Determine the number of levels in the maze.
+     *
+     * @return count (&ge;0)
+     */
+    public int getNumLevels() {
+        int result = levels.length;
+        return result;
     }
 
     /**
@@ -149,11 +178,13 @@ public class WorldState
      * Initialize the maze.
      */
     private void initializeMaze() {
-        int mazeColumns = 12;
-        int mazeRows = 12;
         float vertexSpacing = 20f; // world units
         float baseY = 0f; // world coordinate
-        maze = new GridGraph(mazeRows, mazeColumns, vertexSpacing,
-                generator, baseY);
+        levels = new GridGraph[1];
+        int numRows = 12;
+        int numColumns = numRows;
+        String name = String.format("L%d", 0);
+        levels[0] = new GridGraph(vertexSpacing, baseY, numRows, numColumns,
+                graph, generator, name);
     }
 }

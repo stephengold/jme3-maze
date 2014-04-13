@@ -51,7 +51,6 @@ import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.GridGraph;
 import jme3maze.model.PlayerState;
-import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
@@ -224,15 +223,15 @@ public class MapViewState
             }
         }
 
-        WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph maze = worldState.getMaze();
+        PlayerState playerState = stateManager.getState(PlayerState.class);
+        GridGraph level = playerState.getMazeLevel();
 
         for (NavVertex vertex = startVertex; vertex != null;) {
             addMazeVertex(vertex);
             for (NavArc arc : vertex.getArcs()) {
                 addMazeArc(arc);
             }
-            vertex = maze.findNextLineOfSight(vertex, rowIncrement,
+            vertex = level.findNextLineOfSight(vertex, rowIncrement,
                     columnIncrement);
         }
     }
@@ -449,15 +448,15 @@ public class MapViewState
         int numArcs = vertex.getNumArcs();
         switch (numArcs) {
             case 1:
-                spatial = 
+                spatial =
                         NavDebug.makeBall(vertex, ballRadius, culDeSacMaterial);
                 break;
             case 2:
-                spatial = 
+                spatial =
                         NavDebug.makeBall(vertex, ballRadius, passageMaterial);
                 break;
             default:
-                spatial = NavDebug.makeBall(vertex, ballRadius, 
+                spatial = NavDebug.makeBall(vertex, ballRadius,
                         intersectionMaterial);
         }
         vertexSpatial.put(vertex, spatial);
@@ -489,13 +488,13 @@ public class MapViewState
      */
     private void initializeMaze() {
         ColorRGBA intersectionColor = ColorRGBA.Yellow;
-        intersectionMaterial = 
+        intersectionMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, intersectionColor);
         ColorRGBA culDeSacColor = ColorRGBA.Red;
-        culDeSacMaterial = 
+        culDeSacMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, culDeSacColor);
         ColorRGBA passageColor = ColorRGBA.Green;
-        passageMaterial = 
+        passageMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, passageColor);
 
         ColorRGBA stickColor = ColorRGBA.Blue;
