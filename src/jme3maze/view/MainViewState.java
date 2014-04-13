@@ -182,7 +182,7 @@ public class MainViewState
      * Attach the light source to the avatar using a LightControl.
      */
     public void takeTorch() {
-        Vector3f localOffset = new Vector3f(0f, 6f, -2f);
+        Vector3f localOffset = new Vector3f(2f, 7f, -3f);
         LightControl lightControl =
                 new LightControl(torch, localOffset, forwardDirection);
         avatarNode.addControl(lightControl);
@@ -263,7 +263,7 @@ public class MainViewState
          * Add a control for the forward-looking main camera.
          */
         Camera cam = application.getCamera();
-        Vector3f localOffset = new Vector3f(0f, 5f, -8f);
+        Vector3f localOffset = new Vector3f(0f, 5f, -5f);
         CameraControl forwardView = new CameraControl(cam, localOffset,
                 forwardDirection, WorldState.upDirection);
         avatarNode.addControl(forwardView);
@@ -274,16 +274,16 @@ public class MainViewState
      */
     private void addLight() {
         rootNode.addLight(torch);
-        
+
         float lightIntensity = 1f;
         ColorRGBA pointColor = ColorRGBA.White.mult(lightIntensity);
         torch.setColor(pointColor);
         torch.setName("torch");
         float attenuationRadius = 1000f; // world units
         torch.setRadius(attenuationRadius);
-        
+
         int shadowMapSize = 4096; // pixels
-        PointLightShadowRenderer plsr = 
+        PointLightShadowRenderer plsr =
                 new PointLightShadowRenderer(assetManager, shadowMapSize);
         plsr.setLight(torch);
         ViewPort viewPort = application.getViewPort();
