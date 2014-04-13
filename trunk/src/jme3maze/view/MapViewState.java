@@ -127,9 +127,17 @@ public class MapViewState
      */
     final private Map<NavVertex, Spatial> vertexSpatial = new TreeMap<>();
     /**
-     * ball material: set by initialize()
+     * ball material for cul-de-sac vertex: set by initialize()
      */
-    private Material ballMaterial;
+    private Material culDeSacMaterial;
+    /**
+     * ball material for intersection vertex: set by initialize()
+     */
+    private Material intersectionMaterial;
+    /**
+     * ball material for passage vertex: set by initialize()
+     */
+    private Material passageMaterial;
     /**
      * stick material: set by initialize()
      */
@@ -438,7 +446,20 @@ public class MapViewState
         if (spatial != null) {
             return;
         }
-        spatial = NavDebug.makeBall(vertex, ballRadius, ballMaterial);
+        int numArcs = vertex.getNumArcs();
+        switch (numArcs) {
+            case 1:
+                spatial = 
+                        NavDebug.makeBall(vertex, ballRadius, culDeSacMaterial);
+                break;
+            case 2:
+                spatial = 
+                        NavDebug.makeBall(vertex, ballRadius, passageMaterial);
+                break;
+            default:
+                spatial = NavDebug.makeBall(vertex, ballRadius, 
+                        intersectionMaterial);
+        }
         vertexSpatial.put(vertex, spatial);
         mazeNode.attachChild(spatial);
     }
@@ -467,8 +488,16 @@ public class MapViewState
      * Initialize maze materials and maze node.
      */
     private void initializeMaze() {
-        ColorRGBA ballColor = ColorRGBA.Yellow;
-        ballMaterial = MyAsset.createUnshadedMaterial(assetManager, ballColor);
+        ColorRGBA intersectionColor = ColorRGBA.Yellow;
+        intersectionMaterial = 
+                MyAsset.createUnshadedMaterial(assetManager, intersectionColor);
+        ColorRGBA culDeSacColor = ColorRGBA.Red;
+        culDeSacMaterial = 
+                MyAsset.createUnshadedMaterial(assetManager, culDeSacColor);
+        ColorRGBA passageColor = ColorRGBA.Green;
+        passageMaterial = 
+                MyAsset.createUnshadedMaterial(assetManager, passageColor);
+
         ColorRGBA stickColor = ColorRGBA.Blue;
         stickMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, stickColor);
