@@ -34,6 +34,7 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import jme3maze.items.Ankh;
 import jme3maze.items.Crown;
 import jme3maze.items.Item;
 import jme3maze.items.Mapmaker;
@@ -218,7 +219,7 @@ public class FreeItemsState
         Crown crown = new Crown(application);
         add(crown, goalVertex);
         /*
-         * Place the torch item at a random vertex one hop from the
+         * Place the torch at a random vertex one hop from the
          * starting point.
          */
         List<NavVertex> options = maze.findByHops(1, startVertex);
@@ -230,10 +231,21 @@ public class FreeItemsState
             add(torch, torchVertex);
         }
         /*
-         * Place the mapmaker item at a random vertex exactly three hops
+         * Place the ankh at a random vertex exactly five hops
          * from the starting point.
          */
-        options = maze.findByHops(3, startVertex);
+        options = maze.findByHops(5, startVertex);
+        options.remove(goalVertex);
+        NavVertex ankhVertex = (NavVertex) Noise.pick(options, generator);
+        if (ankhVertex != null) {
+            Ankh ankh = new Ankh(application);
+            add(ankh, ankhVertex);
+        }
+        /*
+         * Place the mapmaker at a random vertex exactly six hops
+         * from the starting point.
+         */
+        options = maze.findByHops(6, startVertex);
         options.remove(goalVertex);
         NavVertex mapmakerVertex = (NavVertex) Noise.pick(options, generator);
         if (mapmakerVertex != null) {
