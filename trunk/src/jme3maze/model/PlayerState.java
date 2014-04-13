@@ -30,7 +30,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
@@ -66,21 +65,29 @@ public class PlayerState
      */
     private AppStateManager stateManager;
     /**
-     * items collected but not yet consumed or dropped
-     */
-    private ArrayList<Item> inventory = new ArrayList<>();
-    /**
      * rate of movement in world units per second (&gt;0)
      */
     private float maxMoveSpeed = 50f;
     /**
      * rate of rotation in radians per second (&gt;0)
      */
-    private float maxTurnRate = 5f;
+    private float maxTurnRate = 2f;
+    /*
+     * which level of the maze this player is on (&ge;0)
+     */
+    private int mazeLevelIndex = 0;
     /*
      * number of moves made since the start of the game (&ge;0)
      */
     private int moveCount = 0;
+    /**
+     * item in the player's left hand
+     */
+    private Item leftHandItem = null;
+    /**
+     * item in the player's right hand
+     */
+    private Item rightHandItem = null;
     /**
      * arc which this player is on: set by constructor
      */
@@ -155,6 +162,17 @@ public class PlayerState
     }
 
     /**
+     * Access the maze level this player is on.
+     *
+     * @return pre-existing instance
+     */
+    public GridGraph getMazeLevel() {
+        WorldState worldState = stateManager.getState(WorldState.class);
+        GridGraph level = worldState.getLevel(mazeLevelIndex);
+        return level;
+    }
+
+    /**
      * Read this player's move count.
      *
      * @return number of moves initiated (&ge;0)
@@ -209,7 +227,7 @@ public class PlayerState
     }
 
     /**
-     * Alter this player's arc.
+     * Alter this player's current arc.
      *
      * @param newArc (not null)
      */
@@ -227,7 +245,6 @@ public class PlayerState
         if (mapViewState.isEnabled()) {
             mapViewState.addMazeLineOfSight(vertex, direction);
         }
-
     }
 
     /**
@@ -335,12 +352,12 @@ public class PlayerState
 
         this.stateManager = stateManager;
         /*
-         * Choose a random starting arc.
+         * Choose a random starting arc from maze level 0.
          */
         WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph maze = worldState.getMaze();
+        GridGraph level0 = worldState.getLevel(0);
         Random generator = worldState.getGenerator();
-        NavArc playerStartArc = maze.randomArc(generator);
+        NavArc playerStartArc = level0.randomArc(generator);
         setArc(playerStartArc);
     }
 }

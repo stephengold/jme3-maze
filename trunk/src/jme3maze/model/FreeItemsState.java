@@ -43,6 +43,7 @@ import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
 import jme3utilities.math.Noise;
+import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
@@ -214,15 +215,15 @@ public class FreeItemsState
         PlayerState playerState = stateManager.getState(PlayerState.class);
         NavVertex startVertex = playerState.getVertex();
         WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph maze = worldState.getMaze();
-        NavVertex goalVertex = maze.findFurthest(startVertex);
+        NavGraph graph = worldState.getGraph();
+        NavVertex goalVertex = graph.findFurthest(startVertex);
         Crown crown = new Crown(application);
         add(crown, goalVertex);
         /*
          * Place the torch at a random vertex one hop from the
          * starting point.
          */
-        List<NavVertex> options = maze.findByHops(1, startVertex);
+        List<NavVertex> options = graph.findByHops(1, startVertex);
         options.remove(goalVertex);
         Random generator = worldState.getGenerator();
         NavVertex torchVertex = (NavVertex) Noise.pick(options, generator);
@@ -234,7 +235,7 @@ public class FreeItemsState
          * Place the ankh at a random vertex exactly five hops
          * from the starting point.
          */
-        options = maze.findByHops(5, startVertex);
+        options = graph.findByHops(5, startVertex);
         options.remove(goalVertex);
         NavVertex ankhVertex = (NavVertex) Noise.pick(options, generator);
         if (ankhVertex != null) {
@@ -245,7 +246,7 @@ public class FreeItemsState
          * Place the mapmaker at a random vertex exactly six hops
          * from the starting point.
          */
-        options = maze.findByHops(6, startVertex);
+        options = graph.findByHops(6, startVertex);
         options.remove(goalVertex);
         NavVertex mapmakerVertex = (NavVertex) Noise.pick(options, generator);
         if (mapmakerVertex != null) {

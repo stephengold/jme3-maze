@@ -213,11 +213,11 @@ public class MainViewState
         rootNode = this.application.getRootNode();
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
-         * Generate a 3D representation of the maze.
+         * Generate a 3D representation of maze level 0.
          */
         WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph maze = worldState.getMaze();
-        addMaze(maze);
+        GridGraph level0 = worldState.getLevel(0);
+        addMaze(level0);
         /*
          * Add free items.
          */
@@ -291,9 +291,9 @@ public class MainViewState
     }
 
     /**
-     * Add 3-D representation of a maze to the scene.
+     * Add 3-D representation of a maze level to the scene.
      */
-    private void addMaze(GridGraph maze) {
+    private void addMaze(GridGraph level) {
         ColorRGBA ceilingColor = new ColorRGBA(1f, 1f, 1f, 1f);
         Material ceilingMaterial =
                 MyAsset.createShinyMaterial(assetManager, ceilingColor);
@@ -322,13 +322,13 @@ public class MainViewState
         float ceilingY = floorY + wallHeight; // world coordinate
 
         FloorView floorView = new FloorView(floorY, floorMaterial);
-        floorView.visualize(maze, mazeNode);
+        floorView.visualize(level, mazeNode);
 
         WallsView wallsView =
                 new WallsView(floorY, corridorWidth, wallHeight, wallMaterial);
-        wallsView.visualize(maze, mazeNode);
+        wallsView.visualize(level, mazeNode);
 
         CeilingView ceilingView = new CeilingView(ceilingY, ceilingMaterial);
-        ceilingView.visualize(maze, mazeNode);
+        ceilingView.visualize(level, mazeNode);
     }
 }
