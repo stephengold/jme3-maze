@@ -98,9 +98,9 @@ class CeilingView {
         int gridColumns = level.getColumns();
         float vertexSpacing = level.getVertexSpacing();
         for (int row = 0; row < gridRows; row++) {
-            float x = vertexSpacing * (row - 0.5f);
+            float x = vertexSpacing * (row - gridRows / 2 - 0.5f);
             for (int column = 0; column < gridColumns; column++) {
-                float z = vertexSpacing * (column + 0.5f);
+                float z = vertexSpacing * (column - gridColumns / 2 + 0.5f);
                 Vector3f location = new Vector3f(x, ceilingY, z);
                 String description = String.format("floor%d,%d", row, column);
                 addTile(level, parentNode, location, description);
