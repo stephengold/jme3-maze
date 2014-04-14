@@ -30,7 +30,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import java.util.Random;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
 import jme3maze.view.MainViewState;
@@ -324,6 +323,9 @@ public class PlayerState
             Vector3f newLocation = vertex.getLocation();
             setLocation(newLocation);
 
+            WorldState worldState = stateManager.getState(WorldState.class);
+            mazeLevelIndex = worldState.findLevelIndex(vertex);
+
             MapViewState mapViewState =
                     stateManager.getState(MapViewState.class);
             if (mapViewState.isEnabled()) {
@@ -352,12 +354,10 @@ public class PlayerState
 
         this.stateManager = stateManager;
         /*
-         * Choose a random starting arc from maze level 0.
+         * Get the player's starting point.
          */
         WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph level0 = worldState.getLevel(0);
-        Random generator = worldState.getGenerator();
-        NavArc playerStartArc = level0.randomArc(generator);
+        NavArc playerStartArc = worldState.getStartArc();
         setArc(playerStartArc);
     }
 }

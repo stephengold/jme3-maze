@@ -28,8 +28,10 @@ package jme3maze.model;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Validate;
 import jme3utilities.math.Noise;
@@ -79,6 +81,10 @@ public class GridGraph {
      * generator for randomization: set by constructor (not null)
      */
     final private Random generator;
+    /**
+     * name for this grid: set by constructor (not null)
+     */
+    final private String name;
     // *************************************************************************
     // constructors
 
@@ -88,17 +94,21 @@ public class GridGraph {
      * @param vertexSpacing spacing between rows and columns in the X-Z plane
      * (in world units, &gt;0)
      * @param yValue y-coordinate of the grid (in world coordinates)
-     * @param gridRows number of rows on the X-axis of the grid (&gt;1)
-     * @param gridColumns number of columns on the Z-axis of the grid (&gt;1)
+     * @param numRows number of rows on the X-axis of the grid (&gt;1)
+     * @param numColumns number of columns on the Z-axis of the grid (&gt;1)
      * @param graph navigation graph to contain the vertices (not null)
      * @param generator number generator for randomization (not null)
      * @param name name for this grid (not null)
+     * @param entryStartVertex vertex to connect to the entry point (or null for
+     * none)
+     * @param entryEndLocation location for the entry point (or null for none)
      */
-    GridGraph(float vertexSpacing, float yValue, int gridRows, int gridColumns,
-            NavGraph graph, Random generator, String name) {
+    GridGraph(float vertexSpacing, float yValue, int numRows, int numColumns,
+            NavGraph graph, Random generator, String name,
+            NavVertex entryStartVertex, Vector3f entryEndLocation) {
         assert vertexSpacing > 0f : vertexSpacing;
-        assert gridRows > 1 : gridRows;
-        assert gridColumns > 1 : gridColumns;
+        assert numRows > 1 : numRows;
+        assert numColumns > 1 : numColumns;
         assert graph != null;
         assert generator != null;
         assert name != null;
@@ -106,45 +116,51 @@ public class GridGraph {
         this.generator = generator;
         this.vertexSpacing = vertexSpacing;
         this.graph = graph;
+        this.name = name;
         /**
          * Create a rectangular grid of vertices in which neighbors are
          * connected by arcs.
          */
-        grid = new NavVertex[gridRows][gridColumns];
+        grid = new NavVertex[numRows][numColumns];
         addVertices(yValue, name);
         addArcs();
+
+        if (entryEndLocation != null) {
+            /*
+             * Remove the arc which would interfere with entry from above.
+             */
+            Vector3f entryStartLocation = entryStartVertex.getLocation();
+            Vector3f entryOffset =
+                    entryStartLocation.subtract(entryEndLocation);
+            entryOffset.y = 0f;
+            NavVertex entryEndVertex = findVertex(entryEndLocation);
+            NavArc arc = entryEndVertex.findLeastTurn(entryOffset);
+            graph.removePair(arc);
+            numArcs -= 2;
+        }
         /**
          * Prune arcs until a minimum spanning tree is obtained.
          */
         int numPairs = numVertices - 1;
-        if (numPairs <= 0) {
-            return;
-        }
         pruneTo(numPairs);
+
+        if (entryEndLocation != null) {
+            Vector3f entryStartLocation = entryStartVertex.getLocation();
+            Vector3f entryOffset =
+                    entryEndLocation.subtract(entryStartLocation);
+            float entryLength = entryOffset.length();
+            Vector3f entryDirection = entryOffset.normalize();
+            NavVertex entryEndVertex = findVertex(entryEndLocation);
+            graph.addArc(entryStartVertex, entryEndVertex, entryLength,
+                    entryDirection);
+            Vector3f entryReverseDirection = entryDirection.negate();
+            graph.addArc(entryEndVertex, entryStartVertex, entryLength,
+                    entryReverseDirection);
+            numArcs += 2;
+        }
     }
     // *************************************************************************
     // new methods exposed
-
-    /**
-     * Find the column index of the specified vertex.
-     *
-     * @param vertex (member)
-     * @return value between 0 and numColumns-1, inclusive
-     */
-    public int findColumn(NavVertex vertex) {
-        graph.validateMember(vertex);
-
-        Vector3f location = vertex.getLocation();
-        int gridColumns = getColumns();
-        int column = Math.round(location.z / vertexSpacing) + gridColumns / 2;
-
-        if (column < 0) {
-            return 0;
-        } else if (column >= gridColumns) {
-            return gridColumns - 1;
-        }
-        return column;
-    }
 
     /**
      * Find the next vertex along the specified line of sight.
@@ -156,7 +172,7 @@ public class GridGraph {
      */
     public NavVertex findNextLineOfSight(NavVertex fromVertex,
             int rowIncrement, int columnIncrement) {
-        graph.validateMember(fromVertex);
+        validateMember(fromVertex);
 
         int row = findRow(fromVertex) + rowIncrement;
         int column = findColumn(fromVertex) + columnIncrement;
@@ -169,24 +185,19 @@ public class GridGraph {
     }
 
     /**
-     * Find the row index of the specified vertex.
+     * Find a vertex by its location.
      *
-     * @param vertex (member)
-     * @return value between 0 and numRows-1, inclusive
+     * @param location (world coordinates, not null)
+     * @return pre-existing instance (or null if not found)
      */
-    public int findRow(NavVertex vertex) {
-        graph.validateMember(vertex);
+    final public NavVertex findVertex(Vector3f location) {
+        Validate.nonNull(location, "location");
 
-        Vector3f location = vertex.getLocation();
-        int gridRows = getRows();
-        int row = Math.round(location.x / vertexSpacing) + gridRows / 2;
+        int row = findRow(location);
+        int column = findColumn(location);
+        NavVertex result = grid[row][column];
 
-        if (row < 0) {
-            return 0;
-        } else if (row >= gridRows) {
-            return gridRows - 1;
-        }
-        return row;
+        return result;
     }
 
     /**
@@ -198,6 +209,21 @@ public class GridGraph {
         int result = grid[0].length;
         assert result > 1 : result;
         return result;
+    }
+
+    /**
+     * Read the world Y-coordinate for this grid's floor.
+     */
+    public float getFloorY() {
+        float result = grid[0][0].getLocation().getY();
+        return result;
+    }
+
+    /**
+     * Read the name of this grid.
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -216,7 +242,7 @@ public class GridGraph {
      *
      * @param row
      * @param column
-     * @return pre-existing instance (or null if invalid index)
+     * @return pre-existing member (or null if invalid index)
      */
     public NavVertex getVertex(int row, int column) {
         if (row < 0 || row >= getRows()) {
@@ -240,20 +266,40 @@ public class GridGraph {
     }
 
     /**
+     * Enumerate all vertices in this grid.
+     *
+     * @return new collection of members
+     */
+    public Collection<NavVertex> getVertices() {
+        List<NavVertex> result = new ArrayList<>();
+        int numRows = getRows();
+        int numColumns = getColumns();
+        for (int row = 0; row < numRows; row++) {
+            for (int column = 0; column < numColumns; column++) {
+                NavVertex vertex = grid[row][column];
+                boolean success = result.add(vertex);
+                assert success : vertex;
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Select a random arc from this grid.
      *
      * @param generator generator of uniform random values (not null)
-     * @return pre-existing instance (member)
+     * @return pre-existing member
      */
     public NavArc randomArc(Random generator) {
         Validate.nonNull(generator, "generator");
 
         List<NavArc> allArcs = new ArrayList<>();
 
-        int gridRows = getRows();
-        int gridColumns = getColumns();
-        for (int row = 0; row < gridRows; row++) {
-            for (int column = 0; column < gridColumns; column++) {
+        int numRows = getRows();
+        int numColumns = getColumns();
+        for (int row = 0; row < numRows; row++) {
+            for (int column = 0; column < numColumns; column++) {
                 NavVertex vertex = grid[row][column];
                 NavArc[] vertexArcs = vertex.getArcs();
                 List<NavArc> list = Arrays.asList(vertexArcs);
@@ -268,10 +314,10 @@ public class GridGraph {
     // private methods
 
     /**
-     * Create a new arc and add it to the grid.
+     * Create a new arc and add it to this grid.
      *
-     * @param startVertex not null
-     * @param endVertex not null
+     * @param startVertex member
+     * @param endVertex member
      */
     private void addArc(NavVertex startVertex, NavVertex endVertex) {
         assert startVertex != null;
@@ -283,56 +329,56 @@ public class GridGraph {
         float pathLength = offset.length();
         Vector3f direction = offset.divide(pathLength);
         graph.addArc(startVertex, endVertex, pathLength, direction);
+        numArcs++;
     }
 
     /**
      * Add arcs to connect all neighboring vertices.
      */
     private void addArcs() {
-        int gridRows = getRows();
-        int gridColumns = getColumns();
-        for (int row = 0; row < gridRows; row++) {
-            for (int column = 0; column < gridColumns; column++) {
+        int numRows = getRows();
+        int numColumns = getColumns();
+        for (int row = 0; row < numRows; row++) {
+            for (int column = 0; column < numColumns; column++) {
                 NavVertex vertex = grid[row][column];
                 /*
                  * Each vertex has two-to-four neighbors.
                  */
-                if (row + 1 < gridRows) {
+                if (row + 1 < numRows) {
                     NavVertex north = grid[row + 1][column];
                     addArc(vertex, north);
-                    numArcs++;
                 }
-                if (column + 1 < gridColumns) {
+                if (column + 1 < numColumns) {
                     NavVertex east = grid[row][column + 1];
                     addArc(vertex, east);
-                    numArcs++;
                 }
                 if (row - 1 >= 0) {
                     NavVertex south = grid[row - 1][column];
                     addArc(vertex, south);
-                    numArcs++;
                 }
                 if (column - 1 >= 0) {
                     NavVertex west = grid[row][column - 1];
                     addArc(vertex, west);
-                    numArcs++;
                 }
             }
         }
     }
 
     /**
-     * Initialize the grid with vertices.
+     * Fill this grid with vertices (but no arcs).
      *
-     * @param yValue y-coordinate of the grid (in world coordinates)
+     * @param yValue y-coordinate for this grid (in world coordinates)
+     * @param namePrefix (not null)
      */
     private void addVertices(float yValue, String namePrefix) {
-        int gridRows = getRows();
-        int gridColumns = getColumns();
-        for (int row = 0; row < gridRows; row++) {
-            float x = vertexSpacing * (row - gridRows / 2);
-            for (int column = 0; column < gridColumns; column++) {
-                float z = vertexSpacing * (column - gridColumns / 2);
+        assert namePrefix != null;
+
+        int numRows = getRows();
+        int numColumns = getColumns();
+        for (int row = 0; row < numRows; row++) {
+            float x = vertexSpacing * (row - numRows / 2);
+            for (int column = 0; column < numColumns; column++) {
+                float z = vertexSpacing * (column - numColumns / 2);
                 Vector3f position = new Vector3f(x, yValue, z);
                 String description =
                         String.format("%s(%d,%d)", namePrefix, row, column);
@@ -343,6 +389,92 @@ public class GridGraph {
                 numVertices++;
             }
         }
+    }
+
+    /**
+     * Test whether this grid contains the specified vertex.
+     *
+     * @param vertex vertex to be tested (or null)
+     */
+    private boolean contains(NavVertex vertex) {
+        if (vertex == null) {
+            return false;
+        }
+        int row = findRow(vertex);
+        int column = findColumn(vertex);
+        boolean result = grid[row][column] == vertex;
+
+        return result;
+    }
+
+    /**
+     * Find the column index of the specified vertex.
+     *
+     * @param vertex (member)
+     * @return value between 0 and numColumns-1, inclusive
+     */
+    private int findColumn(NavVertex vertex) {
+        graph.validateMember(vertex);
+
+        Vector3f location = vertex.getLocation();
+        int column = findColumn(location);
+
+        return column;
+    }
+
+    /**
+     * Find the column index of the specified location.
+     *
+     * @param location in world coordinates (not null)
+     * @return value between 0 and numColumns-1, inclusive
+     */
+    private int findColumn(Vector3f location) {
+        assert location != null;
+
+        int numColumns = getColumns();
+        int column = Math.round(location.z / vertexSpacing) + numColumns / 2;
+
+        if (column < 0) {
+            return 0;
+        } else if (column >= numColumns) {
+            return numColumns - 1;
+        }
+        return column;
+    }
+
+    /**
+     * Find the row index of the specified vertex.
+     *
+     * @param vertex (member)
+     * @return value between 0 and numRows-1, inclusive
+     */
+    private int findRow(NavVertex vertex) {
+        graph.validateMember(vertex);
+
+        Vector3f location = vertex.getLocation();
+        int row = findRow(location);
+
+        return row;
+    }
+
+    /**
+     * Find the row index of the specified location.
+     *
+     * @param location in world coordinates (not null)
+     * @return value between 0 and numRows-1, inclusive
+     */
+    private int findRow(Vector3f location) {
+        assert location != null;
+
+        int numRows = getRows();
+        int row = Math.round(location.x / vertexSpacing) + numRows / 2;
+
+        if (row < 0) {
+            return 0;
+        } else if (row >= numRows) {
+            return numRows - 1;
+        }
+        return row;
     }
 
     /**
@@ -359,6 +491,19 @@ public class GridGraph {
                 graph.removePair(arc);
                 numArcs -= 2;
             }
+        }
+    }
+
+    /**
+     * Verify that a vertex belongs to this grid.
+     *
+     * @param vertex vertex to be validated (or null)
+     */
+    private void validateMember(NavVertex vertex) {
+        if (!contains(vertex)) {
+            logger.log(Level.SEVERE, "vertex={0}", vertex);
+            throw new IllegalArgumentException(
+                    "grid should contain the vertex");
         }
     }
 }

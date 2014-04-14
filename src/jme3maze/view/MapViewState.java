@@ -51,6 +51,7 @@ import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.GridGraph;
 import jme3maze.model.PlayerState;
+import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
@@ -380,7 +381,18 @@ public class MapViewState
      * Initialize the camera and view port for this view.
      */
     private void addCamera() {
+        /*
+         * The application's default camera provides
+         * a convenient starting point.
+         */
         Camera mapCamera = application.getCamera().clone();
+        /*
+         * Limit far plane in order to display a single maze level at a time.
+         */
+        WorldState worldState = stateManager.getState(WorldState.class);
+        float levelSpacing = worldState.getLevelSpacing();
+        mapCamera.setFrustumFar(levelSpacing);
+
         mapCamera.setParallelProjection(true);
         /*
          * Position the inset view port in the upper left corner
@@ -391,6 +403,7 @@ public class MapViewState
         float y1 = 0.65f;
         float y2 = 0.95f;
         mapCamera.setViewPort(x1, x2, y1, y2);
+
         float tanYfov = 50f; // world units
         MyCamera.setYTangent(mapCamera, tanYfov);
 
@@ -490,16 +503,19 @@ public class MapViewState
         ColorRGBA intersectionColor = ColorRGBA.Yellow;
         intersectionMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, intersectionColor);
+        
         ColorRGBA culDeSacColor = ColorRGBA.Red;
         culDeSacMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, culDeSacColor);
+        
         ColorRGBA passageColor = ColorRGBA.Green;
         passageMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, passageColor);
-
+        
         ColorRGBA stickColor = ColorRGBA.Blue;
         stickMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, stickColor);
+
         rootNode.attachChild(mazeNode);
     }
 }

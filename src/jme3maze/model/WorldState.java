@@ -30,10 +30,13 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import java.util.Collection;
 import java.util.Random;
 import java.util.logging.Logger;
 import jme3utilities.Validate;
+import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
+import jme3utilities.navigation.NavVertex;
 
 /**
  * App state to manage the maze in the Maze Game.
@@ -47,6 +50,14 @@ public class WorldState
     // *************************************************************************
     // constants
 
+    /**
+     * spacing between levels (world units)
+     */
+    final private static float levelSpacing = 20f;
+    /**
+     * spacing between adjacent vertices in a level (world units)
+     */
+    final private static float vertexSpacing = 20f;
     /**
      * message logger for this class
      */
@@ -74,6 +85,10 @@ public class WorldState
      * pseudo-random number generator: set by constructor
      */
     final private Random generator;
+    /**
+     * starting point for player
+     */
+    private NavArc startArc;
     // *************************************************************************
     // constructors
 
@@ -92,6 +107,21 @@ public class WorldState
     }
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Find the level index of the specified vertex.
+     *
+     * @param vertex (not null)
+     * @return
+     */
+    public int findLevelIndex(NavVertex vertex) {
+        Validate.nonNull(vertex, "vertex");
+
+        Vector3f location = vertex.getLocation();
+        int levelIndex = Math.round(-location.y / levelSpacing);
+
+        return levelIndex;
+    }
 
     /**
      * Access the number generator.
@@ -128,6 +158,15 @@ public class WorldState
     }
 
     /**
+     * Read the vertical interval between maze levels.
+     *
+     * @return distance (in world units, &gt;0)
+     */
+    public float getLevelSpacing() {
+        return levelSpacing;
+    }
+
+    /**
      * Determine the number of levels in the maze.
      *
      * @return count (&ge;0)
@@ -135,6 +174,16 @@ public class WorldState
     public int getNumLevels() {
         int result = levels.length;
         return result;
+    }
+
+    /**
+     * Access the start arc for this world.
+     *
+     * @return pre-existing instance
+     */
+    public NavArc getStartArc() {
+        assert startArc != null;
+        return startArc;
     }
 
     /**
@@ -178,13 +227,43 @@ public class WorldState
      * Initialize the maze.
      */
     private void initializeMaze() {
-        float vertexSpacing = 20f; // world units
-        float baseY = 0f; // world coordinate
-        levels = new GridGraph[1];
-        int numRows = 12;
-        int numColumns = numRows;
-        String name = String.format("L%d", 0);
-        levels[0] = new GridGraph(vertexSpacing, baseY, numRows, numColumns,
-                graph, generator, name);
+        int numLevels = 2;
+        levels = new GridGraph[numLevels];
+        NavVertex entryStartVertex = null;
+        Vector3f entryEndLocation = null;
+
+        for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
+            float baseY = -levelIndex * levelSpacing; // world coordinate
+            int numRows = 5 + 2 * levelIndex; // 5, 7, 9, ...
+            int numColumns = numRows;
+            String levelName = String.format("L%d", levelIndex);
+            GridGraph level = new GridGraph(vertexSpacing, baseY, numRows,
+                    numColumns, graph, generator, levelName, entryStartVertex,
+                    entryEndLocation);
+            levels[levelIndex] = level;
+
+            NavVertex entryEndVertex;
+            if (entryEndLocation == null) {
+                /*
+                 * top level (level 0)
+                 */
+                startArc = level.randomArc(generator);
+                entryEndVertex = startArc.getFromVertex();
+            } else {
+                entryEndVertex = level.findVertex(entryEndLocation);
+            }
+            /*
+             * Put the level's exit as far as possible from the entrance.
+             */
+            Collection<NavVertex> vertices = level.getVertices();
+            entryStartVertex = graph.findFurthest(entryEndVertex, vertices);
+            NavArc[] arcs = entryStartVertex.getArcs();
+            assert arcs.length == 1 : arcs.length;
+            NavArc arc = arcs[0];
+            Vector3f arcDirection = arc.getStartDirection();
+            Vector3f entryStartLocation = entryStartVertex.getLocation();
+            entryEndLocation = entryStartLocation.subtract(arcDirection);
+            entryEndLocation.y -= vertexSpacing;
+        }
     }
 }
