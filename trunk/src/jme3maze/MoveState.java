@@ -58,7 +58,7 @@ class MoveState
      * maximum number of arcs per vertex for which the player turns
      * automatically
      */
-    final private static int maxArcsForAutoTurn = 2;
+    final private static int maxArcsForAutoTurn = 0;
     /**
      * message logger for this class
      */
