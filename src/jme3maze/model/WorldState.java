@@ -51,13 +51,13 @@ public class WorldState
     // constants
 
     /**
-     * spacing between levels (world units)
+     * spacing between levels (in world units)
      */
     final private static float levelSpacing = 20f;
     /**
-     * spacing between adjacent vertices in a level (world units)
+     * spacing between adjacent vertices in a level (in world units)
      */
-    final private static float vertexSpacing = 20f;
+    final private static float vertexSpacing = 30f;
     /**
      * message logger for this class
      */
@@ -184,6 +184,15 @@ public class WorldState
     public NavArc getStartArc() {
         assert startArc != null;
         return startArc;
+    }
+
+    /**
+     * Read the spacing between vertices in the X and Z directions.
+     *
+     * @return distance (in world units, &gt;0)
+     */
+    public float getVertexSpacing() {
+        return vertexSpacing;
     }
 
     /**
