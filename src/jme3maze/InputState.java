@@ -213,7 +213,7 @@ class InputState
                 float dot = direction.dot(arcDirection);
                 if (1f - dot < epsilon) {
                     /*
-                     * The player's direction closely matches the 
+                     * The player's direction closely matches the
                      * horizontal direction of an arc, so follow that arc.
                      */
                     goMove(arc);

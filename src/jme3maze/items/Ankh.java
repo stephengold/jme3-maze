@@ -59,7 +59,7 @@ public class Ankh
      */
     final private static String iconAssetPath = "Textures/map-icons/ankh.png";
     /**
-     * asset path to the "ankh" 3D model asset
+     * asset path to the "ankh" 3-D model asset
      */
     final private static String modelAssetPath = "Models/items/ankh/ankh.j3o";
     // *************************************************************************
@@ -102,9 +102,6 @@ public class Ankh
      */
     @Override
     public Spatial visualizeMain() {
-        /*
-         * An ankh is represented by a gold teapot.
-         */
         AssetManager assetManager = application.getAssetManager();
         Spatial spatial = assetManager.loadModel(modelAssetPath);
 

@@ -67,7 +67,7 @@ public class Torch
      */
     final private static String iconAssetPath = "Textures/map-icons/torch.png";
     /**
-     * asset path to the "torch" 3D model asset
+     * asset path to the "torch" 3-D model asset
      */
     final private static String modelAssetPath = "Models/items/torch/torch.j3o";
     // *************************************************************************
