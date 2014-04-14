@@ -82,6 +82,22 @@ public class MainViewState
      */
     final private static boolean shadowsFlag = true;
     /**
+     * width of maze corridors (in world units)
+     */
+    final private static float corridorWidth = 10f;
+    /**
+     * height of camera above player's base location (in world units)
+     */
+    final private static float eyeHeight = 5f;
+    /**
+     * height of maze walls (in world units)
+     */
+    final private static float wallHeight = 10f;
+    /**
+     * resolution of shadow map (in pixels per side)
+     */
+    final private static int shadowMapSize = 256;
+    /**
      * message logger for this class
      */
     final private static Logger logger =
@@ -311,7 +327,7 @@ public class MainViewState
          * Add a control for the forward-looking main camera.
          */
         Camera cam = application.getCamera();
-        Vector3f localOffset = new Vector3f(0f, 5f, -5f);
+        Vector3f localOffset = new Vector3f(0f, eyeHeight, -5f);
         CameraControl forwardView = new CameraControl(cam, localOffset,
                 forwardDirection, WorldState.upDirection);
         avatarNode.addControl(forwardView);
@@ -331,7 +347,6 @@ public class MainViewState
         torch.setRadius(attenuationRadius);
 
         if (shadowsFlag) {
-            int shadowMapSize = 4096; // pixels
             PointLightShadowRenderer plsr =
                     new PointLightShadowRenderer(assetManager, shadowMapSize);
             plsr.setLight(torch);
@@ -351,8 +366,6 @@ public class MainViewState
         assert mazeNode != null;
 
         float floorY = level.getFloorY();
-        float corridorWidth = 10f; // world units
-        float wallHeight = 10f; // world units
         float ceilingY = floorY + wallHeight; // world coordinate
 
         FloorView floorView = new FloorView(floorMaterial);

@@ -82,16 +82,24 @@ public class MapViewState
     /**
      * ball radius (world units)
      */
-    final private static float ballRadius = 3f;
+    final private static float ballRadius = 5f;
+    /**
+     * diameter of icons (world units)
+     */
+    final private static float iconDiameter = 30f;
     /**
      * stick radius (world units)
      */
-    final private static float stickRadius = 1f;
+    final private static float stickRadius = 2f;
     /**
      * message logger for this class
      */
     final private static Logger logger =
             Logger.getLogger(MapViewState.class.getName());
+    /**
+     * reusable unit-square mesh
+     */
+    final private static Quad unitSquare = new Quad(1f, 1f);
     /**
      * asset path to the "eye" icon asset
      */
@@ -251,14 +259,13 @@ public class MapViewState
 
         Node node = new Node("icon node");
 
-        Quad unitSquare = new Quad(1f, 1f);
         Geometry geometry = new Geometry("icon", unitSquare);
         node.attachChild(geometry);
         Quaternion rotation = new Quaternion();
         rotation.lookAt(Vector3f.UNIT_Y, Vector3f.UNIT_Z);
         geometry.setLocalRotation(rotation);
-        geometry.setLocalScale(16f);
-        geometry.setLocalTranslation(8f, 3f, -8f);
+        geometry.setLocalScale(iconDiameter);
+        geometry.setLocalTranslation(iconDiameter / 2f, 5f, -iconDiameter / 2f);
         geometry.setMaterial(material);
         geometry.setQueueBucket(Bucket.Transparent);
 
@@ -404,8 +411,9 @@ public class MapViewState
         float y2 = 0.95f;
         mapCamera.setViewPort(x1, x2, y1, y2);
 
-        float tanYfov = 50f; // world units
-        MyCamera.setYTangent(mapCamera, tanYfov);
+        float vertexSpacing = worldState.getVertexSpacing();
+        float yViewRadius = 3f * vertexSpacing; // world units
+        MyCamera.setYTangent(mapCamera, yViewRadius);
 
         RenderManager renderManager = application.getRenderManager();
         ViewPort insetView = renderManager.createMainView("inset", mapCamera);
@@ -415,7 +423,8 @@ public class MapViewState
         /*
          * Add a control for the downward-looking map camera.
          */
-        Vector3f offset = new Vector3f(0f, 20f, 0f);
+        float cameraHeight = 0.7f * levelSpacing; // world units
+        Vector3f offset = new Vector3f(0f, cameraHeight, 0f);
         Vector3f down = new Vector3f(0f, -1f, 0f);
         CameraControl downView =
                 new CameraControl(mapCamera, offset, down, forwardDirection);
