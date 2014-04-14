@@ -159,10 +159,6 @@ class WallsView {
         float halfSpacing = vertexSpacing / 2f;
         float halfWidth = corridorWidth / 2f;
 
-        Vector3f corner1 = new Vector3f(halfSpacing, 0f, halfWidth);
-        corner1 = orientation.mult(corner1);
-        corner1.addLocal(vertexLocation);
-
         Vector3f corner2 = new Vector3f(halfWidth, 0f, halfWidth);
         corner2 = orientation.mult(corner2);
         corner2.addLocal(vertexLocation);
@@ -179,18 +175,10 @@ class WallsView {
         corner5 = orientation.mult(corner5);
         corner5.addLocal(vertexLocation);
 
-        Vector3f corner6 = new Vector3f(-halfSpacing, 0f, halfWidth);
-        corner6 = orientation.mult(corner6);
-        corner6.addLocal(vertexLocation);
-
-        String description = "opening wall 1";
-        addSegment(parentNode, corner1, corner2, description);
-        description = "opening wall 2";
+        String description = "opening wall 2";
         addSegment(parentNode, corner2, corner3, description);
         description = "opening wall 3";
         addSegment(parentNode, corner4, corner5, description);
-        description = "opening wall 4";
-        addSegment(parentNode, corner5, corner6, description);
     }
 
     /**
