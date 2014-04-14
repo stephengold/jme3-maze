@@ -32,7 +32,8 @@ import java.util.logging.Logger;
 import jme3utilities.MyString;
 
 /**
- * Collectible item in the Maze Game. Each item has a named type.
+ * Generic collectible item in the Maze Game. Each item has a named type.
+ * Multiple instances may share the same type.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */

@@ -60,7 +60,7 @@ public class Crown
      */
     final private static String iconAssetPath = "Textures/map-icons/crown.png";
     /**
-     * asset path to the "crown" 3D model asset
+     * asset path to the "crown" 3-D model asset
      */
     final private static String modelAssetPath = "Models/items/crown/crown.j3o";
     // *************************************************************************
@@ -111,9 +111,6 @@ public class Crown
      */
     @Override
     public Spatial visualizeMain() {
-        /*
-         * A crown is represented by a gold teapot.
-         */
         AssetManager assetManager = application.getAssetManager();
         Node node = (Node) assetManager.loadModel(modelAssetPath);
 
@@ -131,7 +128,9 @@ public class Crown
                 MyAsset.createShinyMaterial(assetManager, deshretColor);
         Spatial deshret = node.getChild("Deshret");
         deshret.setMaterial(deshretMaterial);
-
+        /*
+         * Make it rotate.
+         */
         Vector3f axis = Vector3f.UNIT_Y;
         float rate = 0.5f; // radians per second
         RotationControl rotationControl = new RotationControl(rate, axis);

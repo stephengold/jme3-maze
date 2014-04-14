@@ -503,15 +503,15 @@ public class MapViewState
         ColorRGBA intersectionColor = ColorRGBA.Yellow;
         intersectionMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, intersectionColor);
-        
+
         ColorRGBA culDeSacColor = ColorRGBA.Red;
         culDeSacMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, culDeSacColor);
-        
+
         ColorRGBA passageColor = ColorRGBA.Green;
         passageMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, passageColor);
-        
+
         ColorRGBA stickColor = ColorRGBA.Blue;
         stickMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, stickColor);

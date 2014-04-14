@@ -99,7 +99,7 @@ class FloorView {
             for (int column = 0; column < gridColumns; column++) {
                 float z = vertexSpacing * (column - gridColumns / 2 + 0.5f);
                 Vector3f location = new Vector3f(x, floorY, z);
-                String description = 
+                String description =
                         String.format("%sFloor%d,%d", prefix, row, column);
                 addTile(level, parentNode, location, description);
             }
