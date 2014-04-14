@@ -285,12 +285,15 @@ public class MainViewState
          */
         addLight();
         addCamera();
-        /*
-         * As a debugging aid, dump the scene graph of this view.
-         */
-        Printer printer = new Printer();
-        printer.setPrintTransform(true);
-        printer.printSubtree(rootNode);
+
+        if (debugFlag) {
+            /*
+             * As a debugging aid, dump the scene graph of this view.
+             */
+            Printer printer = new Printer();
+            printer.setPrintTransform(true);
+            printer.printSubtree(rootNode);
+        }
     }
     // *************************************************************************
     // private methods
