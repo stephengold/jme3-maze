@@ -101,7 +101,7 @@ class CeilingView {
         for (int row = 0; row < gridRows; row++) {
             float x = vertexSpacing * (row - gridRows / 2 - 0.5f);
             for (int column = 0; column < gridColumns; column++) {
-                float z = vertexSpacing * (column - gridColumns / 2 + 0.5f);
+                float z = vertexSpacing * (column - gridColumns / 2 - 0.5f);
                 Vector3f location = new Vector3f(x, ceilingY, z);
                 String description =
                         String.format("%sCeiling%d,%d", prefix, row, column);
