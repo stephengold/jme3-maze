@@ -52,15 +52,11 @@ class FloorView {
     final private static Logger logger =
             Logger.getLogger(FloorView.class.getName());
     /**
-     * a unit square mesh
+     * reusable unit-square mesh
      */
     final private static Quad unitSquare = new Quad(1f, 1f);
     // *************************************************************************
     // fields
-    /**
-     * Y-coordinate of the floor (in world coordinates)
-     */
-    private float floorY;
     /**
      * material for floor (not null)
      */
@@ -74,10 +70,9 @@ class FloorView {
      * @param floorY Y-coordinate of the floor (in world coordinates)
      * @param material material for floor (not null)
      */
-    FloorView(float floorY, Material material) {
+    FloorView(Material material) {
         Validate.nonNull(material, "material");
 
-        this.floorY = floorY;
         this.material = material;
     }
     // *************************************************************************
@@ -94,15 +89,18 @@ class FloorView {
         Validate.nonNull(level, "level");
         Validate.nonNull(parentNode, "node");
 
+        float floorY = level.getFloorY();
         int gridRows = level.getRows();
         int gridColumns = level.getColumns();
+        String prefix = level.getName();
         float vertexSpacing = level.getVertexSpacing();
         for (int row = 0; row < gridRows; row++) {
             float x = vertexSpacing * (row - gridRows / 2 - 0.5f);
             for (int column = 0; column < gridColumns; column++) {
                 float z = vertexSpacing * (column - gridColumns / 2 + 0.5f);
                 Vector3f location = new Vector3f(x, floorY, z);
-                String description = String.format("floor%d,%d", row, column);
+                String description = 
+                        String.format("%sFloor%d,%d", prefix, row, column);
                 addTile(level, parentNode, location, description);
             }
         }

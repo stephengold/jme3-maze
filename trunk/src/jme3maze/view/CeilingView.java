@@ -52,7 +52,7 @@ class CeilingView {
     final private static Logger logger =
             Logger.getLogger(CeilingView.class.getName());
     /**
-     * a unit square mesh
+     * reusable unit-square mesh
      */
     final private static Quad unitSquare = new Quad(1f, 1f);
     // *************************************************************************
@@ -96,13 +96,15 @@ class CeilingView {
 
         int gridRows = level.getRows();
         int gridColumns = level.getColumns();
+        String prefix = level.getName();
         float vertexSpacing = level.getVertexSpacing();
         for (int row = 0; row < gridRows; row++) {
             float x = vertexSpacing * (row - gridRows / 2 - 0.5f);
             for (int column = 0; column < gridColumns; column++) {
                 float z = vertexSpacing * (column - gridColumns / 2 + 0.5f);
                 Vector3f location = new Vector3f(x, ceilingY, z);
-                String description = String.format("floor%d,%d", row, column);
+                String description =
+                        String.format("%sCeiling%d,%d", prefix, row, column);
                 addTile(level, parentNode, location, description);
             }
         }

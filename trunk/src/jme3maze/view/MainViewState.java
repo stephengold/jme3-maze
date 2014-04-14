@@ -57,6 +57,8 @@ import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.controls.LightControl;
 import jme3utilities.debug.Printer;
+import jme3utilities.navigation.NavDebug;
+import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
@@ -71,6 +73,14 @@ public class MainViewState
     // *************************************************************************
     // constants
 
+    /**
+     * flag to enable debug features
+     */
+    final private static boolean debugFlag = false;
+    /**
+     * flag to enable shadows
+     */
+    final private static boolean shadowsFlag = true;
     /**
      * message logger for this class
      */
@@ -104,6 +114,18 @@ public class MainViewState
      * map free items to their spatials
      */
     private Map<Item, Spatial> itemSpatial = new TreeMap<>();
+    /**
+     * shared material for ceiling geometries
+     */
+    private Material ceilingMaterial;
+    /**
+     * shared material for floor geometries
+     */
+    private Material floorMaterial;
+    /**
+     * shared material for wall geometries
+     */
+    private Material wallMaterial;
     /**
      * root of this view's scene graph: set by initialize()
      */
@@ -213,11 +235,34 @@ public class MainViewState
         rootNode = this.application.getRootNode();
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
-         * Generate a 3D representation of maze level 0.
+         * Initialize shared materials.
          */
+        ceilingMaterial =
+                MyAsset.createShinyMaterial(assetManager, ColorRGBA.White);
+
+        Texture floorTexture =
+                MyAsset.loadTexture(assetManager, pondAssetPath);
+        floorMaterial =
+                MyAsset.createShadedMaterial(assetManager, floorTexture);
+        floorMaterial.setBoolean("UseMaterialColors", true);
+        floorMaterial.setColor("Diffuse", ColorRGBA.White);
+
+        Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
+        wallMaterial = MyAsset.createShadedMaterial(assetManager, wallTexture);
+        wallMaterial.setBoolean("UseMaterialColors", true);
+        wallMaterial.setColor("Diffuse", ColorRGBA.White);
+        /*
+         * Generate a 3-D representation of each maze level.
+         */
+        Node mazeNode = new Node("main maze");
+        rootNode.attachChild(mazeNode);
+
         WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph level0 = worldState.getLevel(0);
-        addMaze(level0);
+        int numLevels = worldState.getNumLevels();
+        for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
+            GridGraph level = worldState.getLevel(levelIndex);
+            addMazeLevel(level, mazeNode);
+        }
         /*
          * Add free items.
          */
@@ -245,7 +290,7 @@ public class MainViewState
          */
         Printer printer = new Printer();
         printer.setPrintTransform(true);
-        //printer.printSubtree(rootNode);
+        printer.printSubtree(rootNode);
     }
     // *************************************************************************
     // private methods
@@ -282,53 +327,47 @@ public class MainViewState
         float attenuationRadius = 1000f; // world units
         torch.setRadius(attenuationRadius);
 
-        int shadowMapSize = 4096; // pixels
-        PointLightShadowRenderer plsr =
-                new PointLightShadowRenderer(assetManager, shadowMapSize);
-        plsr.setLight(torch);
-        ViewPort viewPort = application.getViewPort();
-        viewPort.addProcessor(plsr);
+        if (shadowsFlag) {
+            int shadowMapSize = 4096; // pixels
+            PointLightShadowRenderer plsr =
+                    new PointLightShadowRenderer(assetManager, shadowMapSize);
+            plsr.setLight(torch);
+            ViewPort viewPort = application.getViewPort();
+            viewPort.addProcessor(plsr);
+        }
     }
 
     /**
      * Add 3-D representation of a maze level to the scene.
+     *
+     * @param level level to represent (not null)
+     * @param mazeNode where in the scene graph to add (not null)
      */
-    private void addMaze(GridGraph level) {
-        ColorRGBA ceilingColor = new ColorRGBA(1f, 1f, 1f, 1f);
-        Material ceilingMaterial =
-                MyAsset.createShinyMaterial(assetManager, ceilingColor);
+    private void addMazeLevel(GridGraph level, Node mazeNode) {
+        assert level != null;
+        assert mazeNode != null;
 
-        Texture floorTexture =
-                MyAsset.loadTexture(assetManager, pondAssetPath);
-        Material floorMaterial =
-                MyAsset.createShadedMaterial(assetManager, floorTexture);
-        floorMaterial.setBoolean("UseMaterialColors", true);
-        ColorRGBA floorColor = new ColorRGBA(1f, 1f, 1f, 1f);
-        floorMaterial.setColor("Diffuse", floorColor);
-
-        Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
-        Material wallMaterial =
-                MyAsset.createShadedMaterial(assetManager, wallTexture);
-        wallMaterial.setBoolean("UseMaterialColors", true);
-        ColorRGBA wallColor = new ColorRGBA(1f, 1f, 1f, 1f);
-        wallMaterial.setColor("Diffuse", wallColor);
-
-        Node mazeNode = new Node("main maze");
-        rootNode.attachChild(mazeNode);
-
-        float floorY = 0f; // world coordinate
+        float floorY = level.getFloorY();
         float corridorWidth = 10f; // world units
         float wallHeight = 10f; // world units
         float ceilingY = floorY + wallHeight; // world coordinate
 
-        FloorView floorView = new FloorView(floorY, floorMaterial);
+        FloorView floorView = new FloorView(floorMaterial);
         floorView.visualize(level, mazeNode);
 
         WallsView wallsView =
-                new WallsView(floorY, corridorWidth, wallHeight, wallMaterial);
+                new WallsView(corridorWidth, wallHeight, wallMaterial);
         wallsView.visualize(level, mazeNode);
 
         CeilingView ceilingView = new CeilingView(ceilingY, ceilingMaterial);
         ceilingView.visualize(level, mazeNode);
+
+        if (debugFlag) {
+            WorldState worldState = stateManager.getState(WorldState.class);
+            NavGraph graph = worldState.getGraph();
+            Material debugMaterial = MyAsset.createUnshadedMaterial(
+                    assetManager, ColorRGBA.White);
+            NavDebug.addSticks(graph, mazeNode, 0.5f, debugMaterial);
+        }
     }
 }

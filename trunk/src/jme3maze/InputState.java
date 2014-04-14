@@ -198,15 +198,23 @@ class InputState
          */
         switch (lastActionString) {
             case advanceActionString:
+                /*
+                 * Pick the most promising arc.
+                 */
                 NavVertex vertex = playerState.getVertex();
                 direction = playerState.getDirection();
                 NavArc arc = vertex.findLeastTurn(direction);
+                /*
+                 * Compute the arc's horizontal direction.
+                 */
                 Vector3f arcDirection = arc.getStartDirection();
+                arcDirection.setY(0f);
+                arcDirection.normalizeLocal();
                 float dot = direction.dot(arcDirection);
                 if (1f - dot < epsilon) {
                     /*
-                     * The player's direction closely matches an arc, so
-                     * follow that arc.
+                     * The player's direction closely matches the 
+                     * horizontal direction of an arc, so follow that arc.
                      */
                     goMove(arc);
                 }
@@ -260,6 +268,7 @@ class InputState
         if (turnState.isEnabled()) {
             return;
         }
+
         lastActionString = actionString;
     }
     // *************************************************************************

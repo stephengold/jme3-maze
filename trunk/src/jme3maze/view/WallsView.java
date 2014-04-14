@@ -54,15 +54,11 @@ class WallsView {
     final private static Logger logger =
             Logger.getLogger(WallsView.class.getName());
     /**
-     * a unit square mesh
+     * reusable unit-square mesh
      */
     final private static Quad unitSquare = new Quad(1f, 1f);
     // *************************************************************************
     // fields
-    /**
-     * Y-coordinate of the floor (in world coordinates)
-     */
-    private float floorY;
     /**
      * width of corridors (in world units, &gt;0)
      */
@@ -86,13 +82,11 @@ class WallsView {
      * @param wallHeight height of walls (in world units, &gt;0)
      * @param material material for walls (not null)
      */
-    WallsView(float floorY, float corridorWidth, float wallHeight,
-            Material material) {
+    WallsView(float corridorWidth, float wallHeight, Material material) {
         Validate.positive(corridorWidth, "width");
         Validate.positive(wallHeight, "height");
         Validate.nonNull(material, "material");
 
-        this.floorY = floorY;
         this.corridorWidth = corridorWidth;
         this.wallHeight = wallHeight;
         this.material = material;
@@ -136,11 +130,11 @@ class WallsView {
 
         float halfWidth = corridorWidth / 2f;
 
-        Vector3f lowerLeftCorner = new Vector3f(halfWidth, floorY, halfWidth);
+        Vector3f lowerLeftCorner = new Vector3f(halfWidth, 0f, halfWidth);
         lowerLeftCorner = orientation.mult(lowerLeftCorner);
         lowerLeftCorner.addLocal(vertexLocation);
 
-        Vector3f lowerRightCorner = new Vector3f(-halfWidth, floorY, halfWidth);
+        Vector3f lowerRightCorner = new Vector3f(-halfWidth, 0f, halfWidth);
         lowerRightCorner = orientation.mult(lowerRightCorner);
         lowerRightCorner.addLocal(vertexLocation);
 
@@ -165,27 +159,27 @@ class WallsView {
         float halfSpacing = vertexSpacing / 2f;
         float halfWidth = corridorWidth / 2f;
 
-        Vector3f corner1 = new Vector3f(halfSpacing, floorY, halfWidth);
+        Vector3f corner1 = new Vector3f(halfSpacing, 0f, halfWidth);
         corner1 = orientation.mult(corner1);
         corner1.addLocal(vertexLocation);
 
-        Vector3f corner2 = new Vector3f(halfWidth, floorY, halfWidth);
+        Vector3f corner2 = new Vector3f(halfWidth, 0f, halfWidth);
         corner2 = orientation.mult(corner2);
         corner2.addLocal(vertexLocation);
 
-        Vector3f corner3 = new Vector3f(halfWidth, floorY, halfSpacing);
+        Vector3f corner3 = new Vector3f(halfWidth, 0f, halfSpacing);
         corner3 = orientation.mult(corner3);
         corner3.addLocal(vertexLocation);
 
-        Vector3f corner4 = new Vector3f(-halfWidth, floorY, halfSpacing);
+        Vector3f corner4 = new Vector3f(-halfWidth, 0f, halfSpacing);
         corner4 = orientation.mult(corner4);
         corner4.addLocal(vertexLocation);
 
-        Vector3f corner5 = new Vector3f(-halfWidth, floorY, halfWidth);
+        Vector3f corner5 = new Vector3f(-halfWidth, 0f, halfWidth);
         corner5 = orientation.mult(corner5);
         corner5.addLocal(vertexLocation);
 
-        Vector3f corner6 = new Vector3f(-halfSpacing, floorY, halfWidth);
+        Vector3f corner6 = new Vector3f(-halfSpacing, 0f, halfWidth);
         corner6 = orientation.mult(corner6);
         corner6.addLocal(vertexLocation);
 
@@ -203,8 +197,10 @@ class WallsView {
      * Add a single wall segment (quad) to a scene.
      *
      * @param parentNode where in the scene to attach the geometries (not null)
-     * @param lowerLeftCorner world coordinates of lower left (not null)
-     * @param lowerRightCorner world coordinates of lower right (not null)
+     * @param lowerLeftCorner world coordinates of lower left (not null, not
+     * altered)
+     * @param lowerRightCorner world coordinates of lower right (not null, not
+     * altered)
      * @param description name for the geometry (not null)
      */
     private void addSegment(Node parentNode, Vector3f lowerLeftCorner,
@@ -260,8 +256,8 @@ class WallsView {
      *
      * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
-     * @param row (&ge;0)
-     * @param column (&ge;0)
+     * @param row grid row of the vertex (&ge;0)
+     * @param column grid column of the vertex (&ge;0)
      */
     private void visualize(GridGraph level, Node parentNode, int row,
             int column) {

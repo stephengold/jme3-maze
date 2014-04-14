@@ -67,10 +67,6 @@ class MoveState
     // *************************************************************************
     // fields
     /**
-     * attaching application: set by initialize()
-     */
-    private Application application;
-    /**
      * app state manager: set by initialize()
      */
     private AppStateManager stateManager;
@@ -110,9 +106,7 @@ class MoveState
         Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
 
-        this.application = application;
         this.stateManager = stateManager;
-
         freeItemsState = stateManager.getState(FreeItemsState.class);
         playerState = stateManager.getState(PlayerState.class);
     }
@@ -177,6 +171,13 @@ class MoveState
         setEnabled(false);
         playerState.setVertex(destinationVertex);
         /*
+         * Clamp the player's direction to the horizontal (X-Z) plane.
+         */
+        Vector3f direction = playerState.getDirection();
+        direction.y = 0f;
+        direction.normalizeLocal();
+        playerState.setDirection(direction);
+        /*
          * Encounter any free items at the destination.
          */
         Item[] items = freeItemsState.getItems(destinationVertex);
@@ -190,7 +191,6 @@ class MoveState
             /*
              * Turn to the arc which requires the least rotation.
              */
-            Vector3f direction = playerState.getDirection();
             NavArc nextArc = destinationVertex.findLeastTurn(direction);
             Vector3f newDirection = nextArc.getStartDirection();
             TurnState turnState = stateManager.getState(TurnState.class);
