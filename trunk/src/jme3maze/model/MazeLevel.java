@@ -40,12 +40,12 @@ import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * A rectangular grid of uniformly-spaced vertices embedded in a navigation
- * graph.
+ * A level of the maze, consisting of a rectangular grid of uniformly-spaced
+ * vertices embedded in the overall navigation graph.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class GridGraph {
+public class MazeLevel {
     // *************************************************************************
     // constants
 
@@ -53,11 +53,11 @@ public class GridGraph {
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(GridGraph.class.getName());
+            Logger.getLogger(MazeLevel.class.getName());
     // *************************************************************************
     // fields
     /**
-     * navigation graph in which the vertices are contained
+     * navigation graph in which the vertices are embedded
      */
     final private NavGraph graph;
     /**
@@ -66,15 +66,15 @@ public class GridGraph {
      */
     final private float vertexSpacing;
     /**
-     * number of arcs in the grid
+     * number of navigation arcs in this level
      */
     int numArcs = 0;
     /**
-     * number of vertices in the grid
+     * number of navigation vertices in this level
      */
     int numVertices = 0;
     /**
-     * rectangular array of vertices in the grid: set by constructor
+     * rectangular array of vertices: set by constructor
      */
     final private NavVertex[][] grid;
     /**
@@ -82,28 +82,28 @@ public class GridGraph {
      */
     final private Random generator;
     /**
-     * name for this grid: set by constructor (not null)
+     * name for this level: set by constructor (not null)
      */
     final private String name;
     // *************************************************************************
     // constructors
 
     /**
-     * Instantiate a grid with the specified dimensions etc.
+     * Instantiate a level with the specified dimensions etcetera.
      *
      * @param vertexSpacing spacing between rows and columns in the X-Z plane
      * (in world units, &gt;0)
-     * @param yValue y-coordinate of the grid (in world coordinates)
-     * @param numRows number of rows on the X-axis of the grid (&gt;1)
-     * @param numColumns number of columns on the Z-axis of the grid (&gt;1)
+     * @param yValue y-coordinate of the floor (in world coordinates)
+     * @param numRows number of rows of vertices on the X-axis (&gt;1)
+     * @param numColumns number of columns of vertices on the Z-axis (&gt;1)
      * @param graph navigation graph to contain the vertices (not null)
      * @param generator number generator for randomization (not null)
-     * @param name name for this grid (not null)
+     * @param name name for this level (not null)
      * @param entryStartVertex vertex to connect to the entry point (or null for
      * none)
      * @param entryEndLocation location for the entry point (or null for none)
      */
-    GridGraph(float vertexSpacing, float yValue, int numRows, int numColumns,
+    MazeLevel(float vertexSpacing, float yValue, int numRows, int numColumns,
             NavGraph graph, Random generator, String name,
             NavVertex entryStartVertex, Vector3f entryEndLocation) {
         assert vertexSpacing > 0f : vertexSpacing;
@@ -201,7 +201,7 @@ public class GridGraph {
     }
 
     /**
-     * Read the number of columns on the Z-axis of the grid.
+     * Read the number of columns of vertices on the Z-axis of this level.
      *
      * @return count (&gt;1)
      */
@@ -212,7 +212,7 @@ public class GridGraph {
     }
 
     /**
-     * Read the world Y-coordinate for this grid's floor.
+     * Read the world Y-coordinate for this level's floor.
      */
     public float getFloorY() {
         float result = grid[0][0].getLocation().getY();
@@ -220,14 +220,14 @@ public class GridGraph {
     }
 
     /**
-     * Read the name of this grid.
+     * Read the name of this level.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Read the number of rows on the X-axis of the grid.
+     * Read the number of rows of vertices on the X-axis of this level.
      *
      * @return count (&gt;1)
      */
@@ -266,7 +266,7 @@ public class GridGraph {
     }
 
     /**
-     * Enumerate all vertices in this grid.
+     * Enumerate all vertices in this level.
      *
      * @return new collection of members
      */
@@ -286,7 +286,7 @@ public class GridGraph {
     }
 
     /**
-     * Select a random arc from this grid.
+     * Select a random arc from this level.
      *
      * @param generator generator of uniform random values (not null)
      * @return pre-existing member
@@ -314,7 +314,7 @@ public class GridGraph {
     // private methods
 
     /**
-     * Create a new arc and add it to this grid.
+     * Create a new arc and add it to this level.
      *
      * @param startVertex member
      * @param endVertex member
@@ -365,9 +365,9 @@ public class GridGraph {
     }
 
     /**
-     * Fill this grid with vertices (but no arcs).
+     * Fill this level with vertices (but no arcs).
      *
-     * @param yValue y-coordinate for this grid (in world coordinates)
+     * @param yValue y-coordinate for this level (in world coordinates)
      * @param namePrefix (not null)
      */
     private void addVertices(float yValue, String namePrefix) {
@@ -392,7 +392,7 @@ public class GridGraph {
     }
 
     /**
-     * Test whether this grid contains the specified vertex.
+     * Test whether this level contains the specified vertex.
      *
      * @param vertex vertex to be tested (or null)
      */
@@ -495,7 +495,7 @@ public class GridGraph {
     }
 
     /**
-     * Verify that a vertex belongs to this grid.
+     * Verify that a vertex belongs to this level.
      *
      * @param vertex vertex to be validated (or null)
      */
@@ -503,7 +503,7 @@ public class GridGraph {
         if (!contains(vertex)) {
             logger.log(Level.SEVERE, "vertex={0}", vertex);
             throw new IllegalArgumentException(
-                    "grid should contain the vertex");
+                    "vertex should be on this level");
         }
     }
 }

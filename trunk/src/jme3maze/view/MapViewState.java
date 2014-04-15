@@ -49,7 +49,7 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
-import jme3maze.model.GridGraph;
+import jme3maze.model.MazeLevel;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
@@ -233,7 +233,7 @@ public class MapViewState
         }
 
         PlayerState playerState = stateManager.getState(PlayerState.class);
-        GridGraph level = playerState.getMazeLevel();
+        MazeLevel level = playerState.getMazeLevel();
 
         for (NavVertex vertex = startVertex; vertex != null;) {
             addMazeVertex(vertex);

@@ -33,7 +33,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
 import java.util.logging.Logger;
-import jme3maze.model.GridGraph;
+import jme3maze.model.MazeLevel;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavVertex;
@@ -92,7 +92,7 @@ class CeilingView {
      * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      */
-    public void visualize(GridGraph level, Node parentNode) {
+    public void visualize(MazeLevel level, Node parentNode) {
         Validate.nonNull(level, "level");
         Validate.nonNull(parentNode, "node");
 
@@ -120,9 +120,8 @@ class CeilingView {
      * @param location world coordinates of tile's center (not null)
      * @param description name for the geometry (not null)
      */
-    private void addTile(GridGraph level, Node parentNode, Vector3f location,
+    private void addTile(MazeLevel level, Node parentNode, Vector3f location,
             String description) {
-        assert location != null;
         assert description != null;
 
         Geometry geometry = new Geometry(description, unitSquare);

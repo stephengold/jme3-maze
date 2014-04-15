@@ -165,9 +165,9 @@ public class PlayerState
      *
      * @return pre-existing instance
      */
-    public GridGraph getMazeLevel() {
+    public MazeLevel getMazeLevel() {
         WorldState worldState = stateManager.getState(WorldState.class);
-        GridGraph level = worldState.getLevel(mazeLevelIndex);
+        MazeLevel level = worldState.getLevel(mazeLevelIndex);
         return level;
     }
 
