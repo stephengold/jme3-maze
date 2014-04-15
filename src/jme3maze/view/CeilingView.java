@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import jme3maze.model.GridGraph;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
+import jme3utilities.navigation.NavVertex;
 
 /**
  * Visualizer for the ceiling in the main view.
@@ -60,7 +61,7 @@ class CeilingView {
     /**
      * Y-coordinate of the ceiling (in world coordinates)
      */
-    private float ceilingY;
+    private float wallHeight;
     /**
      * material for ceiling (not null)
      */
@@ -71,13 +72,14 @@ class CeilingView {
     /**
      * Instantiate a visualizer with the specified parameters.
      *
-     * @param ceilingY Y-coordinate of the ceiling (in world coordinates)
+     * @param wallHeight height of the walls (in world units, &gt;0)
      * @param material material for floor (not null)
      */
-    CeilingView(float ceilingY, Material material) {
+    CeilingView(float wallHeight, Material material) {
+        Validate.positive(wallHeight, "height");
         Validate.nonNull(material, "material");
 
-        this.ceilingY = ceilingY;
+        this.wallHeight = wallHeight;
         this.material = material;
     }
     // *************************************************************************
@@ -97,12 +99,10 @@ class CeilingView {
         int gridRows = level.getRows();
         int gridColumns = level.getColumns();
         String prefix = level.getName();
-        float vertexSpacing = level.getVertexSpacing();
         for (int row = 0; row < gridRows; row++) {
-            float x = vertexSpacing * (row - gridRows / 2 - 0.5f);
             for (int column = 0; column < gridColumns; column++) {
-                float z = vertexSpacing * (column - gridColumns / 2 - 0.5f);
-                Vector3f location = new Vector3f(x, ceilingY, z);
+                NavVertex vertex = level.getVertex(row, column);
+                Vector3f location = vertex.getLocation();
                 String description =
                         String.format("%sCeiling%d,%d", prefix, row, column);
                 addTile(level, parentNode, location, description);
@@ -113,11 +113,11 @@ class CeilingView {
     // private methods
 
     /**
-     * Add a square ceiling tile to a scene.
+     * Add a plain square ceiling tile to a scene.
      *
      * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
-     * @param location world coordinates of tile's main corner (not null)
+     * @param location world coordinates of tile's center (not null)
      * @param description name for the geometry (not null)
      */
     private void addTile(GridGraph level, Node parentNode, Vector3f location,
@@ -127,10 +127,13 @@ class CeilingView {
 
         Geometry geometry = new Geometry(description, unitSquare);
         parentNode.attachChild(geometry);
+
         float vertexSpacing = level.getVertexSpacing();
         geometry.setLocalScale(vertexSpacing, vertexSpacing, 1f);
         geometry.setMaterial(material);
-        MySpatial.setWorldLocation(geometry, location);
+        float halfSpacing = vertexSpacing / 2f;
+        Vector3f cornerLocation = location.add(-halfSpacing, wallHeight, -halfSpacing);
+        MySpatial.setWorldLocation(geometry, cornerLocation);
 
         Quaternion rotation = new Quaternion();
         rotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
