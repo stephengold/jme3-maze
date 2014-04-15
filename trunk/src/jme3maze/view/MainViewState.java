@@ -366,7 +366,6 @@ public class MainViewState
         assert mazeNode != null;
 
         float floorY = level.getFloorY();
-        float ceilingY = floorY + wallHeight; // world coordinate
 
         FloorView floorView = new FloorView(floorMaterial);
         floorView.visualize(level, mazeNode);
@@ -375,7 +374,7 @@ public class MainViewState
                 new WallsView(corridorWidth, wallHeight, wallMaterial);
         wallsView.visualize(level, mazeNode);
 
-        CeilingView ceilingView = new CeilingView(ceilingY, ceilingMaterial);
+        CeilingView ceilingView = new CeilingView(wallHeight, ceilingMaterial);
         ceilingView.visualize(level, mazeNode);
 
         if (debugFlag) {

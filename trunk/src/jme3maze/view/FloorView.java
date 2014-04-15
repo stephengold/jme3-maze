@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import jme3maze.model.GridGraph;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
+import jme3utilities.navigation.NavVertex;
 
 /**
  * Visualizer for the floor in the main view.
@@ -89,16 +90,13 @@ class FloorView {
         Validate.nonNull(level, "level");
         Validate.nonNull(parentNode, "node");
 
-        float floorY = level.getFloorY();
         int gridRows = level.getRows();
         int gridColumns = level.getColumns();
         String prefix = level.getName();
-        float vertexSpacing = level.getVertexSpacing();
         for (int row = 0; row < gridRows; row++) {
-            float x = vertexSpacing * (row - gridRows / 2 - 0.5f);
             for (int column = 0; column < gridColumns; column++) {
-                float z = vertexSpacing * (column - gridColumns / 2 + 0.5f);
-                Vector3f location = new Vector3f(x, floorY, z);
+                NavVertex vertex = level.getVertex(row, column);
+                Vector3f location = vertex.getLocation();
                 String description =
                         String.format("%sFloor%d,%d", prefix, row, column);
                 addTile(level, parentNode, location, description);
@@ -109,11 +107,11 @@ class FloorView {
     // private methods
 
     /**
-     * Add a square floor tile to a scene.
+     * Add a plain square floor tile to a scene.
      *
      * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
-     * @param location world coordinates of tile's main corner (not null)
+     * @param location world coordinates of tile's center (not null)
      * @param description name for the geometry (not null)
      */
     private void addTile(GridGraph level, Node parentNode, Vector3f location,
@@ -123,10 +121,13 @@ class FloorView {
 
         Geometry geometry = new Geometry(description, unitSquare);
         parentNode.attachChild(geometry);
+
         float vertexSpacing = level.getVertexSpacing();
         geometry.setLocalScale(vertexSpacing, vertexSpacing, 1f);
         geometry.setMaterial(material);
-        MySpatial.setWorldLocation(geometry, location);
+        float halfSpacing = vertexSpacing / 2f;
+        Vector3f cornerLocation = location.add(-halfSpacing, 0f, halfSpacing);
+        MySpatial.setWorldLocation(geometry, cornerLocation);
 
         Quaternion rotation = new Quaternion();
         rotation.fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X);
