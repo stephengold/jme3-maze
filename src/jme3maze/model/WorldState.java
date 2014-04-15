@@ -76,7 +76,7 @@ public class WorldState
     /**
      * levels of the maze: set by initialize()
      */
-    private GridGraph[] levels;
+    private MazeLevel[] levels;
     /**
      * topology of the complete maze
      */
@@ -139,9 +139,9 @@ public class WorldState
      * @param levelIndex index of the level (&ge;0)
      * @return pre-existing instance
      */
-    public GridGraph getLevel(int levelIndex) {
+    public MazeLevel getLevel(int levelIndex) {
         Validate.nonNegative(levelIndex, "level");
-        GridGraph level = levels[levelIndex];
+        MazeLevel level = levels[levelIndex];
 
         assert level != null;
         return level;
@@ -237,7 +237,7 @@ public class WorldState
      */
     private void initializeMaze() {
         int numLevels = 2;
-        levels = new GridGraph[numLevels];
+        levels = new MazeLevel[numLevels];
         NavVertex entryStartVertex = null;
         Vector3f entryEndLocation = null;
 
@@ -246,7 +246,7 @@ public class WorldState
             int numRows = 5 + 2 * levelIndex; // 5, 7, 9, ...
             int numColumns = numRows;
             String levelName = String.format("L%d", levelIndex);
-            GridGraph level = new GridGraph(vertexSpacing, baseY, numRows,
+            MazeLevel level = new MazeLevel(vertexSpacing, baseY, numRows,
                     numColumns, graph, generator, levelName, entryStartVertex,
                     entryEndLocation);
             levels[levelIndex] = level;

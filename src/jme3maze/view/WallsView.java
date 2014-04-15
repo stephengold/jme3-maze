@@ -32,7 +32,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
 import java.util.logging.Logger;
-import jme3maze.model.GridGraph;
+import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
@@ -101,8 +101,7 @@ class WallsView {
      * @param level maze level to visualize (not null)
      * @param parentNode where in the scene to attach the geometries (not null)
      */
-    public void visualize(GridGraph level, Node parentNode) {
-        Validate.nonNull(level, "level");
+    public void visualize(MazeLevel level, Node parentNode) {
         Validate.nonNull(parentNode, "node");
 
         int gridRows = level.getRows();
@@ -150,7 +149,7 @@ class WallsView {
      * @param vertexLocation (not null)
      * @param orientation relative to the world's +Z direction (not null)
      */
-    private void addOpening(GridGraph level, Node parentNode,
+    private void addOpening(MazeLevel level, Node parentNode,
             Vector3f vertexLocation, Quaternion orientation) {
         assert parentNode != null;
         assert vertexLocation != null;
@@ -220,12 +219,10 @@ class WallsView {
      * @param fromVertex (not null)
      * @param toVertex (not null)
      */
-    private void addWallsBetween(GridGraph level, Node parentNode,
+    private void addWallsBetween(MazeLevel level, Node parentNode,
             NavVertex fromVertex, NavVertex toVertex) {
         assert level != null;
         assert parentNode != null;
-        assert fromVertex != null;
-        assert toVertex != null;
 
         Vector3f fromLocation = fromVertex.getLocation();
         Vector3f toLocation = toVertex.getLocation();
@@ -247,9 +244,8 @@ class WallsView {
      * @param row grid row of the vertex (&ge;0)
      * @param column grid column of the vertex (&ge;0)
      */
-    private void visualize(GridGraph level, Node parentNode, int row,
+    private void visualize(MazeLevel level, Node parentNode, int row,
             int column) {
-        assert level != null;
         assert parentNode != null;
         assert row >= 0 : row;
         assert column >= 0 : column;

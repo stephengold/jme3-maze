@@ -48,7 +48,7 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
-import jme3maze.model.GridGraph;
+import jme3maze.model.MazeLevel;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
@@ -276,7 +276,7 @@ public class MainViewState
         WorldState worldState = stateManager.getState(WorldState.class);
         int numLevels = worldState.getNumLevels();
         for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
-            GridGraph level = worldState.getLevel(levelIndex);
+            MazeLevel level = worldState.getLevel(levelIndex);
             addMazeLevel(level, mazeNode);
         }
         /*
@@ -361,11 +361,9 @@ public class MainViewState
      * @param level level to represent (not null)
      * @param mazeNode where in the scene graph to add (not null)
      */
-    private void addMazeLevel(GridGraph level, Node mazeNode) {
+    private void addMazeLevel(MazeLevel level, Node mazeNode) {
         assert level != null;
         assert mazeNode != null;
-
-        float floorY = level.getFloorY();
 
         FloorView floorView = new FloorView(floorMaterial);
         floorView.visualize(level, mazeNode);
