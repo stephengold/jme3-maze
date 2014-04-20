@@ -1,0 +1,166 @@
+package jme3maze;
+
+import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetLoadException;
+import com.jme3.asset.BlenderKey;
+import com.jme3.export.JmeExporter;
+import com.jme3.export.binary.BinaryExporter;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
+import com.jme3.scene.Mesh.Mode;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.jme3.system.JmeContext;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jme3utilities.Misc;
+import jme3utilities.MyString;
+import jme3utilities.debug.Printer;
+
+/**
+ * A headless simple application to convert Blender assets to J3O files.
+ *
+ * @author Stephen Gold <sgold@sonic.net>
+ */
+public class AssetProcessor
+        extends SimpleApplication {
+    // *************************************************************************
+    // constants
+
+    /**
+     * message logger for this class
+     */
+    final private static Logger logger =
+            Logger.getLogger(AssetProcessor.class.getName());
+    // *************************************************************************
+    // new methods exposed
+
+    /**
+     * Main entry point for the Maze Game asset builder.
+     *
+     * @param arguments array of command-line arguments (not null)
+     */
+    public static void main(String[] arguments) {
+        /*
+         * Mute the chatty loggers found in some imported packages.
+         */
+        Misc.setLoggingLevels(Level.WARNING);
+        /*
+         * Set the logging level for this class.
+         */
+        logger.setLevel(Level.INFO);
+        /*
+         * Instantiate the application.
+         */
+        AssetProcessor application = new AssetProcessor();
+        application.start(JmeContext.Type.Headless);
+        /*
+         * ... and onward to AssetProcessor.simpleInitApp()!
+         */
+    }
+    // *************************************************************************
+    // SimpleApplication methods
+
+    /**
+     * Initialize this application.
+     */
+    @Override
+    public void simpleInitApp() {
+        String userDir = System.getProperty("user.dir");
+        logger.log(Level.INFO, "working directory is {0}",
+                MyString.quote(userDir));
+
+        processItemModels();
+
+        stop();
+    }
+    // *************************************************************************
+    // private methods
+
+    /**
+     * Convert a Blender model asset to J3O format.
+     *
+     * @param path (not null)
+     */
+    private void processModel(String path) {
+        assert path != null;
+        logger.log(Level.FINE, "path={0}", path);
+
+        String sourceAssetPath = String.format("Models/%s.blend", path);
+        String targetFilePath = String.format("assets/Models/%s.j3o", path);
+        File targetFile = new File(targetFilePath);
+        /*
+         * Load the Blender model.
+         */
+        BlenderKey key = new BlenderKey(sourceAssetPath);
+        Spatial model = assetManager.loadModel(key);
+        logger.log(Level.INFO, "read Blender asset {0}",
+                MyString.quote(sourceAssetPath));
+        validateSpatial(model);
+
+        new Printer().printSubtree(model);
+        /*
+         * Save the model in J3O format.
+         */
+        JmeExporter exporter = BinaryExporter.getInstance();
+        try {
+            exporter.save(model, targetFile);
+        } catch (IOException exception) {
+            logger.log(Level.SEVERE, "write to {0} failed",
+                    MyString.quote(targetFilePath));
+            throw new RuntimeException();
+        }
+        logger.log(Level.INFO, "wrote file {0}",
+                MyString.quote(targetFilePath));
+    }
+
+    private void processModelFolder(String folderPath, String[] paths) {
+        for (String modelPath : paths) {
+            String assetPath = String.format("%s/%s", folderPath, modelPath);
+            processModel(assetPath);
+        }
+    }
+
+    /**
+     * Process models in the "Models/items" subfolder.
+     */
+    private void processItemModels() {
+        String[] paths = {
+            "ankh/ankh", "crown/crown", "torch/torch"
+        };
+        processModelFolder("items", paths);
+    }
+
+    /**
+     * Validate a geometry which is part of an imported model.
+     *
+     * @param geometry (not null)
+     */
+    private void validateGeometry(Geometry geometry) {
+        Mesh mesh = geometry.getMesh();
+        Mode mode = mesh.getMode();
+        if (mode != Mesh.Mode.Triangles) {
+            throw new AssetLoadException("expected a mesh in Triangles mode");
+        }
+    }
+
+    /**
+     * Validate a spatial which is part of an imported model.
+     *
+     * @param spatial (not null)
+     */
+    private void validateSpatial(Spatial spatial) {
+        if (spatial instanceof Geometry) {
+            Geometry geometry = (Geometry) spatial;
+            validateGeometry(geometry);
+            return;
+        }
+        assert spatial instanceof Node;
+        Node node = (Node) spatial;
+        for (Spatial child : node.getChildren()) {
+            validateSpatial(child);
+        }
+    }
+}
