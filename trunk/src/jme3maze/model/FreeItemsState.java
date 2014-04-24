@@ -95,7 +95,7 @@ public class FreeItemsState
 
         TreeSet<Item> list = itemsAt.get(vertex);
         if (list == null) {
-            list = new TreeSet();
+            list = new TreeSet<>();
             TreeSet<Item> previousList = itemsAt.put(vertex, list);
             assert previousList == null : previousList;
         }
