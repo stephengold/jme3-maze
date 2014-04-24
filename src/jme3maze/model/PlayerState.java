@@ -35,7 +35,7 @@ import jme3maze.items.Item;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
-import jme3utilities.math.MyVector3f;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
@@ -100,10 +100,9 @@ public class PlayerState
      */
     final private Quaternion orientation = new Quaternion();
     /**
-     * direction this player facing and moving (unit vector in world
-     * coordinates)
+     * direction this player facing (in world coordinates, length=1)
      */
-    final private Vector3f direction = new Vector3f(1f, 0f, 0f);
+    private VectorXZ direction = VectorXZ.north;
     /**
      * location (world coordinates)
      */
@@ -124,9 +123,9 @@ public class PlayerState
     /**
      * Copy this player's direction.
      *
-     * @return a new unit vector in world coordinates
+     * @return new unit vector in world coordinates
      */
-    public Vector3f getDirection() {
+    public VectorXZ getDirection() {
         assert direction.isUnitVector() : direction;
         return direction.clone();
     }
@@ -208,20 +207,12 @@ public class PlayerState
     }
 
     /**
-     * Rotate this player by a specified angle around a specified axis.
+     * Rotate this player around the +Y axis.
      *
-     * @param angle rotation angle (in radians)
-     * @param axis (not null, not zero, unaffected)
+     * @param rotation (length=1)
      */
-    public void rotate(float angle, Vector3f axis) {
-        Validate.nonNull(axis, "axis");
-        if (MyVector3f.isZeroLength(axis)) {
-            throw new IllegalArgumentException("axis has zero length");
-        }
-
-        Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(angle, axis);
-        Vector3f newDirection = rotation.mult(direction);
+    public void rotate(VectorXZ rotation) {
+        VectorXZ newDirection = direction.rotate(rotation);
         setDirection(newDirection);
     }
 
@@ -237,8 +228,8 @@ public class PlayerState
         NavVertex fromVertex = arc.getFromVertex();
         setVertex(fromVertex);
 
-        Vector3f startDirection = arc.getStartDirection();
-        setDirection(startDirection);
+        VectorXZ horizontalDirection = arc.getHorizontalDirection();
+        setDirection(horizontalDirection);
 
         MapViewState mapViewState = stateManager.getState(MapViewState.class);
         if (mapViewState.isEnabled()) {
@@ -249,17 +240,17 @@ public class PlayerState
     /**
      * Alter this player's direction.
      *
-     * @param newDirection world coordinates (not null, not zero, unaffected)
+     * @param newDirection world coordinates (not null, positive length)
      */
-    public void setDirection(Vector3f newDirection) {
+    public void setDirection(VectorXZ newDirection) {
         Validate.nonNull(newDirection, "direction");
-        if (MyVector3f.isZeroLength(newDirection)) {
-            throw new IllegalArgumentException("direction has zero length");
+        if (newDirection.isZeroLength()) {
+            throw new IllegalArgumentException(
+                    "direction should have positive length");
         }
 
-        Vector3f norm = newDirection.normalize();
-        direction.set(norm);
-        orientation.lookAt(direction, WorldState.upDirection);
+        direction = newDirection.normalize();
+        orientation.set(direction.toQuaternion());
         /*
          * Visualize the rotation.
          */
@@ -323,8 +314,7 @@ public class PlayerState
             Vector3f newLocation = vertex.getLocation();
             setLocation(newLocation);
 
-            WorldState worldState = stateManager.getState(WorldState.class);
-            mazeLevelIndex = worldState.findLevelIndex(vertex);
+            mazeLevelIndex = WorldState.findLevelIndex(vertex);
 
             MapViewState mapViewState =
                     stateManager.getState(MapViewState.class);

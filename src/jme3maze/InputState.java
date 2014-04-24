@@ -32,11 +32,11 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
+import com.jme3.math.FastMath;
 import java.util.logging.Logger;
 import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
@@ -77,14 +77,6 @@ class InputState
      * action string for turning one arc to the right
      */
     final private static String rightActionString = "right";
-    /**
-     * the player's left direction in local coordinates
-     */
-    final private static Vector3f leftDirection = Vector3f.UNIT_X;
-    /**
-     * the player's right direction in local coordinates
-     */
-    final private static Vector3f rightDirection = new Vector3f(-1f, 0f, 0f);
     // *************************************************************************
     // fields
     /**
@@ -191,8 +183,7 @@ class InputState
         super.update(elapsedTime);
 
         PlayerState playerState = stateManager.getState(PlayerState.class);
-        Quaternion orientation = playerState.getOrientation();
-        Vector3f direction;
+        VectorXZ direction = playerState.getDirection();
         /*
          * Process the most recent action string.
          */
@@ -202,15 +193,9 @@ class InputState
                  * Pick the most promising arc.
                  */
                 NavVertex vertex = playerState.getVertex();
-                direction = playerState.getDirection();
                 NavArc arc = vertex.findLeastTurn(direction);
-                /*
-                 * Compute the arc's horizontal direction.
-                 */
-                Vector3f arcDirection = arc.getStartDirection();
-                arcDirection.setY(0f);
-                arcDirection.normalizeLocal();
-                float dot = direction.dot(arcDirection);
+                VectorXZ horizontalDirection = arc.getHorizontalDirection();
+                float dot = direction.dot(horizontalDirection);
                 if (1f - dot < epsilon) {
                     /*
                      * The player's direction closely matches the
@@ -222,17 +207,17 @@ class InputState
 
             case leftActionString:
                 /*
-                 * Turn the player 90 degrees to the left;
+                 * Turn the player to the left (90 degrees CCW).
                  */
-                direction = orientation.mult(leftDirection);
+                direction = direction.rotate(-FastMath.HALF_PI);
                 goTurn(direction);
                 break;
 
             case rightActionString:
                 /*
-                 * Turn the player 90 degrees to the right;
+                 * Turn the player to the right (90 degrees CW).
                  */
-                direction = orientation.mult(rightDirection);
+                direction = direction.rotate(FastMath.HALF_PI);
                 goTurn(direction);
                 break;
 
@@ -294,9 +279,9 @@ class InputState
     /**
      * Activate the turn state for a specified direction.
      *
-     * @param newDirection unit vector (unaffected)
+     * @param newDirection (length=1)
      */
-    private void goTurn(Vector3f newDirection) {
+    private void goTurn(VectorXZ newDirection) {
         assert newDirection != null;
         assert newDirection.isUnitVector() : newDirection;
 

@@ -34,6 +34,7 @@ import jme3maze.items.Item;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
@@ -171,13 +172,6 @@ class MoveState
         setEnabled(false);
         playerState.setVertex(destinationVertex);
         /*
-         * Clamp the player's direction to the horizontal (X-Z) plane.
-         */
-        Vector3f direction = playerState.getDirection();
-        direction.y = 0f;
-        direction.normalizeLocal();
-        playerState.setDirection(direction);
-        /*
          * Encounter any free items at the destination.
          */
         Item[] items = freeItemsState.getItems(destinationVertex);
@@ -191,14 +185,15 @@ class MoveState
             /*
              * Turn to the arc which requires the least rotation.
              */
+            VectorXZ direction = playerState.getDirection();
             NavArc nextArc = destinationVertex.findLeastTurn(direction);
-            Vector3f newDirection = nextArc.getStartDirection();
+            VectorXZ horizontalDirection = nextArc.getHorizontalDirection();
             TurnState turnState = stateManager.getState(TurnState.class);
-            turnState.activate(newDirection);
+            turnState.activate(horizontalDirection);
 
         } else {
             /*
-             * Activate the input state to wait for user input.
+             * Activate the input state and await user input.
              */
             InputState inputState = stateManager.getState(InputState.class);
             inputState.setEnabled(true);

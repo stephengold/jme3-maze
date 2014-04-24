@@ -28,13 +28,11 @@ package jme3maze;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.math.FastMath;
-import com.jme3.math.Vector3f;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
-import jme3utilities.math.MyVector3f;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
@@ -54,7 +52,7 @@ class TurnState
     /**
      * tolerance for detecting completion of turn
      */
-    final private static float epsilon = 1e-5f;
+    final private static float epsilon = 1e-3f;
     /**
      * message logger for this class
      */
@@ -73,7 +71,7 @@ class TurnState
     /**
      * final direction of turn: set by activate()
      */
-    private Vector3f finalDirection;
+    private VectorXZ finalDirection;
     // *************************************************************************
     // constructors
 
@@ -90,14 +88,14 @@ class TurnState
      * Enable this state with the specified final direction.
      *
      * @param finalDirection player's direction when the turn is complete
-     * (length=1, unaffected)
+     * (length=1)
      */
-    void activate(Vector3f finalDirection) {
+    void activate(VectorXZ finalDirection) {
         assert finalDirection != null;
         assert finalDirection.isUnitVector() : finalDirection;
         logger.log(Level.INFO, "finalDirection={0}", finalDirection);
 
-        this.finalDirection = finalDirection.clone();
+        this.finalDirection = finalDirection;
         setEnabled(true);
     }
     // *************************************************************************
@@ -122,10 +120,11 @@ class TurnState
         inputState = stateManager.getState(InputState.class);
         playerState = stateManager.getState(PlayerState.class);
         /*
-         * Activate the "turn" app state.
+         * Activate the app state.
          */
-        Vector3f direction = playerState.getArc().getStartDirection();
-        activate(direction);
+        NavArc arc = playerState.getArc();
+        VectorXZ horizontalDirection = arc.getHorizontalDirection();
+        activate(horizontalDirection);
     }
 
     /**
@@ -139,41 +138,31 @@ class TurnState
         assert isEnabled();
         super.update(elapsedTime);
 
-        Vector3f direction = playerState.getDirection();
-        float dot = finalDirection.dot(direction);
-        if (1f - dot < epsilon) {
+        VectorXZ direction = playerState.getDirection();
+        float directionError = direction.directionError(finalDirection);
+        if (Math.abs(directionError) < epsilon) {
             turnComplete();
             return;
         }
-
-        Vector3f axis = direction.cross(finalDirection);
-        if (MyVector3f.isZeroLength(axis)) {
-            axis = Vector3f.UNIT_Y;
-        } else {
-            axis.normalizeLocal();
-        }
-        float angle = FastMath.acos(dot); // positive angle
+        VectorXZ conjugate = direction.mirrorZ();
+        VectorXZ rotation = finalDirection.rotate(conjugate);
         float maxTurnAngle = elapsedTime * playerState.getMaxTurnRate();
-        if (angle > maxTurnAngle) {
-            angle = maxTurnAngle;
-        }
-        assert angle > 0f : angle;
-        logger.log(Level.INFO, "turnAngle={0}", angle);
-        playerState.rotate(angle, axis);
+        VectorXZ limitedRotation = rotation.clampDirection(maxTurnAngle);
+        playerState.rotate(limitedRotation);
     }
     // *************************************************************************
     // private methods
 
     /**
-     * The current turn is complete.
+     * The current rotation is complete.
      */
     private void turnComplete() {
         setEnabled(false);
 
         NavVertex vertex = playerState.getVertex();
         NavArc arc = vertex.findLeastTurn(finalDirection);
-        Vector3f arcDirection = arc.getStartDirection();
-        float dot = finalDirection.dot(arcDirection);
+        VectorXZ horizontalDirection = arc.getHorizontalDirection();
+        float dot = finalDirection.dot(horizontalDirection);
         if (1f - dot < epsilon) {
             playerState.setArc(arc);
         } else {

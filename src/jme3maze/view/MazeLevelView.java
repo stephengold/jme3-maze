@@ -43,7 +43,7 @@ import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Visualizer for a maze level in the main view.
+ * Immutable visualizer for maze levels in the main view.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -113,8 +113,7 @@ class MazeLevelView {
     // new methods exposed
 
     /**
-     * Visualize the ceiling, floor, and walls of the specified maze level under
-     * the specified scene node.
+     * Visualize the specified maze level under the specified scene node.
      *
      * @param level maze level to visualize (not null)
      * @param parentNode where in the scene graph to attach geometries (not
@@ -171,7 +170,7 @@ class MazeLevelView {
      * @param parentNode where in the scene graph to attach geometries (not
      * null)
      * @param vertex (not null, unaffected)
-     * @param direction (positive length, unaffected)
+     * @param direction (positive length)
      */
     private void addClosure(Node parentNode, NavVertex vertex,
             VectorXZ direction) {
@@ -264,7 +263,7 @@ class MazeLevelView {
              */
             float levelSpacing = WorldState.getLevelSpacing();
             Vector3f verticalOffset =
-                    new Vector3f(0f, -levelChange * levelSpacing, 0f);
+                    new Vector3f(0f, -levelChange * levelSpacing / 2f, 0f);
             vertexLocation.addLocal(verticalOffset);
             addSideWalls(parentNode, vertexLocation, orientation);
             /*
@@ -273,8 +272,9 @@ class MazeLevelView {
             float tan = levelSpacing / (vertexSpacing - corridorWidth);
             double tangent = (double) tan;
             float sec = (float) Math.sqrt(1.0 + tangent * tangent);
-            float rotationAngle = FastMath.atan(tan);
+            float rotationAngle = FastMath.atan(tan) * levelChange;
             Vector3f rotationAxis;
+            Quaternion rotation = new Quaternion();
             float dx = horizontalDirection.getX();
             float dz = horizontalDirection.getZ();
             if (Math.abs(dx) > Math.abs(dz)) {
@@ -284,8 +284,14 @@ class MazeLevelView {
                 }
                 ceilingTile.scale(sec, 1f, 1f);
                 floorTile.scale(sec, 1f, 1f);
+
                 float sign = Math.signum(dx);
                 rotationAxis = new Vector3f(0f, -sign, 0f);
+                rotation.fromAngleNormalAxis(rotationAngle, rotationAxis);
+                ceilingTile.rotate(rotation);
+                rotation.fromAngleNormalAxis(-rotationAngle, rotationAxis);
+                floorTile.rotate(rotation);
+
             } else {
                 if (dz > 0f) {
                     MySpatial.moveWorld(floorTile, verticalOffset);
@@ -294,15 +300,13 @@ class MazeLevelView {
                 }
                 ceilingTile.scale(1f, sec, 1f);
                 floorTile.scale(1f, sec, 1f);
+
                 float sign = Math.signum(dz);
                 rotationAxis = new Vector3f(sign, 0f, 0f);
+                rotation.fromAngleNormalAxis(rotationAngle, rotationAxis);
+                ceilingTile.rotate(rotation);
+                floorTile.rotate(rotation);
             }
-            rotationAngle = levelChange * rotationAngle;
-            Quaternion rotation = new Quaternion();
-            rotation.fromAngleNormalAxis(rotationAngle, rotationAxis);
-            ceilingTile.rotate(rotation);
-            rotation.fromAngleNormalAxis(-rotationAngle, rotationAxis);
-            floorTile.rotate(rotation);
         }
     }
 

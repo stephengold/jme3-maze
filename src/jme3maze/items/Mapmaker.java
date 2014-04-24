@@ -41,6 +41,7 @@ import jme3maze.model.PlayerState;
 import jme3maze.view.MapViewState;
 import jme3utilities.MyAsset;
 import jme3utilities.Validate;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavVertex;
 
 /**
@@ -104,7 +105,7 @@ public class Mapmaker
 
             PlayerState playerState = stateManager.getState(PlayerState.class);
             NavVertex vertex = playerState.getVertex();
-            Vector3f direction = playerState.getDirection();
+            VectorXZ direction = playerState.getDirection();
             mapViewState.addMazeLineOfSight(vertex, direction);
         }
     }

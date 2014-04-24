@@ -30,6 +30,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.input.FlyByCamera;
 import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
@@ -78,6 +79,10 @@ public class MainViewState
      */
     final private static boolean debugFlag = false;
     /**
+     * flag to enable shaded materials
+     */
+    final private static boolean shadedFlag = true;
+    /**
      * flag to enable shadows
      */
     final private static boolean shadowsFlag = true;
@@ -113,7 +118,7 @@ public class MainViewState
     final private static String wallAssetPath =
             "Textures/Terrain/BrickWall/BrickWall.jpg";
     /**
-     * local "forward" direction (unit vector)
+     * local "forward" direction (length=1)
      */
     final private static Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
     // *************************************************************************
@@ -179,9 +184,25 @@ public class MainViewState
     }
 
     /**
+     * Replace CameraControl with FlyByCamera for debugging.
+     */
+    public void fly() {
+        CameraControl cameraControl =
+                avatarNode.getControl(CameraControl.class);
+        cameraControl.setEnabled(false);
+
+        FlyByCamera flyCam = application.getFlyByCamera();
+        flyCam.setEnabled(true);
+        flyCam.setMoveSpeed(10f);
+    }
+
+    /**
      * Access the scene's light source.
+     *
+     * @return pre-existing instance
      */
     public Light getLight() {
+        assert torch != null;
         return torch;
     }
 
@@ -251,33 +272,52 @@ public class MainViewState
         rootNode = this.application.getRootNode();
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
-         * Initialize shared materials.
+         * Initialize materials for ceiling, floor, and walls.
          */
-        ceilingMaterial =
-                MyAsset.createShinyMaterial(assetManager, ColorRGBA.White);
+        if (shadedFlag) {
+            ceilingMaterial = MyAsset.createShinyMaterial(assetManager,
+                    ColorRGBA.White.mult(2f));
+        } else {
+            ceilingMaterial = MyAsset.createUnshadedMaterial(assetManager,
+                    ColorRGBA.White);
+        }
 
         Texture floorTexture =
                 MyAsset.loadTexture(assetManager, pondAssetPath);
-        floorMaterial =
-                MyAsset.createShadedMaterial(assetManager, floorTexture);
-        floorMaterial.setBoolean("UseMaterialColors", true);
-        floorMaterial.setColor("Diffuse", ColorRGBA.White);
+        if (shadedFlag) {
+            floorMaterial =
+                    MyAsset.createShadedMaterial(assetManager, floorTexture);
+            floorMaterial.setBoolean("UseMaterialColors", true);
+            floorMaterial.setColor("Diffuse", ColorRGBA.White.mult(2f));
+        } else {
+            floorMaterial =
+                    MyAsset.createUnshadedMaterial(assetManager, floorTexture);
+        }
 
         Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
-        wallMaterial = MyAsset.createShadedMaterial(assetManager, wallTexture);
-        wallMaterial.setBoolean("UseMaterialColors", true);
-        wallMaterial.setColor("Diffuse", ColorRGBA.White);
+        if (shadedFlag) {
+            wallMaterial =
+                    MyAsset.createShadedMaterial(assetManager, wallTexture);
+            wallMaterial.setBoolean("UseMaterialColors", true);
+            wallMaterial.setColor("Diffuse", ColorRGBA.White);
+        } else {
+            wallMaterial =
+                    MyAsset.createUnshadedMaterial(assetManager, wallTexture);
+        }
         /*
          * Generate a 3-D representation of each maze level.
          */
         Node mazeNode = new Node("main maze");
         rootNode.attachChild(mazeNode);
 
+        MazeLevelView mazeLevelView = new MazeLevelView(corridorWidth,
+                wallHeight, ceilingMaterial, floorMaterial, wallMaterial);
+
         WorldState worldState = stateManager.getState(WorldState.class);
         int numLevels = worldState.getNumLevels();
         for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
             MazeLevel level = worldState.getLevel(levelIndex);
-            addMazeLevel(level, mazeNode);
+            addMazeLevel(level, mazeLevelView, mazeNode);
         }
         /*
          * Add free items.
@@ -320,11 +360,12 @@ public class MainViewState
     private void addCamera() {
         /*
          * Disable SimpleApplication's FlyByCamera,
-         * which is for simple demos, not games.
+         * which is for debug and demos, not gameplay.
          */
         application.getFlyByCamera().setEnabled(false);
         /*
-         * Add a control for the forward-looking main camera.
+         * Add a control for the forward-looking main camera, five world units
+         * behind the avatar.
          */
         Camera cam = application.getCamera();
         Vector3f localOffset = new Vector3f(0f, eyeHeight, -5f);
@@ -361,21 +402,17 @@ public class MainViewState
      * @param level level to represent (not null)
      * @param mazeNode where in the scene graph to add (not null)
      */
-    private void addMazeLevel(MazeLevel level, Node mazeNode) {
+    private void addMazeLevel(MazeLevel level, MazeLevelView mazeView,
+            Node mazeNode) {
         assert level != null;
         assert mazeNode != null;
 
-        FloorView floorView = new FloorView(floorMaterial);
-        floorView.visualize(level, mazeNode);
-
-        WallsView wallsView =
-                new WallsView(corridorWidth, wallHeight, wallMaterial);
-        wallsView.visualize(level, mazeNode);
-
-        CeilingView ceilingView = new CeilingView(wallHeight, ceilingMaterial);
-        ceilingView.visualize(level, mazeNode);
+        mazeView.visualize(level, mazeNode);
 
         if (debugFlag) {
+            /*
+             * As a debugging aid, visualize the navigation arcs using sticks.
+             */
             WorldState worldState = stateManager.getState(WorldState.class);
             NavGraph graph = worldState.getGraph();
             Material debugMaterial = MyAsset.createUnshadedMaterial(
