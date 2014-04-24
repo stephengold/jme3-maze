@@ -136,7 +136,7 @@ public class Item
     @Override
     public int compareTo(Object object) {
         Item otherItem = (Item) object;
-        String otherName = otherItem.typeName;
+        String otherName = otherItem.getTypeName();
         return typeName.compareTo(otherName);
     }
 }
