@@ -61,28 +61,23 @@ public class MazeLevel {
      */
     final private NavGraph graph;
     /**
-     * spacing between vertices in the X and Z directions: set by constructor
-     * (in world units, &gt;0)
-     */
-    final private float vertexSpacing;
-    /**
      * number of navigation arcs in this level
      */
-    int numArcs = 0;
+    private int numArcs = 0;
     /**
      * number of navigation vertices in this level
      */
-    int numVertices = 0;
+    private int numVertices = 0;
     /**
      * rectangular array of vertices: set by constructor
      */
     final private NavVertex[][] grid;
     /**
-     * generator for randomization: set by constructor (not null)
+     * generator for randomization (not null): set by constructor
      */
     final private Random generator;
     /**
-     * name for this level: set by constructor (not null)
+     * name for this level (not null): set by constructor
      */
     final private String name;
     // *************************************************************************
@@ -91,8 +86,6 @@ public class MazeLevel {
     /**
      * Instantiate a level with the specified dimensions etcetera.
      *
-     * @param vertexSpacing spacing between rows and columns in the X-Z plane
-     * (in world units, &gt;0)
      * @param yValue y-coordinate of the floor (in world coordinates)
      * @param numRows number of rows of vertices on the X-axis (&gt;1)
      * @param numColumns number of columns of vertices on the Z-axis (&gt;1)
@@ -103,10 +96,9 @@ public class MazeLevel {
      * none)
      * @param entryEndLocation location for the entry point (or null for none)
      */
-    MazeLevel(float vertexSpacing, float yValue, int numRows, int numColumns,
+    MazeLevel(float yValue, int numRows, int numColumns,
             NavGraph graph, Random generator, String name,
             NavVertex entryStartVertex, Vector3f entryEndLocation) {
-        assert vertexSpacing > 0f : vertexSpacing;
         assert numRows > 1 : numRows;
         assert numColumns > 1 : numColumns;
         assert graph != null;
@@ -114,7 +106,6 @@ public class MazeLevel {
         assert name != null;
 
         this.generator = generator;
-        this.vertexSpacing = vertexSpacing;
         this.graph = graph;
         this.name = name;
         /**
@@ -127,7 +118,7 @@ public class MazeLevel {
 
         if (entryEndLocation != null) {
             /*
-             * Remove the arc which would interfere with entry from above.
+             * Remove the arc-pair which would interfere with entry from above.
              */
             Vector3f entryStartLocation = entryStartVertex.getLocation();
             Vector3f entryOffset =
@@ -139,7 +130,7 @@ public class MazeLevel {
             numArcs -= 2;
         }
         /**
-         * Prune arcs until a minimum spanning tree is obtained.
+         * Prune the remaining arcs until a minimum spanning tree is obtained.
          */
         int numPairs = numVertices - 1;
         pruneTo(numPairs);
@@ -213,6 +204,8 @@ public class MazeLevel {
 
     /**
      * Read the world Y-coordinate for this level's floor.
+     *
+     * @return Y-coordinate value
      */
     public float getFloorY() {
         float result = grid[0][0].getLocation().getY();
@@ -221,8 +214,11 @@ public class MazeLevel {
 
     /**
      * Read the name of this level.
+     *
+     * @return name (not null)
      */
     public String getName() {
+        assert name != null;
         return name;
     }
 
@@ -257,21 +253,12 @@ public class MazeLevel {
     }
 
     /**
-     * Read the spacing between vertices in the X and Z directions.
-     *
-     * @return distance (in world units, &gt;0)
-     */
-    public float getVertexSpacing() {
-        return vertexSpacing;
-    }
-
-    /**
      * Enumerate all vertices in this level.
      *
      * @return new collection of members
      */
     public Collection<NavVertex> getVertices() {
-        List<NavVertex> result = new ArrayList<>();
+        List<NavVertex> result = new ArrayList<>(30);
         int numRows = getRows();
         int numColumns = getColumns();
         for (int row = 0; row < numRows; row++) {
@@ -294,7 +281,7 @@ public class MazeLevel {
     public NavArc randomArc(Random generator) {
         Validate.nonNull(generator, "generator");
 
-        List<NavArc> allArcs = new ArrayList<>();
+        List<NavArc> allArcs = new ArrayList<>(30);
 
         int numRows = getRows();
         int numColumns = getColumns();
@@ -375,6 +362,7 @@ public class MazeLevel {
 
         int numRows = getRows();
         int numColumns = getColumns();
+        float vertexSpacing = WorldState.getVertexSpacing();
         for (int row = 0; row < numRows; row++) {
             float x = vertexSpacing * (row - numRows / 2);
             for (int column = 0; column < numColumns; column++) {
@@ -432,6 +420,7 @@ public class MazeLevel {
         assert location != null;
 
         int numColumns = getColumns();
+        float vertexSpacing = WorldState.getVertexSpacing();
         int column = Math.round(location.z / vertexSpacing) + numColumns / 2;
 
         if (column < 0) {
@@ -467,6 +456,7 @@ public class MazeLevel {
         assert location != null;
 
         int numRows = getRows();
+        float vertexSpacing = WorldState.getVertexSpacing();
         int row = Math.round(location.x / vertexSpacing) + numRows / 2;
 
         if (row < 0) {

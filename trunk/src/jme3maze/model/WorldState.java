@@ -32,8 +32,10 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.Collection;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Validate;
+import jme3utilities.math.MyVector3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -66,7 +68,7 @@ public class WorldState
     /**
      * default seed for pseudo-random number generator
      */
-    final private static long defaultSeed = 13498675L;
+    final private static long defaultSeed = 13_498_675L;
     /**
      * "up" direction in world coordinates
      */
@@ -112,19 +114,20 @@ public class WorldState
      * Find the level index of the specified vertex.
      *
      * @param vertex (not null)
-     * @return
+     * @return level index (&ge;0)
      */
-    public int findLevelIndex(NavVertex vertex) {
+    public static int findLevelIndex(NavVertex vertex) {
         Validate.nonNull(vertex, "vertex");
 
         Vector3f location = vertex.getLocation();
         int levelIndex = Math.round(-location.y / levelSpacing);
 
+        assert levelIndex >= 0 : levelIndex;
         return levelIndex;
     }
 
     /**
-     * Access the number generator.
+     * Access this world's generator.
      *
      * @return pre-existing instance
      */
@@ -162,7 +165,8 @@ public class WorldState
      *
      * @return distance (in world units, &gt;0)
      */
-    public float getLevelSpacing() {
+    public static float getLevelSpacing() {
+        assert levelSpacing > 0f : levelSpacing;
         return levelSpacing;
     }
 
@@ -187,22 +191,44 @@ public class WorldState
     }
 
     /**
-     * Read the spacing between vertices in the X and Z directions.
+     * Read the spacing between adjacent vertices in the X and Z directions.
      *
      * @return distance (in world units, &gt;0)
      */
-    public float getVertexSpacing() {
+    public static float getVertexSpacing() {
+        assert vertexSpacing > 0f : vertexSpacing;
         return vertexSpacing;
+    }
+
+    /**
+     * Compute the level difference between the endpoints of the specified arc.
+     *
+     * @param arc (not null, unaffected)
+     * @return number of levels (in the downward direction)
+     */
+    public static int levelChange(NavArc arc) {
+        NavVertex fromVertex = arc.getFromVertex();
+        int fromIndex = findLevelIndex(fromVertex);
+        NavVertex toVertex = arc.getToVertex();
+        int toIndex = findLevelIndex(toVertex);
+        int result = toIndex - fromIndex;
+
+        return result;
     }
 
     /**
      * Convert the specified direction to a quaternion.
      *
-     * @param direction (not null, not zero)
+     * @param direction (positive length, unaffected)
      * @return new instance
      */
     public static Quaternion toOrientation(Vector3f direction) {
         Validate.nonNull(direction, "direction");
+        if (MyVector3f.isZeroLength(direction)) {
+            logger.log(Level.SEVERE, "direction={0}", direction);
+            throw new IllegalArgumentException(
+                    "direction should have positive length");
+        }
 
         Quaternion result = new Quaternion();
         result.lookAt(direction, upDirection);
@@ -233,7 +259,7 @@ public class WorldState
     // private methods
 
     /**
-     * Initialize the maze.
+     * Initialize the psuedo-random maze.
      */
     private void initializeMaze() {
         int numLevels = 2;
@@ -243,12 +269,11 @@ public class WorldState
 
         for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
             float baseY = -levelIndex * levelSpacing; // world coordinate
-            int numRows = 5 + 2 * levelIndex; // 5, 7, 9, ...
+            int numRows = 3 + 2 * levelIndex; // 3, 5, 7, 9, ...
             int numColumns = numRows;
             String levelName = String.format("L%d", levelIndex);
-            MazeLevel level = new MazeLevel(vertexSpacing, baseY, numRows,
-                    numColumns, graph, generator, levelName, entryStartVertex,
-                    entryEndLocation);
+            MazeLevel level = new MazeLevel(baseY, numRows, numColumns, graph,
+                    generator, levelName, entryStartVertex, entryEndLocation);
             levels[levelIndex] = level;
 
             NavVertex entryEndVertex;
@@ -271,8 +296,9 @@ public class WorldState
             NavArc arc = arcs[0];
             Vector3f arcDirection = arc.getStartDirection();
             Vector3f entryStartLocation = entryStartVertex.getLocation();
-            entryEndLocation = entryStartLocation.subtract(arcDirection);
-            entryEndLocation.y -= vertexSpacing;
+            Vector3f offset = arcDirection.mult(vertexSpacing);
+            entryEndLocation = entryStartLocation.subtract(offset);
+            entryEndLocation.y -= levelSpacing;
         }
     }
 }

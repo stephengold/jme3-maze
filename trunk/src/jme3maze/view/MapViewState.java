@@ -58,6 +58,7 @@ import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.debug.Printer;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavVertex;
@@ -105,7 +106,7 @@ public class MapViewState
      */
     final private static String eyeAssetPath = "Textures/map-icons/eye.png";
     /**
-     * local "forward" direction (unit vector)
+     * local "forward" direction (length=1)
      */
     final private static Vector3f forwardDirection = Vector3f.UNIT_Z;
     // *************************************************************************
@@ -211,26 +212,18 @@ public class MapViewState
      * those vertices.
      *
      * @param startVertex (not null)
-     * @param direction (unit vector, not zero)
+     * @param direction (unit vector, positive length)
      */
-    public void addMazeLineOfSight(NavVertex startVertex, Vector3f direction) {
-        int rowIncrement = 0;
-        int columnIncrement = 0;
-        float absX = Math.abs(direction.x);
-        float absZ = Math.abs(direction.z);
-        if (absX > absZ) {
-            if (direction.x > 0f) {
-                rowIncrement = 1;
-            } else {
-                rowIncrement = -1;
-            }
-        } else {
-            if (direction.z > 0f) {
-                columnIncrement = 1;
-            } else {
-                columnIncrement = -1;
-            }
+    public void addMazeLineOfSight(NavVertex startVertex, VectorXZ direction) {
+        Validate.nonNull(direction, "direction");
+        if (direction.isZeroLength()) {
+            throw new IllegalArgumentException(
+                    "direction should have positive length");
         }
+
+        VectorXZ cardinal = direction.cardinalize();
+        int rowIncrement = Math.round(cardinal.getX());
+        int columnIncrement = Math.round(cardinal.getZ());
 
         PlayerState playerState = stateManager.getState(PlayerState.class);
         MazeLevel level = playerState.getMazeLevel();
@@ -250,6 +243,7 @@ public class MapViewState
      *
      * @param textureAssetPath (not null)
      * @param matchEye true to match rotation of the "eye" icon, otherwise false
+     * @return new unparented instance
      */
     public Spatial loadIcon(String textureAssetPath, boolean matchEye) {
         Texture texture = assetManager.loadTexture(textureAssetPath);
@@ -283,6 +277,8 @@ public class MapViewState
      * @param item free item to remove (not null)
      */
     public void removeFreeItem(Item item) {
+        Validate.nonNull(item, "item");
+
         Spatial spatial = itemSpatial.remove(item);
         if (spatial != null) {
             spatial.removeFromParent();
@@ -396,8 +392,7 @@ public class MapViewState
         /*
          * Limit far plane in order to display a single maze level at a time.
          */
-        WorldState worldState = stateManager.getState(WorldState.class);
-        float levelSpacing = worldState.getLevelSpacing();
+        float levelSpacing = WorldState.getLevelSpacing();
         mapCamera.setFrustumFar(levelSpacing);
 
         mapCamera.setParallelProjection(true);
@@ -411,7 +406,7 @@ public class MapViewState
         float y2 = 0.95f;
         mapCamera.setViewPort(x1, x2, y1, y2);
 
-        float vertexSpacing = worldState.getVertexSpacing();
+        float vertexSpacing = WorldState.getVertexSpacing();
         float yViewRadius = 3f * vertexSpacing; // world units
         MyCamera.setYTangent(mapCamera, yViewRadius);
 
