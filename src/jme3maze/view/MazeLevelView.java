@@ -277,7 +277,7 @@ class MazeLevelView {
             Quaternion rotation = new Quaternion();
             float dx = horizontalDirection.getX();
             float dz = horizontalDirection.getZ();
-            if (Math.abs(dx) > Math.abs(dz)) {
+            if (FastMath.abs(dx) > FastMath.abs(dz)) {
                 if (dx < 0f) {
                     MySpatial.moveWorld(ceilingTile, verticalOffset);
                     MySpatial.moveWorld(floorTile, verticalOffset);
@@ -403,16 +403,15 @@ class MazeLevelView {
         assert direction != null;
         assert direction.isUnitVector() : direction;
 
-        Vector3f direction3 = direction.toVector3f();
-        NavArc arc = fromVertex.findLeastTurn(direction3);
+        NavArc arc = fromVertex.findLeastTurn(direction);
         if (arc == null) {
             addClosure(parentNode, fromVertex, direction);
         } else {
-            Vector3f startDirection = arc.getStartDirection();
-            float dot = startDirection.dot(direction3);
+            VectorXZ startDirection = arc.getHorizontalDirection();
+            float dot = startDirection.dot(direction);
             if (dot > 0.5f) {
                 /*
-                 * found an arc with start direction within 60 degrees
+                 * found an arc whose start direction is within 60 degrees
                  */
                 addOpening(parentNode, arc);
             } else {
