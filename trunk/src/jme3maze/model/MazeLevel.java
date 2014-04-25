@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Validate;
 import jme3utilities.math.Noise;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -123,14 +124,15 @@ public class MazeLevel {
             Vector3f entryStartLocation = entryStartVertex.getLocation();
             Vector3f entryOffset =
                     entryStartLocation.subtract(entryEndLocation);
-            entryOffset.y = 0f;
+            VectorXZ horizontalOffset = new VectorXZ(entryOffset);
             NavVertex entryEndVertex = findVertex(entryEndLocation);
-            NavArc arc = entryEndVertex.findLeastTurn(entryOffset);
+            NavArc arc = entryEndVertex.findLeastTurn(horizontalOffset);
             graph.removePair(arc);
             numArcs -= 2;
         }
         /**
          * Prune the remaining arcs until a minimum spanning tree is obtained.
+         * In this way, all vertices are connected without any loops.
          */
         int numPairs = numVertices - 1;
         pruneTo(numPairs);
@@ -176,7 +178,7 @@ public class MazeLevel {
     }
 
     /**
-     * Find a vertex by its location.
+     * Find the vertex nearest to the specified location.
      *
      * @param location (world coordinates, not null)
      * @return pre-existing instance (or null if not found)

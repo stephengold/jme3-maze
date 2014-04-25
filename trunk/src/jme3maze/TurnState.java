@@ -28,6 +28,7 @@ package jme3maze;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.math.FastMath;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.model.PlayerState;
@@ -140,7 +141,7 @@ class TurnState
 
         VectorXZ direction = playerState.getDirection();
         float directionError = direction.directionError(finalDirection);
-        if (Math.abs(directionError) < epsilon) {
+        if (FastMath.abs(directionError) < epsilon) {
             turnComplete();
             return;
         }
