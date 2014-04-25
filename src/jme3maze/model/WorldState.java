@@ -53,6 +53,10 @@ public class WorldState
     // constants
 
     /**
+     * width of maze corridors (in world units)
+     */
+    final private static float corridorWidth = 10f;
+    /**
      * spacing between levels (in world units)
      */
     final private static float levelSpacing = 20f;
@@ -111,19 +115,13 @@ public class WorldState
     // new methods exposed
 
     /**
-     * Find the level index of the specified vertex.
+     * Read the corridor width for mazes.
      *
-     * @param vertex (not null)
-     * @return level index (&ge;0)
+     * @return distance (in world units, &gt;0)
      */
-    public static int findLevelIndex(NavVertex vertex) {
-        Validate.nonNull(vertex, "vertex");
-
-        Vector3f location = vertex.getLocation();
-        int levelIndex = Math.round(-location.y / levelSpacing);
-
-        assert levelIndex >= 0 : levelIndex;
-        return levelIndex;
+    public static float getCorridorWidth() {
+        assert corridorWidth > 0f : corridorWidth;
+        return corridorWidth;
     }
 
     /**
@@ -193,10 +191,10 @@ public class WorldState
     /**
      * Read the spacing between adjacent vertices in the X and Z directions.
      *
-     * @return distance (in world units, &gt;0)
+     * @return distance (in world units, &gt;corridorWidth)
      */
     public static float getVertexSpacing() {
-        assert vertexSpacing > 0f : vertexSpacing;
+        assert vertexSpacing > corridorWidth : vertexSpacing;
         return vertexSpacing;
     }
 
@@ -208,12 +206,38 @@ public class WorldState
      */
     public static int levelChange(NavArc arc) {
         NavVertex fromVertex = arc.getFromVertex();
-        int fromIndex = findLevelIndex(fromVertex);
+        int fromIndex = levelIndex(fromVertex);
         NavVertex toVertex = arc.getToVertex();
-        int toIndex = findLevelIndex(toVertex);
+        int toIndex = levelIndex(toVertex);
         int result = toIndex - fromIndex;
 
         return result;
+    }
+
+    /**
+     * Compute the level index of the specified vertex.
+     *
+     * @param vertex (not null)
+     * @return level index (&ge;0)
+     */
+    public static int levelIndex(NavVertex vertex) {
+        Vector3f location = vertex.getLocation();
+        int levelIndex = levelIndex(location);
+
+        return levelIndex;
+    }
+
+    /**
+     * Compute the level index of the specified location.
+     *
+     * @param location (not null)
+     * @return level index (&ge;0)
+     */
+    public static int levelIndex(Vector3f location) {
+        int levelIndex = Math.round(-location.y / levelSpacing);
+
+        assert levelIndex >= 0 : levelIndex;
+        return levelIndex;
     }
 
     /**
@@ -259,7 +283,7 @@ public class WorldState
     // private methods
 
     /**
-     * Initialize the psuedo-random maze.
+     * Initialize the pseudo-random maze.
      */
     private void initializeMaze() {
         int numLevels = 2;
@@ -287,7 +311,7 @@ public class WorldState
                 entryEndVertex = level.findVertex(entryEndLocation);
             }
             /*
-             * Put the level's exit as far as possible from the entrance.
+             * Put the level's exit as far as possible from its entrance.
              */
             Collection<NavVertex> vertices = level.getVertices();
             entryStartVertex = graph.findFurthest(entryEndVertex, vertices);
