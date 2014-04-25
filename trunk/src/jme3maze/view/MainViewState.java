@@ -87,10 +87,6 @@ public class MainViewState
      */
     final private static boolean shadowsFlag = true;
     /**
-     * width of maze corridors (in world units)
-     */
-    final private static float corridorWidth = 10f;
-    /**
      * height of camera above player's base location (in world units)
      */
     final private static float eyeHeight = 5f;
@@ -310,6 +306,7 @@ public class MainViewState
         Node mazeNode = new Node("main maze");
         rootNode.attachChild(mazeNode);
 
+        float corridorWidth = WorldState.getCorridorWidth();
         MazeLevelView mazeLevelView = new MazeLevelView(corridorWidth,
                 wallHeight, ceilingMaterial, floorMaterial, wallMaterial);
 

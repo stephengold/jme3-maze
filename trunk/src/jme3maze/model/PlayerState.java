@@ -314,7 +314,7 @@ public class PlayerState
             Vector3f newLocation = vertex.getLocation();
             setLocation(newLocation);
 
-            mazeLevelIndex = WorldState.findLevelIndex(vertex);
+            mazeLevelIndex = WorldState.levelIndex(vertex);
 
             MapViewState mapViewState =
                     stateManager.getState(MapViewState.class);
