@@ -107,6 +107,8 @@ public class Mapmaker
             NavVertex vertex = playerState.getVertex();
             VectorXZ direction = playerState.getDirection();
             mapViewState.addMazeLineOfSight(vertex, direction);
+            playerState.setDirection(direction);
+            playerState.setVertex(vertex);
         }
     }
 
