@@ -73,9 +73,9 @@ class MoveState
      */
     private AppStateManager stateManager;
     /**
-     *
+     * distance traveled from start of arc
      */
-    private float distanceTravelled = 0f;
+    private float distanceTraveled = 0f;
     /**
      * app state to manage free items: set by initialize()
      */
@@ -127,7 +127,7 @@ class MoveState
     final public void setEnabled(boolean newState) {
         if (newState && !isEnabled()) {
             playerState.incrementMoveCount();
-            distanceTravelled = 0f;
+            distanceTraveled = 0f;
         }
 
         super.setEnabled(newState);
@@ -146,7 +146,7 @@ class MoveState
 
         NavArc arc = playerState.getArc();
         float arcLength = arc.getPathLength();
-        float distanceRemaining = arcLength - distanceTravelled;
+        float distanceRemaining = arcLength - distanceTraveled;
         if (distanceRemaining <= epsilon) {
             movementComplete(arc);
             return;
@@ -158,8 +158,8 @@ class MoveState
         if (step > distanceRemaining) {
             step = distanceRemaining;
         }
-        distanceTravelled += step;
-        Vector3f newLocation = arc.pathLocation(distanceTravelled);
+        distanceTraveled += step;
+        Vector3f newLocation = arc.pathLocation(distanceTraveled);
         playerState.setLocation(newLocation);
         playerState.setVertex(null);
     }
