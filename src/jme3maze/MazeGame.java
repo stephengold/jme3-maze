@@ -26,6 +26,7 @@
 package jme3maze;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.system.AppSettings;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,6 +94,17 @@ public class MazeGame
      */
     @Override
     public void simpleInitApp() {
+        /*
+         * Disable display of JME statistics.
+         * These displays can be re-enabled by pressing the F5 hotkey.
+         */
+        setDisplayFps(false);
+        setDisplayStatView(false);
+        /*
+         * Capture a screenshot each time the SYSRQ hotkey is pressed.
+         */
+        ScreenshotAppState screenShotState = new ScreenshotAppState();
+        stateManager.attach(screenShotState);
         /*
          * Attach model app states to the application.
          */
