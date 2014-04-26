@@ -39,8 +39,7 @@ import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to translate the player on a constant-velocity trajectory to the
- * endpoint of the current navigation arc.
+ * App state to translate the player along the current navigation arc.
  * <p>
  * Each instance is disabled at creation.
  *
@@ -52,12 +51,14 @@ class MoveState
     // constants
 
     /**
-     * tolerance for detecting completion of move (in world units)
+     * tolerance for detecting completion of a move (in world units)
      */
     final private static float epsilon = 1e-3f;
     /**
      * maximum number of arcs per vertex for which the player turns
-     * automatically
+     * automatically after a move; 0 &rarr; disable automatic turning, &ge;1
+     * &rarr; turn 180 at each cul-de-sac, &ge;2 &rarr; follow turns in
+     * corridors
      */
     final private static int maxArcsForAutoTurn = 0;
     /**
@@ -72,18 +73,23 @@ class MoveState
      */
     private AppStateManager stateManager;
     /**
+     *
+     */
+    private float distanceTravelled = 0f;
+    /**
      * app state to manage free items: set by initialize()
      */
     private FreeItemsState freeItemsState;
     /**
-     * app state to manage player: set by initialize()
+     * app state to manage the player: set by initialize()
      */
     private PlayerState playerState;
     // *************************************************************************
     // constructors
 
     /**
-     * Instantiate a disabled move state.
+     * Instantiate a disabled move state. After instantiation, the first method
+     * invoked should be initialize().
      */
     MoveState() {
         setEnabled(false);
@@ -121,6 +127,7 @@ class MoveState
     final public void setEnabled(boolean newState) {
         if (newState && !isEnabled()) {
             playerState.incrementMoveCount();
+            distanceTravelled = 0f;
         }
 
         super.setEnabled(newState);
@@ -138,23 +145,21 @@ class MoveState
         super.update(elapsedTime);
 
         NavArc arc = playerState.getArc();
-        NavVertex destinationVertex = arc.getToVertex();
-        Vector3f destination = destinationVertex.getLocation();
-        Vector3f location = playerState.getLocation();
-        Vector3f offset = destination.subtract(location);
-        float distanceRemaining = offset.length();
+        float arcLength = arc.getPathLength();
+        float distanceRemaining = arcLength - distanceTravelled;
         if (distanceRemaining <= epsilon) {
-            movementComplete(destinationVertex);
+            movementComplete(arc);
             return;
         }
         /*
-         * Update the player's location.
+         * Update the player's location on the arc.
          */
-        float maxDistance = elapsedTime * playerState.getMaxMoveSpeed();
-        if (distanceRemaining > maxDistance) {
-            offset.multLocal(maxDistance / distanceRemaining);
+        float step = elapsedTime * playerState.getMaxMoveSpeed();
+        if (step > distanceRemaining) {
+            step = distanceRemaining;
         }
-        Vector3f newLocation = location.add(offset);
+        distanceTravelled += step;
+        Vector3f newLocation = arc.pathLocation(distanceTravelled);
         playerState.setLocation(newLocation);
         playerState.setVertex(null);
     }
@@ -164,12 +169,11 @@ class MoveState
     /**
      * The current move is complete.
      *
-     * @param destinationVertex (not null)
+     * @param arc (not null)
      */
-    private void movementComplete(NavVertex destinationVertex) {
-        assert destinationVertex != null;
-
+    private void movementComplete(NavArc arc) {
         setEnabled(false);
+        NavVertex destinationVertex = arc.getToVertex();
         playerState.setVertex(destinationVertex);
         /*
          * Encounter any free items at the destination.

@@ -34,6 +34,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Validate;
+import jme3utilities.math.MyVector3f;
 import jme3utilities.math.Noise;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
@@ -138,18 +139,33 @@ public class MazeLevel {
         pruneTo(numPairs);
 
         if (entryEndLocation != null) {
+            /*
+             * Add an entry ramp down from (and up to) the previous level.
+             */
             Vector3f entryStartLocation = entryStartVertex.getLocation();
-            Vector3f entryOffset =
-                    entryEndLocation.subtract(entryStartLocation);
-            float entryLength = entryOffset.length();
-            Vector3f entryDirection = entryOffset.normalize();
+            Vector3f downOffset = entryEndLocation.subtract(entryStartLocation);
+            VectorXZ horizontalDirection =
+                    MyVector3f.horizontalDirection(downOffset);
+            float halfWidth = WorldState.getCorridorWidth() / 2f;
+            Vector3f step =
+                    horizontalDirection.toVector3f().multLocal(halfWidth);
             NavVertex entryEndVertex = findVertex(entryEndLocation);
-            graph.addArc(entryStartVertex, entryEndVertex, entryLength,
-                    entryDirection);
-            Vector3f entryReverseDirection = entryDirection.negate();
-            graph.addArc(entryEndVertex, entryStartVertex, entryLength,
-                    entryReverseDirection);
-            numArcs += 2;
+            /*
+             * downward arc
+             */
+            Vector3f[] downJoints = new Vector3f[2];
+            downJoints[0] = entryStartLocation.add(step);
+            downJoints[1] = entryEndLocation.subtract(step);
+            graph.addArc(entryStartVertex, entryEndVertex, downJoints);
+            numArcs++;
+            /*
+             * upward arc
+             */
+            Vector3f[] upJoints = new Vector3f[2];
+            upJoints[0] = entryEndLocation.subtract(step);
+            upJoints[1] = entryStartLocation.add(step);
+            graph.addArc(entryEndVertex, entryStartVertex, upJoints);
+            numArcs++;
         }
     }
     // *************************************************************************
@@ -303,7 +319,7 @@ public class MazeLevel {
     // private methods
 
     /**
-     * Create a new arc and add it to this level.
+     * Create a new straight arc and add it to this level.
      *
      * @param startVertex member
      * @param endVertex member
@@ -312,17 +328,12 @@ public class MazeLevel {
         assert startVertex != null;
         assert endVertex != null;
 
-        Vector3f startPosition = startVertex.getLocation();
-        Vector3f offset = endVertex.getLocation();
-        offset.subtractLocal(startPosition);
-        float pathLength = offset.length();
-        Vector3f direction = offset.divide(pathLength);
-        graph.addArc(startVertex, endVertex, pathLength, direction);
+        graph.addArc(startVertex, endVertex);
         numArcs++;
     }
 
     /**
-     * Add arcs to connect all neighboring vertices.
+     * Add straight arcs to connect all neighboring vertices.
      */
     private void addArcs() {
         int numRows = getRows();
