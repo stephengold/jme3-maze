@@ -39,6 +39,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.scene.Node;
 import java.util.logging.Logger;
+import jme3maze.items.Item;
 import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
@@ -46,6 +47,7 @@ import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
+import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import tonegod.gui.core.utils.UIDUtil;
 
@@ -59,7 +61,7 @@ import tonegod.gui.core.utils.UIDUtil;
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-class InputState
+public class InputState
         extends AbstractAppState
         implements ActionListener {
     // *************************************************************************
@@ -69,6 +71,10 @@ class InputState
      * tolerance for comparing direction vectors
      */
     final private static float epsilon = 1e-4f;
+    /**
+     * size inventory icons (fraction of screen height)
+     */
+    final private static float inventoryIconSize = 0.15f;
     /**
      * message logger for this class
      */
@@ -86,12 +92,30 @@ class InputState
      * action string for turning one arc to the right
      */
     final private static String rightActionString = "right";
+    /**
+     * action string for using the left-hand item
+     */
+    final private static String useLeftHandItemActionString =
+            "use leftHandItem";
+    /**
+     * action string for using the right-hand item
+     */
+    final private static String useRightHandItemActionString =
+            "use rightHandItem";
     // *************************************************************************
     // fields
     /**
-     * state manager: set by initialize()
+     * app state manager: set by initialize()
      */
     private AppStateManager stateManager;
+    /**
+     * GUI element for the left hand's inventory
+     */
+    private Element leftHandElement = null;
+    /**
+     * GUI element for the right hand's inventory
+     */
+    private Element rightHandElement = null;
     /**
      * input manager: set by initialize()
      */
@@ -114,6 +138,54 @@ class InputState
      */
     InputState() {
         setEnabled(false);
+    }
+    // *************************************************************************
+    // new methods exposed
+
+    /**
+     * Alter what is held in the player's left hand.
+     *
+     * @param item may be null
+     */
+    public void setLeftHandItem(Item item) {
+        if (leftHandElement != null) {
+            guiScreen.removeElement(leftHandElement);
+        }
+        if (item != null) {
+            Vector2f lowerLeft = descale(0.05f, 0.95f);
+            float size = inventoryIconSize * guiScreen.getHeight();
+            Vector2f dimensions = new Vector2f(size, size);
+            Vector2f offset = new Vector2f(0f, -1f).multLocal(dimensions);
+            Vector2f upperLeft = lowerLeft.add(offset);
+            String assetPath = item.visualizeInventory();
+            String typeName = item.getTypeName();
+            String tipText = String.format("use this %s", typeName);
+            leftHandElement = addActionButton(upperLeft, dimensions,
+                    useLeftHandItemActionString, assetPath, tipText);
+        }
+    }
+
+    /**
+     * Alter what is held in the player's right hand.
+     *
+     * @param item may be null
+     */
+    public void setRightHandItem(Item item) {
+        if (rightHandElement != null) {
+            guiScreen.removeElement(rightHandElement);
+        }
+        if (item != null) {
+            Vector2f lowerRight = descale(0.95f, 0.95f);
+            float size = inventoryIconSize * guiScreen.getHeight();
+            Vector2f dimensions = new Vector2f(size, size);
+            Vector2f offset = new Vector2f(-1f, -1f).multLocal(dimensions);
+            Vector2f upperLeft = lowerRight.add(offset);
+            String assetPath = item.visualizeInventory();
+            String typeName = item.getTypeName();
+            String tipText = String.format("use this %s", typeName);
+            rightHandElement = addActionButton(upperLeft, dimensions,
+                    useRightHandItemActionString, assetPath, tipText);
+        }
     }
     // *************************************************************************
     // AbstractAppState methods
@@ -222,6 +294,14 @@ class InputState
                 goTurn(direction);
                 break;
 
+            case useLeftHandItemActionString:
+                playerState.useLeftHandItem();
+                break;
+
+            case useRightHandItemActionString:
+                playerState.useRightHandItem();
+                break;
+
             default:
                 break;
         }
@@ -261,22 +341,25 @@ class InputState
     // private methods
 
     /**
-     * Add a GUI button which generates actions.
+     * Add a new unpadded GUI button which generates actions.
      *
      * @param upperLeft screen coordinates of the button's upper left corner (in
      * pixels, not null)
      * @param size length and width of the button (in pixels, not null)
      * @param actionString action string to generate on a click (not null)
-     * @param iconName filename of image for icon (not null)
+     * @param iconAssetPath asset path to icon texture (not null)
      * @param tipText action description for the tool tip (or null for none)
      * @return new instance
      */
     private Button addActionButton(Vector2f upperLeft, Vector2f size,
-            final String actionString, String iconName, String tipText) {
+            final String actionString, String iconAssetPath, String tipText) {
+        assert upperLeft != null;
+        assert size != null;
+        assert actionString != null;
+        assert iconAssetPath != null;
+
         String buttonUID = UIDUtil.getUID();
         Vector4f padding = new Vector4f(0f, 0f, 0f, 0f);
-        String iconAssetPath =
-                String.format("Textures/buttons/%s.png", iconName);
         Button button = new ButtonAdapter(guiScreen, buttonUID, upperLeft,
                 size, padding, iconAssetPath) {
             @Override
@@ -284,6 +367,7 @@ class InputState
                 onAction(actionString, true, 0f);
             }
         };
+
         guiScreen.addElement(button);
         if (tipText != null) {
             String toolTipText = String.format("click to %s", tipText);
@@ -349,25 +433,25 @@ class InputState
         Vector2f bottomCenter = descale(0.5f, 0.95f);
         Vector2f upperLeft = bottomCenter.subtract(offset);
         String actionString = advanceActionString;
-        String iconName = "advance";
+        String iconAssetPath = "Textures/buttons/advance.png";
         String tipText = "advance";
-        addActionButton(upperLeft, size, actionString, iconName, tipText);
+        addActionButton(upperLeft, size, actionString, iconAssetPath, tipText);
 
         size = descale(0.1f, 0.1f);
         offset = new Vector2f(0.5f, 1f).multLocal(size);
         bottomCenter = descale(0.35f, 0.95f);
         upperLeft = bottomCenter.subtract(offset);
-        iconName = "left";
+        iconAssetPath = "Textures/buttons/left.png";
         actionString = leftActionString;
         tipText = "turn left";
-        addActionButton(upperLeft, size, actionString, iconName, tipText);
+        addActionButton(upperLeft, size, actionString, iconAssetPath, tipText);
 
         bottomCenter = descale(0.65f, 0.95f);
         upperLeft = bottomCenter.subtract(offset);
-        iconName = "right";
+        iconAssetPath = "Textures/buttons/right.png";
         actionString = rightActionString;
         tipText = "turn right";
-        addActionButton(upperLeft, size, actionString, iconName, tipText);
+        addActionButton(upperLeft, size, actionString, iconAssetPath, tipText);
     }
 
     /**

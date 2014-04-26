@@ -25,11 +25,18 @@
  */
 package jme3maze.items;
 
+import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.AppStateManager;
+import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.model.FreeItemsState;
+import jme3maze.model.PlayerState;
+import jme3maze.view.MapViewState;
 import jme3utilities.MyString;
+import jme3utilities.Validate;
 
 /**
  * Generic collectible item in the Maze Game. Each item has a named type.
@@ -38,7 +45,7 @@ import jme3utilities.MyString;
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class Item
-        implements Comparable {
+        implements Comparable<Item> {
     // *************************************************************************
     // constants
 
@@ -46,12 +53,41 @@ public class Item
      * message logger for this class
      */
     final private static Logger logger = Logger.getLogger(Item.class.getName());
+    /**
+     * asset path to the "unknown" icon asset
+     */
+    final private static String iconAssetPath =
+            "Textures/map-icons/unknown.png";
     // *************************************************************************
     // fields
     /**
+     * app state manager: set by constructor
+     */
+    final protected AppStateManager stateManager;
+    /**
+     * asset manager: set by constructor
+     */
+    final protected AssetManager assetManager;
+    /**
+     * free items: set by constructor
+     */
+    final protected FreeItemsState freeItemsState;
+    /**
+     * map view: set by constructor
+     */
+    final protected MapViewState mapViewState;
+    /**
+     * player: set by constructor
+     */
+    final protected PlayerState playerState;
+    /**
+     * application: set by constructor
+     */
+    final protected SimpleApplication application;
+    /**
      * name of this item's type: set by constructor
      */
-    private String typeName;
+    final private String typeName;
     // *************************************************************************
     // constructors
 
@@ -60,11 +96,22 @@ public class Item
      *
      * @param typeName (not null, not empty)
      */
-    Item(String typeName) {
+    Item(String typeName, SimpleApplication application) {
         assert typeName != null;
         assert typeName.length() > 0 : typeName;
+        Validate.nonNull(application, "application");
 
         this.typeName = typeName;
+        this.application = application;
+        assetManager = application.getAssetManager();
+        stateManager = application.getStateManager();
+
+        freeItemsState = stateManager.getState(FreeItemsState.class);
+        assert freeItemsState != null;
+        mapViewState = stateManager.getState(MapViewState.class);
+        assert mapViewState != null;
+        playerState = stateManager.getState(PlayerState.class);
+        assert playerState != null;
     }
     // *************************************************************************
     // new methods exposed
@@ -90,19 +137,25 @@ public class Item
     }
 
     /**
-     * Visualize this item in the inventory view.
-     *
-     * @return new unparented instance
+     * Use this item.
      */
-    public Spatial visualizeInventory() {
-        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
-                MyString.quote(typeName));
-        Node result = new Node();
-        return result;
+    public void use() {
+        // TODO
     }
 
     /**
-     * Visualize this item in the main view.
+     * Visualize this item in an inventory.
+     *
+     * @return asset path of a texture
+     */
+    public String visualizeInventory() {
+        logger.log(Level.WARNING, "ignored item with unknown type {0}",
+                MyString.quote(typeName));
+        return iconAssetPath;
+    }
+
+    /**
+     * Visualize this item free in the main view.
      *
      * @return new unparented instance
      */
@@ -114,14 +167,14 @@ public class Item
     }
 
     /**
-     * Visualize this item in the map view.
+     * Visualize this item, free in the map view.
      *
      * @return new unparented instance
      */
     public Spatial visualizeMap() {
-        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
+        logger.log(Level.WARNING, "free item with unknown type {0}",
                 MyString.quote(typeName));
-        Node result = new Node();
+        Spatial result = mapViewState.loadIcon(iconAssetPath, true);
         return result;
     }
     // *************************************************************************
@@ -130,12 +183,11 @@ public class Item
     /**
      * Compare with another item.
      *
-     * @param object (instance of Item)
+     * @param otherItem (not null)
      * @return 0 if the items have the same type name
      */
     @Override
-    public int compareTo(Object object) {
-        Item otherItem = (Item) object;
+    public int compareTo(Item otherItem) {
         String otherName = otherItem.getTypeName();
         return typeName.compareTo(otherName);
     }

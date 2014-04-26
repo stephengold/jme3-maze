@@ -26,6 +26,7 @@
 package jme3maze.model;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import java.util.Collection;
@@ -208,6 +209,7 @@ public class FreeItemsState
         super.initialize(stateManager, application);
 
         this.stateManager = stateManager;
+        SimpleApplication app = (SimpleApplication) application;
         /*
          * Place the crown (game-ending goal) at the vertex
          * furthest from the starting point.
@@ -217,7 +219,7 @@ public class FreeItemsState
         WorldState worldState = stateManager.getState(WorldState.class);
         NavGraph graph = worldState.getGraph();
         NavVertex goalVertex = graph.findFurthest(startVertex);
-        Crown crown = new Crown(application);
+        Crown crown = new Crown(app);
         add(crown, goalVertex);
         /*
          * Place the torch at a random vertex one hop from the
@@ -228,7 +230,7 @@ public class FreeItemsState
         Random generator = worldState.getGenerator();
         NavVertex torchVertex = (NavVertex) Noise.pick(options, generator);
         if (torchVertex != null) {
-            Torch torch = new Torch(application);
+            Torch torch = new Torch(app);
             add(torch, torchVertex);
         }
         /*
@@ -239,7 +241,7 @@ public class FreeItemsState
         options.remove(goalVertex);
         NavVertex ankhVertex = (NavVertex) Noise.pick(options, generator);
         if (ankhVertex != null) {
-            Ankh ankh = new Ankh(application);
+            Ankh ankh = new Ankh(app);
             add(ankh, ankhVertex);
         }
         /*
@@ -250,7 +252,7 @@ public class FreeItemsState
         options.remove(goalVertex);
         NavVertex mapmakerVertex = (NavVertex) Noise.pick(options, generator);
         if (mapmakerVertex != null) {
-            Mapmaker mapmaker = new Mapmaker(application);
+            Mapmaker mapmaker = new Mapmaker(app);
             add(mapmaker, mapmakerVertex);
         }
     }

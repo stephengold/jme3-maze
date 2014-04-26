@@ -31,6 +31,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
+import jme3maze.InputState;
 import jme3maze.items.Item;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
@@ -323,6 +324,64 @@ public class PlayerState
             }
         }
     }
+
+    /**
+     * Add the specified item to this player's inventory, in the left hand if
+     * possible.
+     *
+     * @param item (not null)
+     * @return true if successful, otherwise false
+     */
+    public boolean takeFavorLeftHand(Item item) {
+        Validate.nonNull(item, "item");
+
+        if (leftHandItem == null) {
+            setLeftHandItem(item);
+            return true;
+        } else if (rightHandItem == null) {
+            setRightHandItem(item);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Add the specified item to this player's inventory, in the right hand if
+     * possible.
+     *
+     * @param item (not null)
+     * @return true if successful, otherwise false
+     */
+    public boolean takeFavorRightHand(Item item) {
+        Validate.nonNull(item, "item");
+
+        if (rightHandItem == null) {
+            setRightHandItem(item);
+            return true;
+        } else if (leftHandItem == null) {
+            setLeftHandItem(item);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Use the left-hand item.
+     */
+    public void useLeftHandItem() {
+        if (leftHandItem != null) {
+            leftHandItem.use();
+        }
+    }
+
+    /**
+     * Use the right-hand item.
+     */
+    public void useRightHandItem() {
+        if (rightHandItem != null) {
+            rightHandItem.use();
+        }
+    }
     // *************************************************************************
     // AbstractAppState methods
 
@@ -349,5 +408,29 @@ public class PlayerState
         WorldState worldState = stateManager.getState(WorldState.class);
         NavArc playerStartArc = worldState.getStartArc();
         setArc(playerStartArc);
+    }
+    // *************************************************************************
+    // private methods
+
+    /**
+     * Alter what this player holds in their left hand.
+     *
+     * @param item may be null for none
+     */
+    private void setLeftHandItem(Item item) {
+        leftHandItem = item;
+        InputState inputState = stateManager.getState(InputState.class);
+        inputState.setLeftHandItem(item);
+    }
+
+    /**
+     * Alter what this player holds in their right hand.
+     *
+     * @param item may be null for none
+     */
+    private void setRightHandItem(Item item) {
+        rightHandItem = item;
+        InputState inputState = stateManager.getState(InputState.class);
+        inputState.setRightHandItem(item);
     }
 }

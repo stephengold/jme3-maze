@@ -25,9 +25,7 @@
  */
 package jme3maze.items;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
+import com.jme3.app.SimpleApplication;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.influencers.ParticleInfluencer;
@@ -40,11 +38,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 import java.util.logging.Logger;
-import jme3maze.model.FreeItemsState;
 import jme3maze.view.MainViewState;
-import jme3maze.view.MapViewState;
 import jme3utilities.MyAsset;
-import jme3utilities.Validate;
 import jme3utilities.controls.LightControl;
 
 /**
@@ -71,12 +66,6 @@ public class Torch
      */
     final private static String modelAssetPath = "Models/items/torch/torch.j3o";
     // *************************************************************************
-    // fields
-    /**
-     * application: set by constructor
-     */
-    final private Application application;
-    // *************************************************************************
     // constructors
 
     /**
@@ -84,10 +73,8 @@ public class Torch
      *
      * @param application (not null)
      */
-    public Torch(Application application) {
-        super("torch");
-        Validate.nonNull(application, "application");
-        this.application = application;
+    public Torch(SimpleApplication application) {
+        super("torch", application);
     }
     // *************************************************************************
     // Item methods
@@ -97,16 +84,26 @@ public class Torch
      */
     @Override
     public void encounter() {
-        AppStateManager stateManager = application.getStateManager();
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
-        freeItemsState.remove(this);
+        boolean success = playerState.takeFavorLeftHand(this);
+        if (success) {
+            freeItemsState.remove(this);
 
-        MainViewState mainViewState =
-                stateManager.getState(MainViewState.class);
-        mainViewState.takeTorch();
+            MainViewState mainViewState =
+                    stateManager.getState(MainViewState.class);
+            mainViewState.takeTorch();
 
-        System.out.printf("You acquired a %s!%n", getTypeName());
+            System.out.printf("You acquired a %s!%n", getTypeName());
+        }
+    }
+
+    /**
+     * Visualize this torch in an inventory.
+     *
+     * @return asset path of a texture
+     */
+    @Override
+    public String visualizeInventory() {
+        return iconAssetPath;
     }
 
     /**
@@ -121,7 +118,6 @@ public class Torch
         /*
          * Attach the torch model to the node.
          */
-        AssetManager assetManager = application.getAssetManager();
         Spatial spatial = assetManager.loadModel(modelAssetPath);
         node.attachChild(spatial);
         ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
@@ -136,7 +132,6 @@ public class Torch
         /*
          * Attach the light source to the node using a LightControl.
          */
-        AppStateManager stateManager = application.getStateManager();
         MainViewState mainViewState =
                 stateManager.getState(MainViewState.class);
         Light torch = mainViewState.getLight();
@@ -156,10 +151,7 @@ public class Torch
      */
     @Override
     public Spatial visualizeMap() {
-        AppStateManager stateManager = application.getStateManager();
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-
         return icon;
     }
     // *************************************************************************
@@ -172,7 +164,6 @@ public class Torch
         /*
          * Create material for particles.
          */
-        AssetManager assetManager = application.getAssetManager();
         String texturePath = "Effects/Explosion/flame.png";
         Texture texture = MyAsset.loadTexture(assetManager, texturePath);
         Material material =
