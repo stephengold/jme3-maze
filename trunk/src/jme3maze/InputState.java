@@ -26,19 +26,28 @@
 package jme3maze;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector4f;
+import com.jme3.scene.Node;
 import java.util.logging.Logger;
 import jme3maze.model.PlayerState;
 import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
+import tonegod.gui.controls.buttons.Button;
+import tonegod.gui.controls.buttons.ButtonAdapter;
+import tonegod.gui.core.Screen;
+import tonegod.gui.core.utils.UIDUtil;
 
 /**
  * App state for getting player input, enabled when the player is stationary.
@@ -87,6 +96,10 @@ class InputState
      * input manager: set by initialize()
      */
     private InputManager inputManager;
+    /**
+     * GUI screen: set by initialize()
+     */
+    private Screen guiScreen;
     /**
      * name of the most recent action
      */
@@ -147,28 +160,16 @@ class InputState
 
         inputManager = application.getInputManager();
         this.stateManager = stateManager;
-        /*
-         * Map keys to action strings.
-         */
-        KeyTrigger aTrigger = new KeyTrigger(KeyInput.KEY_A);
-        KeyTrigger leftTrigger = new KeyTrigger(KeyInput.KEY_LEFT);
-        inputManager.addMapping(leftActionString, aTrigger, leftTrigger);
 
-        KeyTrigger sTrigger = new KeyTrigger(KeyInput.KEY_S);
-        KeyTrigger upTrigger = new KeyTrigger(KeyInput.KEY_UP);
-        KeyTrigger wTrigger = new KeyTrigger(KeyInput.KEY_W);
-        inputManager.addMapping(advanceActionString,
-                sTrigger, upTrigger, wTrigger);
-
-        KeyTrigger dTrigger = new KeyTrigger(KeyInput.KEY_D);
-        KeyTrigger rightTrigger = new KeyTrigger(KeyInput.KEY_RIGHT);
-        inputManager.addMapping(rightActionString, dTrigger, rightTrigger);
+        initializeHotkeys();
         /*
-         * Register listeners for the action strings.
+         * Initialize the GUI.
          */
-        inputManager.addListener(this, advanceActionString);
-        inputManager.addListener(this, leftActionString);
-        inputManager.addListener(this, rightActionString);
+        guiScreen = new Screen(application);
+        guiScreen.setUseToolTips(true);
+        Node guiNode = ((SimpleApplication) application).getGuiNode();
+        guiNode.addControl(guiScreen);
+        initializeGuiButtons();
     }
 
     /**
@@ -260,6 +261,54 @@ class InputState
     // private methods
 
     /**
+     * Add a GUI button which generates actions.
+     *
+     * @param upperLeft screen coordinates of the button's upper left corner (in
+     * pixels, not null)
+     * @param size length and width of the button (in pixels, not null)
+     * @param actionString action string to generate on a click (not null)
+     * @param iconName filename of image for icon (not null)
+     * @param tipText action description for the tool tip (or null for none)
+     * @return new instance
+     */
+    private Button addActionButton(Vector2f upperLeft, Vector2f size,
+            final String actionString, String iconName, String tipText) {
+        String buttonUID = UIDUtil.getUID();
+        Vector4f padding = new Vector4f(0f, 0f, 0f, 0f);
+        String iconAssetPath =
+                String.format("Textures/buttons/%s.png", iconName);
+        Button button = new ButtonAdapter(guiScreen, buttonUID, upperLeft,
+                size, padding, iconAssetPath) {
+            @Override
+            public void onButtonMouseLeftDown(MouseButtonEvent e, boolean t) {
+                onAction(actionString, true, 0f);
+            }
+        };
+        guiScreen.addElement(button);
+        if (tipText != null) {
+            String toolTipText = String.format("click to %s", tipText);
+            button.setToolTipText(toolTipText);
+        }
+
+        return button;
+    }
+
+    /**
+     * Convert fractional coordinates to GUI screen coordinates.
+     *
+     * @param xFraction fraction of the screen width
+     * @param yFraction fraction of the screen height
+     * @return new instance
+     */
+    private Vector2f descale(float xFraction, float yFraction) {
+        float x = xFraction * guiScreen.getWidth();
+        float y = yFraction * guiScreen.getHeight();
+        Vector2f result = new Vector2f(x, y);
+
+        return result;
+    }
+
+    /**
      * Activate the move state for a specified arc.
      *
      * @param arc not null
@@ -289,5 +338,63 @@ class InputState
 
         TurnState turnState = stateManager.getState(TurnState.class);
         turnState.activate(newDirection);
+    }
+
+    /**
+     * Create GUI buttons and map them to actions.
+     */
+    private void initializeGuiButtons() {
+        Vector2f size = descale(0.15f, 0.15f);
+        Vector2f offset = new Vector2f(0.5f, 1f).multLocal(size);
+        Vector2f bottomCenter = descale(0.5f, 0.95f);
+        Vector2f upperLeft = bottomCenter.subtract(offset);
+        String actionString = advanceActionString;
+        String iconName = "advance";
+        String tipText = "advance";
+        addActionButton(upperLeft, size, actionString, iconName, tipText);
+
+        size = descale(0.1f, 0.1f);
+        offset = new Vector2f(0.5f, 1f).multLocal(size);
+        bottomCenter = descale(0.35f, 0.95f);
+        upperLeft = bottomCenter.subtract(offset);
+        iconName = "left";
+        actionString = leftActionString;
+        tipText = "turn left";
+        addActionButton(upperLeft, size, actionString, iconName, tipText);
+
+        bottomCenter = descale(0.65f, 0.95f);
+        upperLeft = bottomCenter.subtract(offset);
+        iconName = "right";
+        actionString = rightActionString;
+        tipText = "turn right";
+        addActionButton(upperLeft, size, actionString, iconName, tipText);
+    }
+
+    /**
+     * Map hotkeys to actions.
+     */
+    private void initializeHotkeys() {
+        /*
+         * Map hotkeys to action strings.
+         */
+        KeyTrigger aTrigger = new KeyTrigger(KeyInput.KEY_A);
+        KeyTrigger leftTrigger = new KeyTrigger(KeyInput.KEY_LEFT);
+        inputManager.addMapping(leftActionString, aTrigger, leftTrigger);
+
+        KeyTrigger sTrigger = new KeyTrigger(KeyInput.KEY_S);
+        KeyTrigger upTrigger = new KeyTrigger(KeyInput.KEY_UP);
+        KeyTrigger wTrigger = new KeyTrigger(KeyInput.KEY_W);
+        inputManager.addMapping(advanceActionString, sTrigger, upTrigger,
+                wTrigger);
+
+        KeyTrigger dTrigger = new KeyTrigger(KeyInput.KEY_D);
+        KeyTrigger rightTrigger = new KeyTrigger(KeyInput.KEY_RIGHT);
+        inputManager.addMapping(rightActionString, dTrigger, rightTrigger);
+        /*
+         * Register listeners for the action strings.
+         */
+        inputManager.addListener(this, advanceActionString);
+        inputManager.addListener(this, leftActionString);
+        inputManager.addListener(this, rightActionString);
     }
 }
