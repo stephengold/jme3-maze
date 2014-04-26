@@ -96,7 +96,8 @@ public class MazeGame
         /*
          * Attach model app states to the application.
          */
-        WorldState worldState = new WorldState();
+        int numLevels = 3;
+        WorldState worldState = new WorldState(numLevels);
         PlayerState playerState = new PlayerState();
         FreeItemsState freeItemsState = new FreeItemsState();
         stateManager.attachAll(worldState, playerState, freeItemsState);

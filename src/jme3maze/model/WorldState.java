@@ -100,15 +100,23 @@ public class WorldState
 
     /**
      * Instantiate a world using the default seed.
+     *
+     * @param numLevels number of maze levels (&ge;1)
      */
-    public WorldState() {
-        this(defaultSeed);
+    public WorldState(int numLevels) {
+        this(numLevels, defaultSeed);
     }
 
     /**
      * Instantiate a world using the specified seed.
+     *
+     * @param numLevels number of maze levels (&ge;1)
+     * @param seed seed for pseudo-random number generator
      */
-    WorldState(long seed) {
+    public WorldState(int numLevels, long seed) {
+        Validate.positive(numLevels, "number of levels");
+
+        levels = new MazeLevel[numLevels];
         generator = new Random(seed);
     }
     // *************************************************************************
@@ -286,11 +294,9 @@ public class WorldState
      * Initialize the pseudo-random maze.
      */
     private void initializeMaze() {
-        int numLevels = 2;
-        levels = new MazeLevel[numLevels];
         NavVertex entryStartVertex = null;
         Vector3f entryEndLocation = null;
-
+        int numLevels = levels.length;
         for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
             float baseY = -levelIndex * levelSpacing; // world coordinate
             int numRows = 3 + 2 * levelIndex; // 3, 5, 7, 9, ...
