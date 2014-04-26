@@ -25,18 +25,13 @@
  */
 package jme3maze.items;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
+import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.util.logging.Logger;
-import jme3maze.model.FreeItemsState;
-import jme3maze.view.MapViewState;
 import jme3utilities.MyAsset;
-import jme3utilities.Validate;
 import jme3utilities.controls.RotationControl;
 
 /**
@@ -63,12 +58,6 @@ public class Ankh
      */
     final private static String modelAssetPath = "Models/items/ankh/ankh.j3o";
     // *************************************************************************
-    // fields
-    /**
-     * application: set by constructor
-     */
-    final private Application application;
-    // *************************************************************************
     // constructors
 
     /**
@@ -76,23 +65,31 @@ public class Ankh
      *
      * @param application (not null)
      */
-    public Ankh(Application application) {
-        super("ankh");
-        Validate.nonNull(application, "application");
-        this.application = application;
+    public Ankh(SimpleApplication application) {
+        super("ankh", application);
     }
     // *************************************************************************
     // Item methods
 
     /**
-     * Encounter this ankh free in the world.
+     * Encounter this ankh, free in the world.
      */
     @Override
     public void encounter() {
-        AppStateManager stateManager = application.getStateManager();
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
-        freeItemsState.remove(this);
+        boolean success = playerState.takeFavorRightHand(this);
+        if (success) {
+            freeItemsState.remove(this);
+        }
+    }
+
+    /**
+     * Visualize this ankh in an inventory.
+     *
+     * @return asset path of a texture
+     */
+    @Override
+    public String visualizeInventory() {
+        return iconAssetPath;
     }
 
     /**
@@ -102,7 +99,6 @@ public class Ankh
      */
     @Override
     public Spatial visualizeMain() {
-        AssetManager assetManager = application.getAssetManager();
         Spatial spatial = assetManager.loadModel(modelAssetPath);
 
         Vector3f offset = new Vector3f(0f, 5f, 0f); // floating in the air
@@ -129,10 +125,7 @@ public class Ankh
      */
     @Override
     public Spatial visualizeMap() {
-        AppStateManager stateManager = application.getStateManager();
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-
         return icon;
     }
 }

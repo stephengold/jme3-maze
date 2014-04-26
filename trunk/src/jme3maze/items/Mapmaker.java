@@ -25,9 +25,7 @@
  */
 package jme3maze.items;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
+import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -36,11 +34,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import java.util.logging.Logger;
-import jme3maze.model.FreeItemsState;
-import jme3maze.model.PlayerState;
-import jme3maze.view.MapViewState;
 import jme3utilities.MyAsset;
-import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavVertex;
 
@@ -66,12 +60,6 @@ public class Mapmaker
     final private static String iconAssetPath =
             "Textures/map-icons/mapmaker.png";
     // *************************************************************************
-    // fields
-    /**
-     * application: set by constructor
-     */
-    final private Application application;
-    // *************************************************************************
     // constructors
 
     /**
@@ -79,10 +67,8 @@ public class Mapmaker
      *
      * @param application (not null)
      */
-    public Mapmaker(Application application) {
-        super("mapmaker");
-        Validate.nonNull(application, "application");
-        this.application = application;
+    public Mapmaker(SimpleApplication application) {
+        super("mapmaker", application);
     }
     // *************************************************************************
     // Item methods
@@ -92,18 +78,13 @@ public class Mapmaker
      */
     @Override
     public void encounter() {
-        AppStateManager stateManager = application.getStateManager();
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
         freeItemsState.remove(this);
 
         System.out.printf("You acquired a %s!%n", getTypeName());
 
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         if (!mapViewState.isEnabled()) {
             mapViewState.setEnabled(true);
 
-            PlayerState playerState = stateManager.getState(PlayerState.class);
             NavVertex vertex = playerState.getVertex();
             VectorXZ direction = playerState.getDirection();
             mapViewState.addMazeLineOfSight(vertex, direction);
@@ -131,7 +112,6 @@ public class Mapmaker
         cube.setLocalTranslation(offset);
 
         ColorRGBA color = new ColorRGBA(0f, 0.5f, 0f, 1f);
-        AssetManager assetManager = application.getAssetManager();
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         cube.setMaterial(material);
 
@@ -145,10 +125,7 @@ public class Mapmaker
      */
     @Override
     public Spatial visualizeMap() {
-        AppStateManager stateManager = application.getStateManager();
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-
         return icon;
     }
 }

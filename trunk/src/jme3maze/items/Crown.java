@@ -25,19 +25,14 @@
  */
 package jme3maze.items;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
+import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.logging.Logger;
-import jme3maze.model.PlayerState;
-import jme3maze.view.MapViewState;
 import jme3utilities.MyAsset;
-import jme3utilities.Validate;
 import jme3utilities.controls.RotationControl;
 
 /**
@@ -64,12 +59,6 @@ public class Crown
      */
     final private static String modelAssetPath = "Models/items/crown/crown.j3o";
     // *************************************************************************
-    // fields
-    /**
-     * application: set by constructor
-     */
-    final private Application application;
-    // *************************************************************************
     // constructors
 
     /**
@@ -77,10 +66,8 @@ public class Crown
      *
      * @param application (not null)
      */
-    public Crown(Application application) {
-        super("crown");
-        Validate.nonNull(application, "application");
-        this.application = application;
+    public Crown(SimpleApplication application) {
+        super("crown", application);
     }
     // *************************************************************************
     // Item methods
@@ -90,8 +77,6 @@ public class Crown
      */
     @Override
     public void encounter() {
-        AppStateManager stateManager = application.getStateManager();
-        PlayerState playerState = stateManager.getState(PlayerState.class);
         int moveCount = playerState.getMoveCount();
         if (moveCount == 1) {
             System.out.printf(
@@ -111,7 +96,6 @@ public class Crown
      */
     @Override
     public Spatial visualizeMain() {
-        AssetManager assetManager = application.getAssetManager();
         Node node = (Node) assetManager.loadModel(modelAssetPath);
 
         Vector3f offset = new Vector3f(0f, 5f, 0f); // floating in the air
@@ -146,10 +130,7 @@ public class Crown
      */
     @Override
     public Spatial visualizeMap() {
-        AppStateManager stateManager = application.getStateManager();
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-
         return icon;
     }
 }
