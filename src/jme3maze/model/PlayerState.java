@@ -66,7 +66,7 @@ public class PlayerState
     /**
      * rate of movement in world units per second (&gt;0)
      */
-    private float maxMoveSpeed = 50f;
+    private float maxMoveSpeed = 25f;
     /**
      * rate of rotation in radians per second (&gt;0)
      */
