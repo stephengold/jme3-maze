@@ -50,7 +50,7 @@ import jme3utilities.navigation.NavVertex;
 /**
  * App state to manage the items not owned by any character in the Maze Game.
  * <p>
- * Each instance is enabled at creation.
+ * Enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -87,9 +87,9 @@ public class FreeItemsState
      * @param item (not null)
      * @param vertex (not null)
      */
-    void add(Item item, NavVertex vertex) {
-        assert item != null;
-        assert vertex != null;
+    public void add(Item item, NavVertex vertex) {
+        Validate.nonNull(item, "item");
+        Validate.nonNull(vertex, "vertex");
 
         NavVertex previousVertex = itemVertex.put(item, vertex);
         assert previousVertex == null : previousVertex;
