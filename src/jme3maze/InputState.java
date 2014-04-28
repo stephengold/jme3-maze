@@ -38,6 +38,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.scene.Node;
+import java.util.Collection;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
 import jme3maze.model.PlayerState;
@@ -47,6 +48,7 @@ import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
+import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import tonegod.gui.core.utils.UIDUtil;
@@ -54,10 +56,10 @@ import tonegod.gui.core.utils.UIDUtil;
 /**
  * App state for getting player input, enabled when the player is stationary.
  * Input is ignored while the player is turning. Input during player moves is
- * processed when the state is re-enabled, in other words, when the player
+ * processed when the state gets re-enabled, in other words, when the player
  * reaches the destination vertex.
  * <p>
- * Each instance is disabled at creation.
+ * Disabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -72,7 +74,7 @@ public class InputState
      */
     final private static float epsilon = 1e-4f;
     /**
-     * size inventory icons (fraction of screen height)
+     * size of inventory icons (as a fraction of the screen's height)
      */
     final private static float inventoryIconSize = 0.15f;
     /**
@@ -143,46 +145,76 @@ public class InputState
     // new methods exposed
 
     /**
-     * Alter what is held in the player's left hand.
+     * Select use for the specified item from a popup menu.
      *
-     * @param item may be null
+     * @param item (not null)
      */
-    public void setLeftHandItem(Item item) {
+    public void selectUse(final Item item) {
+        Vector2f cursorPosition = inputManager.getCursorPosition();
+        Vector2f upperLeft = cursorPosition.clone();
+        boolean scrollable = false;
+        Menu popupMenu = new Menu(guiScreen, upperLeft, scrollable) {
+            @Override
+            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                String description = (String) value;
+                item.use(description);
+            }
+        };
+        guiScreen.addElement(popupMenu);
+
+        Collection<String> uses = item.findUses(false);
+        for (String use : uses) {
+            String caption = use;
+            Object value = use;
+            Menu subMenu = null;
+            popupMenu.addMenuItem(caption, value, subMenu);
+        }
+
+        Menu caller = null;
+        popupMenu.showMenu(caller, cursorPosition.x, cursorPosition.y);
+    }
+
+    /**
+     * Alter what item is in the player's left hand.
+     *
+     * @param newItem may be null
+     */
+    public void setLeftHandItem(Item newItem) {
         if (leftHandElement != null) {
             guiScreen.removeElement(leftHandElement);
         }
-        if (item != null) {
+        if (newItem != null) {
             Vector2f lowerLeft = descale(0.05f, 0.95f);
             float size = inventoryIconSize * guiScreen.getHeight();
             Vector2f dimensions = new Vector2f(size, size);
             Vector2f offset = new Vector2f(0f, -1f).multLocal(dimensions);
             Vector2f upperLeft = lowerLeft.add(offset);
-            String assetPath = item.visualizeInventory();
-            String typeName = item.getTypeName();
-            String tipText = String.format("use this %s", typeName);
+            String assetPath = newItem.visualizeInventory();
+            boolean freeFlag = false;
+            String tipText = newItem.describeUse(freeFlag);
             leftHandElement = addActionButton(upperLeft, dimensions,
                     useLeftHandItemActionString, assetPath, tipText);
         }
     }
 
     /**
-     * Alter what is held in the player's right hand.
+     * Alter what item is in the player's right hand.
      *
-     * @param item may be null
+     * @param newItem may be null
      */
-    public void setRightHandItem(Item item) {
+    public void setRightHandItem(Item newItem) {
         if (rightHandElement != null) {
             guiScreen.removeElement(rightHandElement);
         }
-        if (item != null) {
+        if (newItem != null) {
             Vector2f lowerRight = descale(0.95f, 0.95f);
             float size = inventoryIconSize * guiScreen.getHeight();
             Vector2f dimensions = new Vector2f(size, size);
             Vector2f offset = new Vector2f(-1f, -1f).multLocal(dimensions);
             Vector2f upperLeft = lowerRight.add(offset);
-            String assetPath = item.visualizeInventory();
-            String typeName = item.getTypeName();
-            String tipText = String.format("use this %s", typeName);
+            String assetPath = newItem.visualizeInventory();
+            boolean freeFlag = false;
+            String tipText = newItem.describeUse(freeFlag);
             rightHandElement = addActionButton(upperLeft, dimensions,
                     useRightHandItemActionString, assetPath, tipText);
         }
@@ -295,10 +327,16 @@ public class InputState
                 break;
 
             case useLeftHandItemActionString:
+                /*
+                 * Attempt to use the item in the player's left hand.
+                 */
                 playerState.useLeftHandItem();
                 break;
 
             case useRightHandItemActionString:
+                /*
+                 * Attempt to use the item in the player's right hand.
+                 */
                 playerState.useRightHandItem();
                 break;
 
@@ -348,7 +386,7 @@ public class InputState
      * @param size length and width of the button (in pixels, not null)
      * @param actionString action string to generate on a click (not null)
      * @param iconAssetPath asset path to icon texture (not null)
-     * @param tipText action description for the tool tip (or null for none)
+     * @param describeUse action description for the tool tip (or null for none)
      * @return new instance
      */
     private Button addActionButton(Vector2f upperLeft, Vector2f size,
@@ -363,7 +401,7 @@ public class InputState
         Button button = new ButtonAdapter(guiScreen, buttonUID, upperLeft,
                 size, padding, iconAssetPath) {
             @Override
-            public void onButtonMouseLeftDown(MouseButtonEvent e, boolean t) {
+            public void onButtonMouseLeftUp(MouseButtonEvent e, boolean t) {
                 onAction(actionString, true, 0f);
             }
         };
