@@ -30,13 +30,18 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.InputState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.view.MapViewState;
 import jme3utilities.MyString;
 import jme3utilities.Validate;
+import jme3utilities.navigation.NavVertex;
 
 /**
  * Generic collectible item in the Maze Game. Each item has a named type.
@@ -54,10 +59,22 @@ public class Item
      */
     final private static Logger logger = Logger.getLogger(Item.class.getName());
     /**
+     * description for "discard" use
+     */
+    final private static String discardUse = "discard";
+    /**
      * asset path to the "unknown" icon asset
      */
     final private static String iconAssetPath =
             "Textures/map-icons/unknown.png";
+    /**
+     * description for "shift to left hand" use
+     */
+    final private static String shiftLeftUse = "shift to left hand";
+    /**
+     * description for "shift to right hand" use
+     */
+    final private static String shiftRightUse = "shift to right hand";
     // *************************************************************************
     // fields
     /**
@@ -72,6 +89,10 @@ public class Item
      * free items: set by constructor
      */
     final protected FreeItemsState freeItemsState;
+    /**
+     * control state: set by constructor
+     */
+    final protected InputState inputState;
     /**
      * map view: set by constructor
      */
@@ -108,8 +129,13 @@ public class Item
 
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
+
+        inputState = stateManager.getState(InputState.class);
+        assert inputState != null;
+
         mapViewState = stateManager.getState(MapViewState.class);
         assert mapViewState != null;
+
         playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;
     }
@@ -117,17 +143,61 @@ public class Item
     // new methods exposed
 
     /**
+     * Describe how this item is used.
+     *
+     * @param freeFlag true if item is free, false if it's in an inventory
+     * @return description suitable for a tool tip, or null if no uses
+     */
+    public String describeUse(boolean freeFlag) {
+        List<String> possibleUses = findUses(freeFlag);
+        int numUses = possibleUses.size();
+
+        String result;
+        if (numUses > 1) {
+            result = String.format("use this %s", typeName);
+        } else if (numUses == 1) {
+            String use = possibleUses.get(0);
+            result = String.format("%s this %s", use, typeName);
+        } else {
+            result = null;
+        }
+
+        return result;
+    }
+
+    /**
      * Encounter this item free in the world.
      */
     public void encounter() {
-        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
+        logger.log(Level.WARNING, "ignored free item of type {0}",
                 MyString.quote(typeName));
+    }
+
+    /**
+     * Enumerate all current uses for this item.
+     *
+     * @param freeFlag true if item is free, false if it's in an inventory
+     * @return new instance
+     */
+    public List<String> findUses(boolean freeFlag) {
+        List<String> result = new LinkedList<>();
+        if (!freeFlag) {
+            result.add("discard");
+            if (playerState.isLeftHandEmpty()) {
+                result.add("shift to left hand");
+            }
+            if (playerState.isRightHandEmpty()) {
+                result.add("shift to right hand");
+            }
+        }
+
+        return result;
     }
 
     /**
      * Read the type name of this item.
      *
-     * @return (not null, not empty)
+     * @return name of the item's type (not null, not empty)
      */
     public String getTypeName() {
         assert typeName != null;
@@ -137,30 +207,71 @@ public class Item
     }
 
     /**
-     * Use this item.
+     * Use this item, or if it currently has multiple uses, have the user select
+     * one.
+     *
+     * @param freeFlag true if item is free, false if it's in an inventory
      */
-    public void use() {
-        // TODO
+    public void use(boolean freeFlag) {
+        List<String> possibleUses = findUses(freeFlag);
+        int numUses = possibleUses.size();
+        if (numUses > 1) {
+            inputState.selectUse(this);
+        } else if (numUses == 1) {
+            use(possibleUses.get(0));
+        }
     }
 
     /**
-     * Visualize this item in an inventory.
+     * Use this item in the specified manner.
      *
-     * @return asset path of a texture
+     * @param useDescription how to use this item (not null)
+     */
+    public void use(String useDescription) {
+        Validate.nonNull(useDescription, "description");
+
+        switch (useDescription) {
+            case discardUse:
+                boolean success = playerState.discard(this);
+                assert success;
+                NavVertex vertex = playerState.getVertex();
+                freeItemsState.add(this, vertex);
+                break;
+
+            case shiftLeftUse:
+                playerState.setRightHandItem(null);
+                playerState.setLeftHandItem(this);
+                break;
+
+            case shiftRightUse:
+                playerState.setLeftHandItem(null);
+                playerState.setRightHandItem(this);
+                break;
+
+            default:
+                logger.log(Level.WARNING, "ignored unknown use {0}",
+                        MyString.quote(useDescription));
+        }
+    }
+
+    /**
+     * Visualize this item in the inventory.
+     *
+     * @return asset path to a texture
      */
     public String visualizeInventory() {
-        logger.log(Level.WARNING, "ignored item with unknown type {0}",
+        logger.log(Level.WARNING, "ignored item of type {0}",
                 MyString.quote(typeName));
         return iconAssetPath;
     }
 
     /**
-     * Visualize this item free in the main view.
+     * Visualize this item, free in the main view.
      *
      * @return new unparented instance
      */
     public Spatial visualizeMain() {
-        logger.log(Level.WARNING, "ignored free item with unknown type {0}",
+        logger.log(Level.WARNING, "ignored free item of type {0}",
                 MyString.quote(typeName));
         Node result = new Node();
         return result;
@@ -184,11 +295,44 @@ public class Item
      * Compare with another item.
      *
      * @param otherItem (not null)
-     * @return 0 if the items have the same type name
+     * @return 0 if the items have the same type
      */
     @Override
     public int compareTo(Item otherItem) {
         String otherName = otherItem.getTypeName();
         return typeName.compareTo(otherName);
+    }
+    // *************************************************************************
+    // Object methods
+
+    /**
+     * Compare for equality based on type of item.
+     *
+     * @param otherObject (unaffected)
+     * @return true if the items have the same type, otherwise false
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        boolean result = false;
+
+        if (this == otherObject) {
+            result = true;
+
+        } else if (otherObject instanceof Item) {
+            Item otherItem = (Item) otherObject;
+            String otherType = otherItem.getTypeName();
+            result = typeName.equals(otherType);
+        }
+
+        return result;
+    }
+
+    /**
+     * Generate the hash code for this item.
+     */
+    @Override
+    public int hashCode() {
+        int hash = Objects.hashCode(this.typeName);
+        return hash;
     }
 }

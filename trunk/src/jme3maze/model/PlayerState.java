@@ -44,7 +44,7 @@ import jme3utilities.navigation.NavVertex;
  * App state to manage the player in the Maze Game. The player has a position in
  * the world and an inventory of items.
  * <p>
- * Each instance is enabled at creation.
+ * Enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -110,6 +110,28 @@ public class PlayerState
     final private Vector3f location = new Vector3f();
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Remove the specified item from this player's inventory.
+     *
+     * @param item item to remove (not null)
+     * @return true if successful, otherwise false
+     */
+    public boolean discard(Item item) {
+        Validate.nonNull(item, "item");
+
+        if (item == leftHandItem) {
+            setLeftHandItem(null);
+            return true;
+        } else if (item == rightHandItem) {
+            setRightHandItem(null);
+            return true;
+        }
+        /*
+         * item not found
+         */
+        return false;
+    }
 
     /**
      * Access this player's current navigation arc.
@@ -208,6 +230,26 @@ public class PlayerState
     }
 
     /**
+     * Test whether the player's left hand is empty.
+     *
+     * @return true if empty, false otherwise
+     */
+    public boolean isLeftHandEmpty() {
+        boolean result = leftHandItem == null;
+        return result;
+    }
+
+    /**
+     * Test whether the player's right hand is empty.
+     *
+     * @return true if empty, false otherwise
+     */
+    public boolean isRightHandEmpty() {
+        boolean result = rightHandItem == null;
+        return result;
+    }
+
+    /**
      * Rotate this player around the +Y axis.
      *
      * @param rotation (length=1)
@@ -265,6 +307,25 @@ public class PlayerState
     }
 
     /**
+     * Alter what this player holds in their left hand.
+     *
+     * @param item may be null for none
+     */
+    public void setLeftHandItem(Item item) {
+        if (item != null) {
+            assert item != leftHandItem : item;
+            assert item != rightHandItem : item;
+        }
+
+        leftHandItem = item;
+        /*
+         * Update the controller.
+         */
+        InputState inputState = stateManager.getState(InputState.class);
+        inputState.setLeftHandItem(item);
+    }
+
+    /**
      * Alter this player's location.
      *
      * @param newLocation world coordinates (not null, unaffected)
@@ -305,6 +366,25 @@ public class PlayerState
     }
 
     /**
+     * Alter what this player holds in their right hand.
+     *
+     * @param item may be null for none
+     */
+    public void setRightHandItem(Item item) {
+        if (item != null) {
+            assert item != leftHandItem : item;
+            assert item != rightHandItem : item;
+        }
+
+        rightHandItem = item;
+        /*
+         * Update the controller.
+         */
+        InputState inputState = stateManager.getState(InputState.class);
+        inputState.setRightHandItem(item);
+    }
+
+    /**
      * Alter this player's vertex.
      *
      * @param newVertex (or null if not at a vertex)
@@ -335,10 +415,10 @@ public class PlayerState
     public boolean takeFavorLeftHand(Item item) {
         Validate.nonNull(item, "item");
 
-        if (leftHandItem == null) {
+        if (isLeftHandEmpty()) {
             setLeftHandItem(item);
             return true;
-        } else if (rightHandItem == null) {
+        } else if (isRightHandEmpty()) {
             setRightHandItem(item);
             return true;
         }
@@ -355,10 +435,10 @@ public class PlayerState
     public boolean takeFavorRightHand(Item item) {
         Validate.nonNull(item, "item");
 
-        if (rightHandItem == null) {
+        if (isRightHandEmpty()) {
             setRightHandItem(item);
             return true;
-        } else if (leftHandItem == null) {
+        } else if (isLeftHandEmpty()) {
             setLeftHandItem(item);
             return true;
         }
@@ -369,8 +449,8 @@ public class PlayerState
      * Use the left-hand item.
      */
     public void useLeftHandItem() {
-        if (leftHandItem != null) {
-            leftHandItem.use();
+        if (!isLeftHandEmpty()) {
+            leftHandItem.use(false);
         }
     }
 
@@ -378,8 +458,8 @@ public class PlayerState
      * Use the right-hand item.
      */
     public void useRightHandItem() {
-        if (rightHandItem != null) {
-            rightHandItem.use();
+        if (!isRightHandEmpty()) {
+            rightHandItem.use(false);
         }
     }
     // *************************************************************************
@@ -408,29 +488,5 @@ public class PlayerState
         WorldState worldState = stateManager.getState(WorldState.class);
         NavArc playerStartArc = worldState.getStartArc();
         setArc(playerStartArc);
-    }
-    // *************************************************************************
-    // private methods
-
-    /**
-     * Alter what this player holds in their left hand.
-     *
-     * @param item may be null for none
-     */
-    private void setLeftHandItem(Item item) {
-        leftHandItem = item;
-        InputState inputState = stateManager.getState(InputState.class);
-        inputState.setLeftHandItem(item);
-    }
-
-    /**
-     * Alter what this player holds in their right hand.
-     *
-     * @param item may be null for none
-     */
-    private void setRightHandItem(Item item) {
-        rightHandItem = item;
-        InputState inputState = stateManager.getState(InputState.class);
-        inputState.setRightHandItem(item);
     }
 }
