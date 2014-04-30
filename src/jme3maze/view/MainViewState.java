@@ -161,13 +161,18 @@ public class MainViewState
     }
 
     /**
-     * Find the item (if any) at the specified screen coordinates in this view.
+     * Find the item (if any) in this view at the specified screen coordinates.
      *
-     * @param screenLocation screen coordinates (not null)
+     * @param screenLocation screen coordinates (not null, in pixels, measured
+     * from the lower left)
      * @return pre-existing vertex or null for none
      */
     public Item findItem(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
+
+        if (!isInViewPort(screenLocation)) {
+            return null;
+        }
         /*
          * Construct a ray based on the screen coordinates.
          */
@@ -223,14 +228,47 @@ public class MainViewState
     }
 
     /**
-     * Remove 3-D representation of a free item from the scene.
+     * Test whether the specified screen coordinates are in this view.
+     *
+     * @param screenLocation screen coordinates (not null, in pixels, measured
+     * from the lower left)
+     * @return true if location is within this view, otherwise false
+     */
+    public boolean isInViewPort(Vector2f screenLocation) {
+        Validate.nonNull(screenLocation, "screen location");
+
+        if (mapViewState.isInViewPort(screenLocation)) {
+            return false;
+        }
+        /*
+         * Scale coordinates to fractions of viewport.
+         */
+        float xFraction = screenLocation.x / cam.getWidth();
+        float yFraction = screenLocation.y / cam.getHeight();
+        if (xFraction > 0f && xFraction < 1f
+                && yFraction > 0f && yFraction < 1f) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Remove the 3-D representation of a free item from the scene.
      *
      * @param item free item to remove (not null)
+     * @return true if successful, otherwise false
      */
-    public void removeFreeItem(Item item) {
+    public boolean removeFreeItem(Item item) {
         Validate.nonNull(item, "item");
+
         Spatial spatial = itemSpatial.remove(item);
-        spatial.removeFromParent();
+        if (spatial == null) {
+            return false;
+        }
+        boolean success = spatial.removeFromParent();
+        assert success : item;
+
+        return true;
     }
 
     /**
