@@ -172,6 +172,23 @@ public class MazeLevel {
     // new methods exposed
 
     /**
+     * Test whether a particular vertex is part of this level.
+     *
+     * @param vertex vertex to test (or null)
+     * @return true if it's a member, otherwise false
+     */
+    public boolean contains(NavVertex vertex) {
+        if (vertex == null) {
+            return false;
+        }
+        int row = findRow(vertex);
+        int column = findColumn(vertex);
+        boolean result = grid[row][column] == vertex;
+
+        return result;
+    }
+
+    /**
      * Find the next vertex along the specified line of sight.
      *
      * @param fromVertex (member)
@@ -390,22 +407,6 @@ public class MazeLevel {
                 numVertices++;
             }
         }
-    }
-
-    /**
-     * Test whether this level contains the specified vertex.
-     *
-     * @param vertex vertex to be tested (or null)
-     */
-    private boolean contains(NavVertex vertex) {
-        if (vertex == null) {
-            return false;
-        }
-        int row = findRow(vertex);
-        int column = findColumn(vertex);
-        boolean result = grid[row][column] == vertex;
-
-        return result;
     }
 
     /**
