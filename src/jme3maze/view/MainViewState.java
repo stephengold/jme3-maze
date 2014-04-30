@@ -27,13 +27,18 @@ package jme3maze.view;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
 import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.PointLightShadowRenderer;
@@ -150,8 +155,49 @@ public class MainViewState
         Vector3f location = vertex.getLocation();
         spatial.move(location);
 
+        spatial.setUserData("item", item);
         itemSpatial.put(item, spatial);
         rootNode.attachChild(spatial);
+    }
+
+    /**
+     * Find the item (if any) at the specified screen coordinates in this view.
+     *
+     * @param screenLocation screen coordinates (not null)
+     * @return pre-existing vertex or null for none
+     */
+    public Item findItem(Vector2f screenLocation) {
+        Validate.nonNull(screenLocation, "screen location");
+        /*
+         * Construct a ray based on the screen coordinates.
+         */
+        Vector3f startLocation = cam.getWorldCoordinates(screenLocation, 0f);
+        Vector3f farPoint = cam.getWorldCoordinates(screenLocation, 1f);
+        Vector3f direction = farPoint.subtract(startLocation).normalizeLocal();
+        Ray ray = new Ray(startLocation, direction);
+        /*
+         * Trace the ray to the nearest geometry.
+         */
+        CollisionResults results = new CollisionResults();
+        rootNode.collideWith(ray, results);
+        CollisionResult nearest = results.getClosestCollision();
+        if (nearest == null) {
+            return null;
+        }
+        Geometry geometry = nearest.getGeometry();
+        /*
+         * Check whether the geometry corresponds to an item.
+         */
+        Spatial spatial = geometry;
+        while (spatial != null) {
+            Item item = spatial.getUserData("item");
+            if (item != null) {
+                return item;
+            }
+            spatial = spatial.getParent();
+        }
+
+        return null;
     }
 
     /**
