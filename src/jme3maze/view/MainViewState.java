@@ -431,6 +431,7 @@ public class MainViewState
             PointLightShadowRenderer plsr =
                     new PointLightShadowRenderer(assetManager, shadowMapSize);
             plsr.setLight(torch);
+            plsr.setShadowIntensity(1f);
             viewPort.addProcessor(plsr);
         }
     }
