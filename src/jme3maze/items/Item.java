@@ -28,8 +28,12 @@ package jme3maze.items;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.export.JmeExporter;
+import com.jme3.export.JmeImporter;
+import com.jme3.export.Savable;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +54,7 @@ import jme3utilities.navigation.NavVertex;
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class Item
-        implements Comparable<Item> {
+        implements Comparable<Item>, Savable {
     // *************************************************************************
     // constants
 
@@ -334,5 +338,29 @@ public class Item
     public int hashCode() {
         int hash = Objects.hashCode(this.typeName);
         return hash;
+    }
+    // *************************************************************************
+    // Savable methods
+
+    /**
+     * De-serialize this item, for example when loading from a J3O file.
+     *
+     * @param importer (not null)
+     */
+    @Override
+    public void read(JmeImporter importer)
+            throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * Serialize this item, for example when saving to a J3O file.
+     *
+     * @param exporter (not null)
+     */
+    @Override
+    public void write(JmeExporter exporter)
+            throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
