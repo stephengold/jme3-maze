@@ -286,7 +286,7 @@ public class MapViewState
         MySpatial.setWorldOrientation(avatarNode, orientation);
     }
     // *************************************************************************
-    // AbstractAppState methods
+    // GameAppState methods
 
     /**
      * Initialize this state prior to its first update.
@@ -316,7 +316,7 @@ public class MapViewState
      */
     @Override
     public void render(RenderManager renderManager) {
-        Validate.nonNull(renderManager, "render manager");
+        super.render(renderManager);
         /*
          * Update logical state here where we can be sure all controls
          * have been updated.
@@ -346,7 +346,7 @@ public class MapViewState
      */
     @Override
     public void update(float elapsedTime) {
-        Validate.nonNegative(elapsedTime, "interval");
+        super.update(elapsedTime);
         updateInterval = elapsedTime;
     }
     // *************************************************************************
