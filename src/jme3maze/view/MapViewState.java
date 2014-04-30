@@ -286,6 +286,22 @@ public class MapViewState
         MySpatial.setWorldOrientation(avatarNode, orientation);
     }
     // *************************************************************************
+    // AbstractAppState methods
+
+    /**
+     * Enable or disable this state.
+     *
+     * @param newState true to enable, false to disable
+     */
+    @Override
+    final public void setEnabled(boolean newState) {
+        if (newState && !isEnabled()) {
+            addCamera();
+        }
+
+        super.setEnabled(newState);
+    }
+    // *************************************************************************
     // GameAppState methods
 
     /**
@@ -308,6 +324,8 @@ public class MapViewState
         printer.setPrintTransform(true);
         //printer.printSubtree(rootNode);
     }
+    // *************************************************************************
+    // SimpleAppState methods
 
     /**
      * Update this view before each render.
@@ -323,20 +341,6 @@ public class MapViewState
          */
         mapRootNode.updateLogicalState(updateInterval);
         mapRootNode.updateGeometricState();
-    }
-
-    /**
-     * Enable or disable this state.
-     *
-     * @param newState true to enable, false to disable
-     */
-    @Override
-    final public void setEnabled(boolean newState) {
-        if (newState && !isEnabled()) {
-            addCamera();
-        }
-
-        super.setEnabled(newState);
     }
 
     /**

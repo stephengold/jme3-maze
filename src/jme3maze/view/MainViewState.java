@@ -217,7 +217,7 @@ public class MainViewState
         avatarNode.addControl(lightControl);
     }
     // *************************************************************************
-    // AbstractAppState methods
+    // GameAppState methods
 
     /**
      * Initialize this state prior to its first update.
