@@ -26,8 +26,6 @@
 package jme3maze.model;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +33,7 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import jme3maze.GameAppState;
 import jme3maze.items.Ankh;
 import jme3maze.items.Crown;
 import jme3maze.items.Item;
@@ -55,7 +54,7 @@ import jme3utilities.navigation.NavVertex;
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class FreeItemsState
-        extends AbstractAppState {
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -66,10 +65,6 @@ public class FreeItemsState
             Logger.getLogger(FreeItemsState.class.getName());
     // *************************************************************************
     // fields
-    /**
-     * app state manager: set by initialize()
-     */
-    private AppStateManager stateManager;
     /**
      * look up the vertex where an item is located
      */
@@ -105,8 +100,6 @@ public class FreeItemsState
         /*
          * update view
          */
-        MainViewState mainViewState =
-                stateManager.getState(MainViewState.class);
         if (mainViewState != null && mainViewState.isInitialized()) {
             mainViewState.addFreeItem(item);
         }
@@ -184,13 +177,11 @@ public class FreeItemsState
         /*
          * update view
          */
-        MainViewState mainState = stateManager.getState(MainViewState.class);
-        mainState.removeFreeItem(item);
-        MapViewState mapState = stateManager.getState(MapViewState.class);
-        mapState.removeFreeItem(item);
+        mainViewState.removeFreeItem(item);
+        mapViewState.removeFreeItem(item);
     }
     // *************************************************************************
-    // AbstractAppState methods
+    // GameAppState methods
 
     /**
      * Initialize this state prior to its first update.
@@ -201,25 +192,15 @@ public class FreeItemsState
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
-        if (isInitialized()) {
-            throw new IllegalStateException("already initialized");
-        }
-        Validate.nonNull(application, "application");
-        Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
-
-        this.stateManager = stateManager;
-        SimpleApplication app = (SimpleApplication) application;
         /*
          * Place the crown (game-ending goal) at the vertex
          * furthest from the starting point.
          */
-        PlayerState playerState = stateManager.getState(PlayerState.class);
         NavVertex startVertex = playerState.getVertex();
-        WorldState worldState = stateManager.getState(WorldState.class);
         NavGraph graph = worldState.getGraph();
         NavVertex goalVertex = graph.findFurthest(startVertex);
-        Crown crown = new Crown(app);
+        Crown crown = new Crown(simpleApplication);
         add(crown, goalVertex);
         /*
          * Place the torch at a random vertex one hop from the
@@ -230,7 +211,7 @@ public class FreeItemsState
         Random generator = worldState.getGenerator();
         NavVertex torchVertex = (NavVertex) Noise.pick(options, generator);
         if (torchVertex != null) {
-            Torch torch = new Torch(app);
+            Torch torch = new Torch(simpleApplication);
             add(torch, torchVertex);
         }
         /*
@@ -241,7 +222,7 @@ public class FreeItemsState
         options.remove(goalVertex);
         NavVertex ankhVertex = (NavVertex) Noise.pick(options, generator);
         if (ankhVertex != null) {
-            Ankh ankh = new Ankh(app);
+            Ankh ankh = new Ankh(simpleApplication);
             add(ankh, ankhVertex);
         }
         /*
@@ -252,7 +233,7 @@ public class FreeItemsState
         options.remove(goalVertex);
         NavVertex mapmakerVertex = (NavVertex) Noise.pick(options, generator);
         if (mapmakerVertex != null) {
-            Mapmaker mapmaker = new Mapmaker(app);
+            Mapmaker mapmaker = new Mapmaker(simpleApplication);
             add(mapmaker, mapmakerVertex);
         }
     }

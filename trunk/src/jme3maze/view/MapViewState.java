@@ -27,9 +27,7 @@ package jme3maze.view;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
@@ -47,10 +45,9 @@ import com.jme3.texture.Texture;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import jme3maze.GameAppState;
 import jme3maze.items.Item;
-import jme3maze.model.FreeItemsState;
 import jme3maze.model.MazeLevel;
-import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MyCamera;
@@ -64,14 +61,14 @@ import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to manage the (inset) map view in the Maze Game.
+ * Game app state to manage the (inset) map view in the Maze Game.
  * <p>
- * Each instance is disabled at creation.
+ * Disabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class MapViewState
-        extends AbstractAppState {
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -111,14 +108,6 @@ public class MapViewState
     final private static Vector3f forwardDirection = Vector3f.UNIT_Z;
     // *************************************************************************
     // fields
-    /**
-     * app state manager: set by initialize()
-     */
-    private AppStateManager stateManager;
-    /**
-     * asset manager: set by initialize()
-     */
-    private AssetManager assetManager;
     /**
      * interval between updates (in seconds, &ge;0)
      */
@@ -162,7 +151,7 @@ public class MapViewState
     /**
      * root of this view's scene graph
      */
-    final private Node rootNode = new Node("map root node");
+    final private Node mapRootNode = new Node("map root node");
     /**
      * attaching application: set by initialize()
      */
@@ -197,14 +186,12 @@ public class MapViewState
         }
         spatial = item.visualizeMap();
 
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
         NavVertex vertex = freeItemsState.getVertex(item);
         Vector3f location = vertex.getLocation();
         spatial.move(location);
 
         itemSpatial.put(item, spatial);
-        rootNode.attachChild(spatial);
+        mapRootNode.attachChild(spatial);
     }
 
     /**
@@ -225,7 +212,6 @@ public class MapViewState
         int rowIncrement = Math.round(cardinal.getX());
         int columnIncrement = Math.round(cardinal.getZ());
 
-        PlayerState playerState = stateManager.getState(PlayerState.class);
         MazeLevel level = playerState.getMazeLevel();
 
         for (NavVertex vertex = startVertex; vertex != null;) {
@@ -316,16 +302,7 @@ public class MapViewState
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
-        if (isInitialized()) {
-            throw new IllegalStateException("already initialized");
-        }
-        Validate.nonNull(application, "application");
-        Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
-
-        this.application = (SimpleApplication) application;
-        assetManager = application.getAssetManager();
-        this.stateManager = stateManager;
 
         initializeMaze();
         addPlayer();
@@ -349,8 +326,8 @@ public class MapViewState
          * Update logical state here where we can be sure all controls
          * have been updated.
          */
-        rootNode.updateLogicalState(updateInterval);
-        rootNode.updateGeometricState();
+        mapRootNode.updateLogicalState(updateInterval);
+        mapRootNode.updateGeometricState();
     }
 
     /**
@@ -410,9 +387,8 @@ public class MapViewState
         float yViewRadius = 3f * vertexSpacing; // world units
         MyCamera.setYTangent(mapCamera, yViewRadius);
 
-        RenderManager renderManager = application.getRenderManager();
         ViewPort insetView = renderManager.createMainView("inset", mapCamera);
-        insetView.attachScene(rootNode);
+        insetView.attachScene(mapRootNode);
         insetView.setBackgroundColor(mapBackground);
         insetView.setClearFlags(true, true, true);
         /*
@@ -451,8 +427,6 @@ public class MapViewState
     private void addMazeVertex(NavVertex vertex) {
         assert vertex != null;
 
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
         Item[] items = freeItemsState.getItems(vertex);
         for (Item item : items) {
             addFreeItem(item);
@@ -487,8 +461,7 @@ public class MapViewState
         /*
          * Add avatar node.
          */
-        rootNode.attachChild(avatarNode);
-        PlayerState playerState = stateManager.getState(PlayerState.class);
+        mapRootNode.attachChild(avatarNode);
         Vector3f location = playerState.getLocation();
         MySpatial.setWorldLocation(avatarNode, location);
         Quaternion orientation = playerState.getOrientation();
@@ -520,6 +493,6 @@ public class MapViewState
         stickMaterial =
                 MyAsset.createUnshadedMaterial(assetManager, stickColor);
 
-        rootNode.attachChild(mazeNode);
+        mapRootNode.attachChild(mazeNode);
     }
 }

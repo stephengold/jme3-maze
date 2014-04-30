@@ -26,30 +26,27 @@
 package jme3maze.model;
 
 import com.jme3.app.Application;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
-import jme3maze.InputState;
+import jme3maze.GameAppState;
 import jme3maze.items.Item;
-import jme3maze.view.MainViewState;
-import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to manage the player in the Maze Game. The player has a position in
- * the world and an inventory of items.
+ * Game app state to manage the player in the Maze Game. The player has a
+ * position in * the world and an inventory of items.
  * <p>
  * Enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class PlayerState
-        extends AbstractAppState {
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -60,10 +57,6 @@ public class PlayerState
             Logger.getLogger(PlayerState.class.getName());
     // *************************************************************************
     // fields
-    /**
-     * state manager: set by initialize()
-     */
-    private AppStateManager stateManager;
     /**
      * rate of movement in world units per second (&gt;0)
      */
@@ -188,7 +181,6 @@ public class PlayerState
      * @return pre-existing instance
      */
     public MazeLevel getMazeLevel() {
-        WorldState worldState = stateManager.getState(WorldState.class);
         MazeLevel level = worldState.getLevel(mazeLevelIndex);
         return level;
     }
@@ -274,7 +266,6 @@ public class PlayerState
         VectorXZ horizontalDirection = arc.getHorizontalDirection();
         setDirection(horizontalDirection);
 
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         if (mapViewState.isEnabled()) {
             mapViewState.addMazeLineOfSight(vertex, direction);
         }
@@ -297,10 +288,7 @@ public class PlayerState
         /*
          * Visualize the rotation.
          */
-        MainViewState mainViewState =
-                stateManager.getState(MainViewState.class);
         mainViewState.setPlayerOrientation(orientation);
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         if (mapViewState.isEnabled()) {
             mapViewState.setPlayerOrientation(orientation);
         }
@@ -321,7 +309,6 @@ public class PlayerState
         /*
          * Update the controller.
          */
-        InputState inputState = stateManager.getState(InputState.class);
         inputState.setLeftHandItem(item);
     }
 
@@ -336,10 +323,7 @@ public class PlayerState
         /*
          * Visualize the translation.
          */
-        MainViewState mainViewState =
-                stateManager.getState(MainViewState.class);
         mainViewState.setPlayerLocation(location);
-        MapViewState mapViewState = stateManager.getState(MapViewState.class);
         if (mapViewState.isEnabled()) {
             mapViewState.setPlayerLocation(location);
         }
@@ -380,7 +364,6 @@ public class PlayerState
         /*
          * Update the controller.
          */
-        InputState inputState = stateManager.getState(InputState.class);
         inputState.setRightHandItem(item);
     }
 
@@ -397,8 +380,6 @@ public class PlayerState
 
             mazeLevelIndex = WorldState.levelIndex(vertex);
 
-            MapViewState mapViewState =
-                    stateManager.getState(MapViewState.class);
             if (mapViewState.isEnabled()) {
                 mapViewState.addMazeLineOfSight(vertex, direction);
             }
@@ -463,7 +444,7 @@ public class PlayerState
         }
     }
     // *************************************************************************
-    // AbstractAppState methods
+    // GameAppState methods
 
     /**
      * Initialize this state prior to its first update.
@@ -474,18 +455,10 @@ public class PlayerState
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
-        if (isInitialized()) {
-            throw new IllegalStateException("already initialized");
-        }
-        Validate.nonNull(application, "application");
-        Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
-
-        this.stateManager = stateManager;
         /*
-         * Get the player's starting point.
+         * Get the player's start arc.
          */
-        WorldState worldState = stateManager.getState(WorldState.class);
         NavArc playerStartArc = worldState.getStartArc();
         setArc(playerStartArc);
     }

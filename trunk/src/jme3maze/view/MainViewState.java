@@ -26,19 +26,13 @@
 package jme3maze.view;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
-import com.jme3.input.FlyByCamera;
 import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.Camera;
-import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -47,10 +41,9 @@ import com.jme3.texture.Texture;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import jme3maze.GameAppState;
 import jme3maze.items.Item;
-import jme3maze.model.FreeItemsState;
 import jme3maze.model.MazeLevel;
-import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MySpatial;
@@ -63,14 +56,14 @@ import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to manage the (1st-person) main view in the Maze Game.
+ * Game app state to manage the (1st-person) main view in the Maze Game.
  * <p>
- * Each instance is enabled at creation.
+ * Enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class MainViewState
-        extends AbstractAppState {
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -120,14 +113,6 @@ public class MainViewState
     // *************************************************************************
     // fields
     /**
-     * app state manager: set by initialize()
-     */
-    private AppStateManager stateManager;
-    /**
-     * asset manager: set by initialize()
-     */
-    private AssetManager assetManager;
-    /**
      * map free items to their spatials
      */
     private Map<Item, Spatial> itemSpatial = new TreeMap<>();
@@ -144,10 +129,6 @@ public class MainViewState
      */
     private Material wallMaterial;
     /**
-     * root of this view's scene graph: set by initialize()
-     */
-    private Node rootNode;
-    /**
      * node which represents the player in this view
      */
     final private Node avatarNode = new Node("main avatar node");
@@ -155,10 +136,6 @@ public class MainViewState
      * point light source for this view
      */
     final private PointLight torch = new PointLight();
-    /**
-     * attaching application: set by initialize()
-     */
-    private SimpleApplication application;
     // *************************************************************************
     // new methods exposed
 
@@ -169,8 +146,6 @@ public class MainViewState
      */
     public void addFreeItem(Item item) {
         Spatial spatial = item.visualizeMain();
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
         NavVertex vertex = freeItemsState.getVertex(item);
         Vector3f location = vertex.getLocation();
         spatial.move(location);
@@ -187,7 +162,6 @@ public class MainViewState
                 avatarNode.getControl(CameraControl.class);
         cameraControl.setEnabled(false);
 
-        FlyByCamera flyCam = application.getFlyByCamera();
         flyCam.setEnabled(true);
         flyCam.setMoveSpeed(10f);
     }
@@ -254,18 +228,8 @@ public class MainViewState
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
-        if (isInitialized()) {
-            throw new IllegalStateException("already initialized");
-        }
-        Validate.nonNull(application, "application");
-        Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
 
-        this.application = (SimpleApplication) application;
-        this.stateManager = stateManager;
-
-        assetManager = application.getAssetManager();
-        rootNode = this.application.getRootNode();
         rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
          * Initialize materials for ceiling, floor, and walls.
@@ -310,7 +274,6 @@ public class MainViewState
         MazeLevelView mazeLevelView = new MazeLevelView(corridorWidth,
                 wallHeight, ceilingMaterial, floorMaterial, wallMaterial);
 
-        WorldState worldState = stateManager.getState(WorldState.class);
         int numLevels = worldState.getNumLevels();
         for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
             MazeLevel level = worldState.getLevel(levelIndex);
@@ -319,8 +282,6 @@ public class MainViewState
         /*
          * Add free items.
          */
-        FreeItemsState freeItemsState =
-                stateManager.getState(FreeItemsState.class);
         for (Item item : freeItemsState.getAll()) {
             addFreeItem(item);
         }
@@ -328,7 +289,6 @@ public class MainViewState
          * Add avatar to represent the player.
          */
         rootNode.attachChild(avatarNode);
-        PlayerState playerState = stateManager.getState(PlayerState.class);
         Vector3f location = playerState.getLocation();
         MySpatial.setWorldLocation(avatarNode, location);
         Quaternion orientation = playerState.getOrientation();
@@ -359,12 +319,11 @@ public class MainViewState
          * Disable SimpleApplication's FlyByCamera,
          * which is for debug and demos, not gameplay.
          */
-        application.getFlyByCamera().setEnabled(false);
+        flyCam.setEnabled(false);
         /*
          * Add a control for the forward-looking main camera, five world units
          * behind the avatar.
          */
-        Camera cam = application.getCamera();
         Vector3f localOffset = new Vector3f(0f, eyeHeight, -5f);
         CameraControl forwardView = new CameraControl(cam, localOffset,
                 forwardDirection, WorldState.upDirection);
@@ -388,7 +347,6 @@ public class MainViewState
             PointLightShadowRenderer plsr =
                     new PointLightShadowRenderer(assetManager, shadowMapSize);
             plsr.setLight(torch);
-            ViewPort viewPort = application.getViewPort();
             viewPort.addProcessor(plsr);
         }
     }
@@ -410,7 +368,6 @@ public class MainViewState
             /*
              * As a debugging aid, visualize the navigation arcs using sticks.
              */
-            WorldState worldState = stateManager.getState(WorldState.class);
             NavGraph graph = worldState.getGraph();
             Material debugMaterial = MyAsset.createUnshadedMaterial(
                     assetManager, ColorRGBA.White);
