@@ -108,6 +108,8 @@ public class TurnState
         VectorXZ horizontalDirection = arc.getHorizontalDirection();
         activate(horizontalDirection);
     }
+    // *************************************************************************
+    // SimpleAppState methods
 
     /**
      * Update this state.

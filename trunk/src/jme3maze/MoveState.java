@@ -25,14 +25,9 @@
  */
 package jme3maze;
 
-import com.jme3.app.Application;
-import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
-import jme3maze.model.FreeItemsState;
-import jme3maze.model.PlayerState;
-import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
@@ -82,7 +77,7 @@ public class MoveState
         setEnabled(false);
     }
     // *************************************************************************
-    // GameAppState methods
+    // AbstractAppState methods
 
     /**
      * Enable or disable this state.
@@ -98,6 +93,8 @@ public class MoveState
 
         super.setEnabled(newState);
     }
+    // *************************************************************************
+    // SimpleAppState methods
 
     /**
      * Update this state.
