@@ -174,10 +174,20 @@ public class Item
     }
 
     /**
+     * Remove this item from the player's inventory.
+     */
+    public void discard() {
+        boolean success = playerState.discard(this);
+        assert success : this;
+        NavVertex vertex = playerState.getVertex();
+        freeItemsState.add(this, vertex);
+    }
+
+    /**
      * Encounter this item free in the world.
      */
     public void encounter() {
-        logger.log(Level.WARNING, "ignored free item of type {0}",
+        logger.log(Level.WARNING, "encountered free item of type {0}",
                 MyString.quote(typeName));
     }
 
@@ -234,6 +244,22 @@ public class Item
     }
 
     /**
+     * Shift this item from the left hand to the right hand.
+     */
+    public void shiftLeft() {
+        playerState.setRightHandItem(null);
+        playerState.setLeftHandItem(this);
+    }
+
+    /**
+     * Shift this item from the right hand to the left hand.
+     */
+    public void shiftRight() {
+        playerState.setLeftHandItem(null);
+        playerState.setRightHandItem(this);
+    }
+
+    /**
      * Add this item to the player's inventory.
      */
     public void take() {
@@ -270,20 +296,15 @@ public class Item
 
         switch (useDescription) {
             case discardUse:
-                boolean success = playerState.discard(this);
-                assert success;
-                NavVertex vertex = playerState.getVertex();
-                freeItemsState.add(this, vertex);
+                discard();
                 break;
 
             case shiftLeftUse:
-                playerState.setRightHandItem(null);
-                playerState.setLeftHandItem(this);
+                shiftLeft();
                 break;
 
             case shiftRightUse:
-                playerState.setLeftHandItem(null);
-                playerState.setRightHandItem(this);
+                shiftRight();
                 break;
 
             case takeUse:
