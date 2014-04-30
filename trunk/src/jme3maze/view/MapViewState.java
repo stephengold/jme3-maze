@@ -27,10 +27,14 @@ package jme3maze.view;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
@@ -107,6 +111,10 @@ public class MapViewState
     final private static Vector3f forwardDirection = Vector3f.UNIT_Z;
     // *************************************************************************
     // fields
+    /**
+     * camera for rendering the map: set by addCamera()
+     */
+    private Camera mapCamera;
     /**
      * interval between updates (in seconds, &ge;0)
      */
@@ -217,6 +225,58 @@ public class MapViewState
             vertex = level.findNextLineOfSight(vertex, rowIncrement,
                     columnIncrement);
         }
+    }
+
+    /**
+     * Find the vertex (if any) at the specified screen coordinates in this
+     * view.
+     *
+     * @param screenLocation screen coordinates (not null)
+     * @return pre-existing vertex or null for none
+     */
+    public NavVertex findVertex(Vector2f screenLocation) {
+        Validate.nonNull(screenLocation, "screen location");
+
+        if (mapCamera == null) {
+            return null;
+        }
+        /*
+         * Construct a ray based on the screen coordinates.
+         */
+        Vector3f startLocation =
+                mapCamera.getWorldCoordinates(screenLocation, 0f);
+        Vector3f farPoint = mapCamera.getWorldCoordinates(screenLocation, 1f);
+        Vector3f direction = farPoint.subtract(startLocation).normalizeLocal();
+        Ray ray = new Ray(startLocation, direction);
+        /*
+         * Trace the ray to the nearest geometry.
+         */
+        CollisionResults results = new CollisionResults();
+        mapRootNode.collideWith(ray, results);
+        CollisionResult nearest = results.getClosestCollision();
+        if (nearest == null) {
+            return null;
+        }
+        Geometry geometry = nearest.getGeometry();
+        /*
+         * Check whether the geometry corresponds to a vertex on the
+         * same maze level as the player.
+         */
+        Spatial spatial = geometry;
+        while (spatial != null) {
+            NavVertex vertex = geometry.getUserData("vertex");
+            if (vertex != null) {
+                MazeLevel level = playerState.getMazeLevel();
+                if (level.contains(vertex)) {
+                    return vertex;
+                } else {
+                    return null;
+                }
+            }
+            spatial = spatial.getParent();
+        }
+
+        return null;
     }
 
     /**
@@ -364,7 +424,7 @@ public class MapViewState
          * The application's default camera provides
          * a convenient starting point.
          */
-        Camera mapCamera = cam.clone();
+        mapCamera = cam.clone();
         /*
          * Limit far plane in order to display a single maze level at a time.
          */
@@ -449,6 +509,7 @@ public class MapViewState
                 spatial = NavDebug.makeBall(vertex, ballRadius,
                         intersectionMaterial);
         }
+        spatial.setUserData("vertex", vertex);
         vertexSpatial.put(vertex, spatial);
         mazeNode.attachChild(spatial);
     }
