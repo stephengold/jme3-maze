@@ -28,6 +28,7 @@ package jme3maze;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.RawInputListener;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
@@ -41,10 +42,9 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
-import jme3maze.view.MainViewState;
-import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
@@ -68,7 +68,7 @@ import tonegod.gui.core.utils.UIDUtil;
  */
 public class InputState
         extends GameAppState
-        implements ActionListener {
+        implements ActionListener, RawInputListener {
     // *************************************************************************
     // constants
 
@@ -140,24 +140,26 @@ public class InputState
     // new methods exposed
 
     /**
-     * Select use for the specified item from a popup menu.
+     * Select a use for the specified item from a popup menu.
      *
      * @param item (not null)
+     * @param freeFlag true if item is free, false if it's in an inventory
      */
-    public void selectUse(final Item item) {
+    public void selectUse(final Item item, boolean freeFlag) {
         Vector2f cursorPosition = inputManager.getCursorPosition();
         Vector2f upperLeft = cursorPosition.clone();
         boolean scrollable = false;
         Menu popupMenu = new Menu(guiScreen, upperLeft, scrollable) {
             @Override
-            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+            public void onMenuItemClicked(int index, Object value,
+                    boolean isToggled) {
                 String description = (String) value;
                 item.use(description);
             }
         };
         guiScreen.addElement(popupMenu);
 
-        Collection<String> uses = item.findUses(false);
+        Collection<String> uses = item.findUses(freeFlag);
         for (String use : uses) {
             String caption = use;
             Object value = use;
@@ -215,7 +217,147 @@ public class InputState
         }
     }
     // *************************************************************************
-    // AbstractAppState methods
+    // ActionListener methods
+
+    /**
+     * Record an action from the keyboard.
+     *
+     * @param actionString textual description of the action (not null)
+     * @param ongoing true if the action is ongoing, otherwise false
+     * @param ignored
+     */
+    @Override
+    public void onAction(String actionString, boolean ongoing, float ignored) {
+        Validate.nonNull(actionString, "action string");
+        /*
+         * Ignore actions which are not ongoing.
+         */
+        if (!ongoing) {
+            return;
+        }
+        /*
+         * Ignore actions requested while the player is turning.
+         */
+        if (turnState.isEnabled()) {
+            return;
+        }
+
+        lastActionString = actionString;
+    }
+    // *************************************************************************
+    // GameAppState methods
+
+    /**
+     * Initialize this state prior to its first update.
+     *
+     * @param stateManager (not null)
+     * @param application attaching application (not null)
+     */
+    @Override
+    public void initialize(AppStateManager stateManager,
+            Application application) {
+        super.initialize(stateManager, application);
+
+        initializeHotkeys();
+        /*
+         * Initialize the GUI.
+         */
+        guiScreen = new Screen(application);
+        guiScreen.setUseToolTips(true);
+        guiNode.addControl(guiScreen);
+        initializeGuiButtons();
+        /*
+         * Set up callback for mouse clicks AFTER instantiating the GUI screen
+         * so that the GUI sees those events first.
+         */
+        inputManager.addRawInputListener(this);
+    }
+    // *************************************************************************
+    // RawInputListener methods
+
+    /**
+     * Callback before each batch of input.
+     */
+    @Override
+    public void beginInput() {
+    }
+
+    /**
+     * Callback after each batch of input.
+     */
+    @Override
+    public void endInput() {
+    }
+
+    /**
+     * Callback for joystick motion events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onJoyAxisEvent(JoyAxisEvent event) {
+    }
+
+    /**
+     * Callback for joystick button events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onJoyButtonEvent(JoyButtonEvent event) {
+    }
+
+    /**
+     * Callback for keyboard events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onKeyEvent(KeyInputEvent event) {
+    }
+
+    /**
+     * Callback for mouse button events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onMouseButtonEvent(MouseButtonEvent event) {
+        if (event.getButtonIndex() == MouseInput.BUTTON_LEFT
+                && event.isPressed()) {
+            float x = event.getX();
+            float y = event.getY();
+            Vector2f click2d = new Vector2f(x, y);
+            /*
+             * If the cursor's hotspot was over an item in the main view,
+             * use that item.
+             */
+            Item item = mainViewState.findItem(click2d);
+            if (item != null) {
+                item.use(true);
+            }
+        }
+    }
+
+    /**
+     * Callback for mouse motion events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onMouseMotionEvent(MouseMotionEvent event) {
+    }
+
+    /**
+     * Callback for touch screen events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onTouchEvent(TouchEvent event) {
+    }
+    // *************************************************************************
+    // SimpleAppState methods
 
     /**
      * Clean up this state on detach.
@@ -240,27 +382,6 @@ public class InputState
         inputManager.removeListener(this);
 
         super.cleanup();
-    }
-
-    /**
-     * Initialize this state prior to its first update.
-     *
-     * @param stateManager (not null)
-     * @param application attaching application (not null)
-     */
-    @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
-        super.initialize(stateManager, application);
-
-        initializeHotkeys();
-        /*
-         * Initialize the GUI.
-         */
-        guiScreen = new Screen(application);
-        guiScreen.setUseToolTips(true);
-        guiNode.addControl(guiScreen);
-        initializeGuiButtons();
     }
 
     /**
@@ -329,34 +450,6 @@ public class InputState
         }
 
         lastActionString = "";
-    }
-    // *************************************************************************
-    // ActionListener methods
-
-    /**
-     * Record an action from the keyboard.
-     *
-     * @param actionString textual description of the action (not null)
-     * @param ongoing true if the action is ongoing, otherwise false
-     * @param ignored
-     */
-    @Override
-    public void onAction(String actionString, boolean ongoing, float ignored) {
-        Validate.nonNull(actionString, "action string");
-        /*
-         * Ignore actions which are not ongoing.
-         */
-        if (!ongoing) {
-            return;
-        }
-        /*
-         * Ignore actions requested while the player is turning.
-         */
-        if (turnState.isEnabled()) {
-            return;
-        }
-
-        lastActionString = actionString;
     }
     // *************************************************************************
     // private methods

@@ -48,8 +48,8 @@ import jme3utilities.Validate;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Generic collectible item in the Maze Game. Each item has a named type.
- * Multiple instances may share the same type.
+ * Generic collectible item in the Maze Game. Each item has a named type. Item
+ * instances may share the same type.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -79,6 +79,10 @@ public class Item
      * description for "shift to right hand" use
      */
     final private static String shiftRightUse = "shift to right hand";
+    /**
+     * description for "take" use
+     */
+    final private static String takeUse = "take";
     // *************************************************************************
     // fields
     /**
@@ -185,13 +189,17 @@ public class Item
      */
     public List<String> findUses(boolean freeFlag) {
         List<String> result = new LinkedList<>();
-        if (!freeFlag) {
-            result.add("discard");
+        if (freeFlag) {
+            if (isWithinReach()) {
+                result.add(takeUse);
+            }
+        } else {
+            result.add(discardUse);
             if (playerState.isLeftHandEmpty()) {
-                result.add("shift to left hand");
+                result.add(shiftLeftUse);
             }
             if (playerState.isRightHandEmpty()) {
-                result.add("shift to right hand");
+                result.add(shiftRightUse);
             }
         }
 
@@ -206,13 +214,39 @@ public class Item
     public String getTypeName() {
         assert typeName != null;
         assert typeName.length() > 0 : typeName;
-
         return typeName;
     }
 
     /**
+     * Test whether this item is within the player's reach.
+     *
+     * @return true if within reach, otherwise false
+     */
+    public boolean isWithinReach() {
+        NavVertex itemVertex = freeItemsState.getVertex(this);
+        if (itemVertex == null) {
+            return false;
+        }
+        NavVertex playerVertex = playerState.getVertex();
+        boolean result = itemVertex == playerVertex;
+
+        return result;
+    }
+
+    /**
+     * Add this item to the player's inventory.
+     */
+    public void take() {
+        boolean success = playerState.takeFavorRightHand(this);
+        if (success) {
+            success = freeItemsState.remove(this);
+            assert success : this;
+        }
+    }
+
+    /**
      * Use this item, or if it currently has multiple uses, have the user select
-     * one.
+     * a use and do that one.
      *
      * @param freeFlag true if item is free, false if it's in an inventory
      */
@@ -220,7 +254,7 @@ public class Item
         List<String> possibleUses = findUses(freeFlag);
         int numUses = possibleUses.size();
         if (numUses > 1) {
-            inputState.selectUse(this);
+            inputState.selectUse(this, freeFlag);
         } else if (numUses == 1) {
             use(possibleUses.get(0));
         }
@@ -250,6 +284,10 @@ public class Item
             case shiftRightUse:
                 playerState.setLeftHandItem(null);
                 playerState.setRightHandItem(this);
+                break;
+
+            case takeUse:
+                take();
                 break;
 
             default:

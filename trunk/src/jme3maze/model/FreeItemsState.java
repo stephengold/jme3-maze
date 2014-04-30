@@ -39,8 +39,6 @@ import jme3maze.items.Crown;
 import jme3maze.items.Item;
 import jme3maze.items.Mapmaker;
 import jme3maze.items.Torch;
-import jme3maze.view.MainViewState;
-import jme3maze.view.MapViewState;
 import jme3utilities.Validate;
 import jme3utilities.math.Noise;
 import jme3utilities.navigation.NavGraph;
@@ -164,21 +162,27 @@ public class FreeItemsState
      * Remove the specified item from the collection.
      *
      * @param item (not null)
+     * @return true if successful, otherwise false
      */
-    public void remove(Item item) {
+    public boolean remove(Item item) {
         Validate.nonNull(item, "item");
 
         NavVertex vertex = itemVertex.remove(item);
-        assert vertex != null;
+        if (vertex == null) {
+            return false;
+        }
         TreeSet<Item> list = itemsAt.get(vertex);
-        assert list != null;
+        assert list != null : item;
         boolean success = list.remove(item);
-        assert success;
+        assert success : item;
         /*
          * update view
          */
-        mainViewState.removeFreeItem(item);
+        success = mainViewState.removeFreeItem(item);
+        assert success : item;
         mapViewState.removeFreeItem(item);
+
+        return true;
     }
     // *************************************************************************
     // GameAppState methods

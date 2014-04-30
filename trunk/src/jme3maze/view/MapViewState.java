@@ -89,6 +89,26 @@ public class MapViewState
      */
     final private static float iconDiameter = 30f;
     /**
+     * bottom edge of the inset view as a fraction of the main view's height,
+     * measured from the bottom edge
+     */
+    final private static float insetBottom = 0.65f;
+    /**
+     * left edge of the inset view as a fraction of the main view's width,
+     * measured from the left edge
+     */
+    final private static float insetLeft = 0.05f;
+    /**
+     * right edge of the inset view as a fraction of the main view's width,
+     * measured from the left edge
+     */
+    final private static float insetRight = 0.35f;
+    /**
+     * top edge of the inset view as a fraction of the main view's height,
+     * measured from the bottom edge
+     */
+    final private static float insetTop = 0.95f;
+    /**
      * stick radius (world units)
      */
     final private static float stickRadius = 2f;
@@ -228,16 +248,17 @@ public class MapViewState
     }
 
     /**
-     * Find the vertex (if any) at the specified screen coordinates in this
-     * view.
+     * Find the vertex (if any) in this view at the specified screen
+     * coordinates.
      *
-     * @param screenLocation screen coordinates (not null)
+     * @param screenLocation screen coordinates (not null, in pixels, measured
+     * from the lower left)
      * @return pre-existing vertex or null for none
      */
     public NavVertex findVertex(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
 
-        if (mapCamera == null) {
+        if (!isInViewPort(screenLocation)) {
             return null;
         }
         /*
@@ -280,6 +301,31 @@ public class MapViewState
     }
 
     /**
+     * Test whether the specified screen coordinates are in this view.
+     *
+     * @param screenLocation screen coordinates (not null, in pixels, measured
+     * from the lower left)
+     * @return true if location is within this view, otherwise false
+     */
+    public boolean isInViewPort(Vector2f screenLocation) {
+        Validate.nonNull(screenLocation, "screen location");
+
+        if (mapCamera == null) {
+            return false;
+        }
+        /*
+         * Scale coordinates to fractions of viewport.
+         */
+        float xFraction = screenLocation.x / mapCamera.getWidth();
+        float yFraction = screenLocation.y / mapCamera.getHeight();
+        if (xFraction > insetLeft && xFraction < insetRight
+                && yFraction > insetBottom && yFraction < insetTop) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Load an icon from a texture asset.
      *
      * @param textureAssetPath (not null)
@@ -316,14 +362,19 @@ public class MapViewState
      * Remove a free item's visualization from the scene.
      *
      * @param item free item to remove (not null)
+     * @return true if successful, otherwise false
      */
-    public void removeFreeItem(Item item) {
+    public boolean removeFreeItem(Item item) {
         Validate.nonNull(item, "item");
 
         Spatial spatial = itemSpatial.remove(item);
-        if (spatial != null) {
-            spatial.removeFromParent();
+        if (spatial == null) {
+            return false;
         }
+        boolean success = spatial.removeFromParent();
+        assert success;
+
+        return true;
     }
 
     /**
@@ -436,11 +487,7 @@ public class MapViewState
          * Position the inset view port in the upper left corner
          * of the main view port.
          */
-        float x1 = 0.05f;
-        float x2 = 0.35f;
-        float y1 = 0.65f;
-        float y2 = 0.95f;
-        mapCamera.setViewPort(x1, x2, y1, y2);
+        mapCamera.setViewPort(insetLeft, insetRight, insetBottom, insetTop);
 
         float vertexSpacing = WorldState.getVertexSpacing();
         float yViewRadius = 3f * vertexSpacing; // world units
