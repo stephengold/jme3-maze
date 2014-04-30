@@ -68,7 +68,7 @@ import tonegod.gui.core.utils.UIDUtil;
  */
 public class InputState
         extends GameAppState
-        implements ActionListener {
+        implements ActionListener, RawInputListener {
     // *************************************************************************
     // constants
 
@@ -357,6 +357,79 @@ public class InputState
         }
 
         lastActionString = actionString;
+    }
+    // *************************************************************************
+    // RawInputListener methods
+
+    @Override
+    public void beginInput() {
+    }
+
+    @Override
+    public void endInput() {
+    }
+
+    /**
+     * Callback for joystick motion events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onJoyAxisEvent(JoyAxisEvent event) {
+    }
+
+    /**
+     * Callback for joystick button events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onJoyButtonEvent(JoyButtonEvent event) {
+    }
+
+    /**
+     * Callback for mouse motion events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onMouseMotionEvent(MouseMotionEvent event) {
+    }
+
+    /**
+     * Callback for mouse button events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onMouseButtonEvent(MouseButtonEvent event) {
+        if (event.getButtonIndex() == 0 && event.isPressed()) {
+            Vector2f click2d = inputManager.getCursorPosition();
+            MapViewState mapView = stateManager.getState(MapViewState.class);
+            NavVertex vertex = null;//mapView.findVertex(click2d);
+            if (vertex != null) {
+            }
+            MainViewState mainView = stateManager.getState(MainViewState.class);
+            //Item item = mainView.findItem(click2d);
+        }
+    }
+
+    /**
+     * Callback for keyboard events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onKeyEvent(KeyInputEvent event) {
+    }
+
+    /**
+     * Callback for touch screen events.
+     *
+     * @param event (not null)
+     */
+    @Override
+    public void onTouchEvent(TouchEvent event) {
     }
     // *************************************************************************
     // private methods

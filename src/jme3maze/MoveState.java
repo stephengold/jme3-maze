@@ -26,7 +26,6 @@
 package jme3maze;
 
 import com.jme3.app.Application;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
@@ -39,14 +38,14 @@ import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to translate the player along the current navigation arc.
+ * Game app state to translate the player along the current navigation arc.
  * <p>
  * Each instance is disabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-class MoveState
-        extends AbstractAppState {
+public class MoveState
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -69,21 +68,9 @@ class MoveState
     // *************************************************************************
     // fields
     /**
-     * app state manager: set by initialize()
-     */
-    private AppStateManager stateManager;
-    /**
      * distance traveled from start of arc
      */
     private float distanceTraveled = 0f;
-    /**
-     * app state to manage free items: set by initialize()
-     */
-    private FreeItemsState freeItemsState;
-    /**
-     * app state to manage the player: set by initialize()
-     */
-    private PlayerState playerState;
     // *************************************************************************
     // constructors
 
@@ -95,28 +82,7 @@ class MoveState
         setEnabled(false);
     }
     // *************************************************************************
-    // AbstractAppState methods
-
-    /**
-     * Initialize this state prior to its first update.
-     *
-     * @param stateManager (not null)
-     * @param application attaching application (not null)
-     */
-    @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
-        if (isInitialized()) {
-            throw new IllegalStateException("already initialized");
-        }
-        Validate.nonNull(application, "application");
-        Validate.nonNull(stateManager, "state manager");
-        super.initialize(stateManager, application);
-
-        this.stateManager = stateManager;
-        freeItemsState = stateManager.getState(FreeItemsState.class);
-        playerState = stateManager.getState(PlayerState.class);
-    }
+    // GameAppState methods
 
     /**
      * Enable or disable this state.
@@ -140,8 +106,6 @@ class MoveState
      */
     @Override
     public void update(float elapsedTime) {
-        Validate.nonNegative(elapsedTime, "interval");
-        assert isEnabled();
         super.update(elapsedTime);
 
         NavArc arc = playerState.getArc();
@@ -192,14 +156,12 @@ class MoveState
             VectorXZ direction = playerState.getDirection();
             NavArc nextArc = destinationVertex.findLeastTurn(direction);
             VectorXZ horizontalDirection = nextArc.getHorizontalDirection();
-            TurnState turnState = stateManager.getState(TurnState.class);
             turnState.activate(horizontalDirection);
 
         } else {
             /*
              * Activate the input state and await user input.
              */
-            InputState inputState = stateManager.getState(InputState.class);
             inputState.setEnabled(true);
         }
     }

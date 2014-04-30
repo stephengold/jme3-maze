@@ -26,7 +26,6 @@
 package jme3maze.model;
 
 import com.jme3.app.Application;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -34,6 +33,7 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.GameAppState;
 import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
 import jme3utilities.navigation.NavArc;
@@ -41,14 +41,14 @@ import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to manage the maze in the Maze Game.
+ * Game app state to manage the maze in the Maze Game.
  * <p>
- * Each instance is enabled at creation.
+ * Enabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class WorldState
-        extends AbstractAppState {
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -267,7 +267,7 @@ public class WorldState
         return result;
     }
     // *************************************************************************
-    // AbstractAppState methods
+    // GameAppState methods
 
     /**
      * Initialize this state prior to its first update.
@@ -278,13 +278,7 @@ public class WorldState
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
-        if (isInitialized()) {
-            throw new IllegalStateException("already initialized");
-        }
-        Validate.nonNull(application, "application");
-        Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
-
         initializeMaze();
     }
     // *************************************************************************

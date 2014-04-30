@@ -26,27 +26,24 @@
 package jme3maze;
 
 import com.jme3.app.Application;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.FastMath;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.model.PlayerState;
-import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to rotate the player at a constant angular rate to a specified
+ * Game app state to rotate the player at a constant angular rate to a specified
  * direction.
  * <p>
- * Each instance is disabled at creation.
+ * Disabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-class TurnState
-        extends AbstractAppState {
+public class TurnState
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -61,14 +58,6 @@ class TurnState
             Logger.getLogger(TurnState.class.getName());
     // *************************************************************************
     // fields
-    /**
-     * app state for getting player input: set by initialize()
-     */
-    private InputState inputState;
-    /**
-     * app state to manage the player: set by initialize()
-     */
-    private PlayerState playerState;
     /**
      * final direction of turn: set by activate()
      */
@@ -100,7 +89,7 @@ class TurnState
         setEnabled(true);
     }
     // *************************************************************************
-    // AbstractAppState methods
+    // GameAppState methods
 
     /**
      * Initialize this state prior to its first update.
@@ -111,17 +100,9 @@ class TurnState
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
-        if (isInitialized()) {
-            throw new IllegalStateException("already initialized");
-        }
-        Validate.nonNull(application, "application");
-        Validate.nonNull(stateManager, "state manager");
         super.initialize(stateManager, application);
-
-        inputState = stateManager.getState(InputState.class);
-        playerState = stateManager.getState(PlayerState.class);
         /*
-         * Activate the app state.
+         * Activate the player's current arc.
          */
         NavArc arc = playerState.getArc();
         VectorXZ horizontalDirection = arc.getHorizontalDirection();
@@ -135,8 +116,6 @@ class TurnState
      */
     @Override
     public void update(float elapsedTime) {
-        Validate.nonNegative(elapsedTime, "interval");
-        assert isEnabled();
         super.update(elapsedTime);
 
         VectorXZ direction = playerState.getDirection();
