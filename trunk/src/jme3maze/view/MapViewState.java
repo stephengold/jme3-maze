@@ -26,7 +26,6 @@
 package jme3maze.view;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
@@ -152,10 +151,6 @@ public class MapViewState
      * root of this view's scene graph
      */
     final private Node mapRootNode = new Node("map root node");
-    /**
-     * attaching application: set by initialize()
-     */
-    private SimpleApplication application;
     /**
      * map icon which represents the player
      */
@@ -365,7 +360,7 @@ public class MapViewState
          * The application's default camera provides
          * a convenient starting point.
          */
-        Camera mapCamera = application.getCamera().clone();
+        Camera mapCamera = cam.clone();
         /*
          * Limit far plane in order to display a single maze level at a time.
          */
