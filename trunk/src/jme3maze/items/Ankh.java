@@ -28,11 +28,9 @@ package jme3maze.items;
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.util.logging.Logger;
 import jme3utilities.MyAsset;
-import jme3utilities.controls.RotationControl;
 
 /**
  * Ankh item in the Maze Game. Used to resurrect mummies.
@@ -72,14 +70,19 @@ public class Ankh
     // Item methods
 
     /**
-     * Encounter this ankh, free in the world.
+     * Add this ankh to the player's inventory, favoring the right hand.
      */
     @Override
-    public void encounter() {
+    public void take() {
         boolean success = playerState.takeFavorRightHand(this);
-        if (success) {
-            freeItemsState.remove(this);
+        if (!success) {
+            return;
         }
+
+        success = freeItemsState.remove(this);
+        assert success : this;
+
+        System.out.printf("You took an %s.%n", getTypeName());
     }
 
     /**
@@ -100,20 +103,11 @@ public class Ankh
     @Override
     public Spatial visualizeMain() {
         Spatial spatial = assetManager.loadModel(modelAssetPath);
-
-        Vector3f offset = new Vector3f(0f, 5f, 0f); // floating in the air
-        spatial.setLocalTranslation(offset);
+        spatial.setLocalTranslation(3f, 2.36f, -3f); // standing in northwest corner
 
         ColorRGBA color = ColorRGBA.Yellow;
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
-        /*
-         * Make it rotate.
-         */
-        Vector3f axis = Vector3f.UNIT_Y;
-        float rate = 1.5f; // radians per second
-        RotationControl rotationControl = new RotationControl(rate, axis);
-        spatial.addControl(rotationControl);
 
         return spatial;
     }
