@@ -346,7 +346,9 @@ public class MapViewState
         rotation.lookAt(Vector3f.UNIT_Y, Vector3f.UNIT_Z);
         geometry.setLocalRotation(rotation);
         geometry.setLocalScale(iconDiameter);
-        geometry.setLocalTranslation(iconDiameter / 2f, 5f, -iconDiameter / 2f);
+        float y = matchEye ? 5f : 6f;
+        float iconRadius = iconDiameter / 2f;
+        geometry.setLocalTranslation(iconRadius, y, -iconRadius);
         geometry.setMaterial(material);
         geometry.setQueueBucket(Bucket.Transparent);
 
