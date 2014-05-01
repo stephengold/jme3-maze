@@ -80,20 +80,23 @@ public class Torch
     // Item methods
 
     /**
-     * Encounter this torch, free in the world.
+     * Add this torch to the player's inventory, favoring the left hand.
      */
     @Override
-    public void encounter() {
+    public void take() {
         boolean success = playerState.takeFavorLeftHand(this);
-        if (success) {
-            freeItemsState.remove(this);
-
-            MainViewState mainViewState =
-                    stateManager.getState(MainViewState.class);
-            mainViewState.takeTorch();
-
-            System.out.printf("You acquired a %s!%n", getTypeName());
+        if (!success) {
+            return;
         }
+
+        success = freeItemsState.remove(this);
+        assert success : this;
+
+        MainViewState mainViewState =
+                stateManager.getState(MainViewState.class);
+        mainViewState.takeTorch();
+
+        System.out.printf("You took a %s.%n", getTypeName());
     }
 
     /**
@@ -114,7 +117,7 @@ public class Torch
     @Override
     public Spatial visualizeMain() {
         Node node = new Node("torch node");
-        node.setLocalTranslation(0f, 4f, 0f); // floating in midair
+        node.setLocalTranslation(3f, 2.65f, 3f); // standing in northeast corner
         /*
          * Attach the torch model to the node.
          */

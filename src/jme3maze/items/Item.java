@@ -187,14 +187,12 @@ public class Item
      * Encounter this item free in the world.
      */
     public void encounter() {
-        logger.log(Level.WARNING, "encountered free item of type {0}",
-                MyString.quote(typeName));
     }
 
     /**
      * Enumerate all current uses for this item.
      *
-     * @param freeFlag true if item is free, false if it's in an inventory
+     * @param freeFlag true if item is free, false if it's in inventory
      * @return new instance
      */
     public List<String> findUses(boolean freeFlag) {
@@ -260,14 +258,18 @@ public class Item
     }
 
     /**
-     * Add this item to the player's inventory.
+     * Add this item to the player's inventory, favoring the right hand.
      */
     public void take() {
         boolean success = playerState.takeFavorRightHand(this);
-        if (success) {
-            success = freeItemsState.remove(this);
-            assert success : this;
+        if (!success) {
+            return;
         }
+
+        success = freeItemsState.remove(this);
+        assert success : this;
+
+        System.out.printf("You took a %s.%n", getTypeName());
     }
 
     /**
