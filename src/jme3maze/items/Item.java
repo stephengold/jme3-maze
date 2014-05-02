@@ -336,7 +336,7 @@ public class Item
      * @return new unparented instance
      */
     public Spatial visualizeMain() {
-        logger.log(Level.WARNING, "ignored free item of type {0}",
+        logger.log(Level.WARNING, "invisible free item of type {0}",
                 MyString.quote(typeName));
         Node result = new Node();
         return result;

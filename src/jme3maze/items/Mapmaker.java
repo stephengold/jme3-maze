@@ -27,6 +27,7 @@ package jme3maze.items;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -121,7 +122,8 @@ public class Mapmaker
         ColorRGBA skirtColor = ColorRGBA.Red;
         Material skirtMaterial =
                 MyAsset.createShinyMaterial(assetManager, skirtColor);
-        skirtMaterial.getAdditionalRenderState().setFaceCullMode(FaceCullMode.Off);
+        RenderState renderState = skirtMaterial.getAdditionalRenderState();
+        renderState.setFaceCullMode(FaceCullMode.Off);
         Node main = (Node) node.getChild("main");
         Spatial skirt = main.getChild("main2");
         skirt.setMaterial(skirtMaterial);

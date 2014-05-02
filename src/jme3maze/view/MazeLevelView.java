@@ -371,7 +371,7 @@ class MazeLevelView {
             Vector3f lowerRightCorner, String description) {
         assert lowerLeftCorner != null;
         assert lowerRightCorner != null;
-        assert lowerLeftCorner.y == lowerRightCorner.y;
+        assert lowerLeftCorner.y == lowerRightCorner.y : lowerLeftCorner.y;
         assert description != null;
 
         Geometry geometry = new Geometry(description, unitSquare);

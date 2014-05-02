@@ -58,6 +58,10 @@ public class Crown
      * asset path to the "crown" 3-D model asset
      */
     final private static String modelAssetPath = "Models/items/crown/crown.j3o";
+    /**
+     * offset of model from vertex when free
+     */
+    final private static Vector3f modelOffset = new Vector3f(0f, 5f, 0f);
     // *************************************************************************
     // constructors
 
@@ -97,8 +101,7 @@ public class Crown
     @Override
     public Spatial visualizeMain() {
         Node node = (Node) assetManager.loadModel(modelAssetPath);
-
-        Vector3f offset = new Vector3f(0f, 5f, 0f); // floating in the air
+        Vector3f offset = new Vector3f(modelOffset);
         node.setLocalTranslation(offset);
 
         ColorRGBA hedjetColor = ColorRGBA.White;
