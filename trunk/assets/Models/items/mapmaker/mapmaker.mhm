@@ -1,0 +1,26 @@
+# Written by MakeHuman 1.0.0
+version v1.0.0
+tags mapmaker
+macro Weight 0.516000
+macro Gender 1.000000
+macro Age 0.335000
+macro Height 0.500000
+macro Asian 0.029365
+macro African 0.441635
+macro Caucasian 0.529000
+macro Muscle 0.232000
+macro BodyProportions 0.510000
+gendered breast-trans-vert-down-up -0.536000
+gendered BreastFirmness 0.500000
+gendered BreastSize 0.148000
+eyes Low-Poly 1cc97a30-85a1-42e6-a9f7-b3e753732baa
+clothes short01 f859bbbd-3b32-4a52-aa91-813ff2f0d1af
+clothesHideFaces True
+face head-age-less-more 0.006000
+face head-angle-in-out -0.162000
+face head-invertedtriangular 1.000000
+torso hip-scale-horiz-decr-incr -0.496000
+skinMaterial skins/default.mhmat
+material short01 f859bbbd-3b32-4a52-aa91-813ff2f0d1af clothes/short01/basic.mhmat
+material Low-Poly 1cc97a30-85a1-42e6-a9f7-b3e753732baa eyes/materials/brown.mhmat
+skeleton game.json 
