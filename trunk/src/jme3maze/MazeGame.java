@@ -49,6 +49,10 @@ public class MazeGame
     // constants
 
     /**
+     * number of levels in the maze
+     */
+    final private static int numLevels = 2;
+    /**
      * message logger for this class
      */
     final private static Logger logger =
@@ -108,7 +112,6 @@ public class MazeGame
         /*
          * Attach model app states to the application.
          */
-        int numLevels = 3;
         WorldState worldState = new WorldState(numLevels);
         PlayerState playerState = new PlayerState();
         FreeItemsState freeItemsState = new FreeItemsState();
