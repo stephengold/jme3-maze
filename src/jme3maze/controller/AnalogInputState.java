@@ -109,6 +109,19 @@ public class AnalogInputState
      */
     private float upTilt = 0f;
     // *************************************************************************
+    // new methods exposed
+
+    /**
+     * Reset the cameras back to their default state.
+     */
+    public void resetCameras() {
+        leftPan = 0f;
+        outZoom = 0f;
+        upTilt = 0f;
+
+        updateCamera();
+    }
+    // *************************************************************************
     // AnalogListener methods
 
     /**
@@ -279,12 +292,12 @@ public class AnalogInputState
      * Update the main camera's look direction and field of view.
      */
     private void updateCamera() {
-        float altitude = 1f * upTilt;
-        float azimuth = FastMath.HALF_PI - 1f * leftPan;
+        float altitude = upTilt; // radians
+        float azimuth = FastMath.HALF_PI - leftPan; // radians
         Vector3f direction = MyVector3f.fromAltAz(altitude, azimuth);
         mainViewState.setLookDirection(direction);
 
-        float yTangent = 0.2f * FastMath.exp(0.1f * outZoom);
+        float yTangent = FastMath.exp(0.1f * outZoom);
         MyCamera.setYTangent(cam, yTangent);
     }
 
@@ -297,8 +310,8 @@ public class AnalogInputState
         logger.log(Level.INFO, "{0}", amount);
 
         outZoom += amount;
-        if (outZoom > maxZoom) {
-            outZoom = maxZoom;
+        if (outZoom > 0f) {
+            outZoom = 0f;
         }
         if (outZoom < -maxZoom) {
             outZoom = -maxZoom;
