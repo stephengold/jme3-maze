@@ -27,6 +27,7 @@ package jme3maze.model;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.math.Vector3f;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -95,6 +96,14 @@ public class FreeItemsState
         }
         boolean success = list.add(item);
         assert success;
+
+        if (item instanceof Torch) {
+            Torch torch = (Torch) item;
+            Vector3f offset = torch.getLightOffset();
+            Vector3f location = vertex.getLocation();
+            location.addLocal(offset);
+            worldState.setTorchLocation(location);
+        }
         /*
          * update view
          */

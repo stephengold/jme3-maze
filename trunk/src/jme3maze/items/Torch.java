@@ -29,7 +29,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.influencers.ParticleInfluencer;
-import com.jme3.light.Light;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -38,9 +37,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 import java.util.logging.Logger;
-import jme3maze.view.MainViewState;
 import jme3utilities.MyAsset;
-import jme3utilities.controls.LightControl;
 
 /**
  * Torch item in the Maze Game. Provides illumination.
@@ -65,6 +62,14 @@ public class Torch
      * asset path to the "torch" 3-D model asset
      */
     final private static String modelAssetPath = "Models/items/torch/torch.j3o";
+    /**
+     * offset of light-source from vertex when free
+     */
+    final private static Vector3f lightOffset = new Vector3f(3f, 4.65f, 3f);
+    /**
+     * offset of model from vertex when free
+     */
+    final private static Vector3f modelOffset = new Vector3f(3f, 2.65f, 3f);
     // *************************************************************************
     // constructors
 
@@ -77,10 +82,39 @@ public class Torch
         super("torch", application);
     }
     // *************************************************************************
+    // new methods exposed
+
+    /**
+     * Read the offset of the light-source from the vertex when free.
+     *
+     * @return new vector in world coordinates
+     */
+    public Vector3f getLightOffset() {
+        return lightOffset.clone();
+    }
+    // *************************************************************************
     // Item methods
 
     /**
-     * Add this torch to the player's inventory, favoring the left hand.
+     * Shift from the left hand to the right hand.
+     */
+    @Override
+    public void shiftLeft() {
+        super.shiftLeft();
+        playerState.updateTorchLocation();
+    }
+
+    /**
+     * Shift from the right hand to the left hand.
+     */
+    @Override
+    public void shiftRight() {
+        super.shiftRight();
+        playerState.updateTorchLocation();
+    }
+
+    /**
+     * Add to the player's inventory, favoring the left hand.
      */
     @Override
     public void take() {
@@ -92,15 +126,13 @@ public class Torch
         success = freeItemsState.remove(this);
         assert success : this;
 
-        MainViewState mainViewState =
-                stateManager.getState(MainViewState.class);
-        mainViewState.takeTorch();
+        playerState.updateTorchLocation();
 
         System.out.printf("You took a %s.%n", getTypeName());
     }
 
     /**
-     * Visualize this torch in an inventory.
+     * Visualize in inventory.
      *
      * @return asset path of a texture
      */
@@ -110,14 +142,14 @@ public class Torch
     }
 
     /**
-     * Visualize this torch in the main view.
+     * Visualize in the main view.
      *
      * @return new unparented instance
      */
     @Override
     public Spatial visualizeMain() {
         Node node = new Node("torch node");
-        node.setLocalTranslation(3f, 2.65f, 3f); // standing in northeast corner
+        node.setLocalTranslation(modelOffset);
         /*
          * Attach the torch model to the node.
          */
@@ -132,23 +164,12 @@ public class Torch
         ParticleEmitter emitter = createEmitter();
         emitter.setLocalTranslation(0f, 1f, 0f);
         node.attachChild(emitter);
-        /*
-         * Attach the light source to the node using a LightControl.
-         */
-        MainViewState mainViewState =
-                stateManager.getState(MainViewState.class);
-        Light torch = mainViewState.getLight();
-        Vector3f lightOffset = new Vector3f(0f, 2f, 0f);
-        Vector3f lightDirection = new Vector3f(0f, 0f, 1f);
-        LightControl lightControl =
-                new LightControl(torch, lightOffset, lightDirection);
-        node.addControl(lightControl);
 
         return node;
     }
 
     /**
-     * Visualize this torch in the map view.
+     * Visualize in the map view.
      *
      * @return new unparented instance
      */

@@ -54,7 +54,6 @@ import jme3utilities.MyAsset;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
-import jme3utilities.controls.LightControl;
 import jme3utilities.debug.Printer;
 import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavGraph;
@@ -292,13 +291,13 @@ public class MainViewState
     }
 
     /**
-     * Attach the light source to the avatar using a LightControl.
+     * Alter the location of the torch.
+     *
+     * @param newLocation (in world coordinates, not null)
      */
-    public void takeTorch() {
-        Vector3f localOffset = new Vector3f(2f, 7f, -3f);
-        LightControl lightControl =
-                new LightControl(torch, localOffset, forwardDirection);
-        avatarNode.addControl(lightControl);
+    public void setTorchLocation(Vector3f newLocation) {
+        Validate.nonNull(newLocation, "location");
+        torch.setPosition(newLocation);
     }
     // *************************************************************************
     // GameAppState methods
