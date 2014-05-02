@@ -28,6 +28,7 @@ package jme3maze.items;
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import java.util.logging.Logger;
 import jme3utilities.MyAsset;
@@ -55,6 +56,10 @@ public class Ankh
      * asset path to the "ankh" 3-D model asset
      */
     final private static String modelAssetPath = "Models/items/ankh/ankh.j3o";
+    /**
+     * offset of model from vertex when free
+     */
+    final private static Vector3f modelOffset = new Vector3f(3f, 1.18f, -3f);
     // *************************************************************************
     // constructors
 
@@ -70,7 +75,7 @@ public class Ankh
     // Item methods
 
     /**
-     * Add this ankh to the player's inventory, favoring the right hand.
+     * Add to the player's inventory, favoring the right hand.
      */
     @Override
     public void take() {
@@ -82,11 +87,11 @@ public class Ankh
         success = freeItemsState.remove(this);
         assert success : this;
 
-        System.out.printf("You took an %s.%n", getTypeName());
+        System.out.printf("You picked up an %s.%n", getTypeName());
     }
 
     /**
-     * Visualize this ankh in an inventory.
+     * Visualize in inventory.
      *
      * @return asset path of a texture
      */
@@ -96,15 +101,14 @@ public class Ankh
     }
 
     /**
-     * Visualize this ankh in the main view.
+     * Visualize in the main view.
      *
      * @return new unparented instance
      */
     @Override
     public Spatial visualizeMain() {
         Spatial spatial = assetManager.loadModel(modelAssetPath);
-        spatial.setLocalTranslation(3f, 2.36f, -3f); // standing in northwest corner
-
+        spatial.setLocalTranslation(modelOffset);
         ColorRGBA color = ColorRGBA.Yellow;
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
@@ -113,7 +117,7 @@ public class Ankh
     }
 
     /**
-     * Visualize this ankh in the map view.
+     * Visualize in the map view.
      *
      * @return new unparented instance
      */
