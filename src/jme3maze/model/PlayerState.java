@@ -32,6 +32,7 @@ import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.items.Item;
+import jme3maze.items.Torch;
 import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
@@ -244,7 +245,7 @@ public class PlayerState
     /**
      * Rotate this player around the +Y axis.
      *
-     * @param rotation (length=1)
+     * @param rotation new direction for the current X-axis (length=1)
      */
     public void rotate(VectorXZ rotation) {
         VectorXZ newDirection = direction.rotate(rotation);
@@ -258,17 +259,17 @@ public class PlayerState
      */
     final public void setArc(NavArc newArc) {
         Validate.nonNull(newArc, "arc");
-        arc = newArc;
 
+        arc = newArc;
         NavVertex fromVertex = arc.getFromVertex();
         setVertex(fromVertex);
 
         VectorXZ horizontalDirection = arc.getHorizontalDirection();
         setDirection(horizontalDirection);
-
-        if (mapViewState.isEnabled()) {
-            mapViewState.addMazeLineOfSight(vertex, direction);
-        }
+        /*
+         * Update the map (if enabled and readable).
+         */
+        mapViewState.addMazeLineOfSight(vertex, direction);
     }
 
     /**
@@ -285,6 +286,7 @@ public class PlayerState
 
         direction = newDirection.normalize();
         orientation.set(direction.toQuaternion());
+        updateTorchLocation();
         /*
          * Visualize the rotation.
          */
@@ -319,7 +321,9 @@ public class PlayerState
      */
     public void setLocation(Vector3f newLocation) {
         Validate.nonNull(newLocation, "location");
+
         location.set(newLocation);
+        updateTorchLocation();
         /*
          * Visualize the translation.
          */
@@ -379,10 +383,10 @@ public class PlayerState
             setLocation(newLocation);
 
             mazeLevelIndex = WorldState.levelIndex(vertex);
-
-            if (mapViewState.isEnabled()) {
-                mapViewState.addMazeLineOfSight(vertex, direction);
-            }
+            /*
+             * Update the map (if enabled).
+             */
+            mapViewState.addMazeLineOfSight(vertex, direction);
         }
     }
 
@@ -424,6 +428,26 @@ public class PlayerState
             return true;
         }
         return false;
+    }
+
+    /**
+     * Update the location of the hand-held torch, if any.
+     */
+    public void updateTorchLocation() {
+        Vector3f localOffset = null;
+        if (leftHandItem instanceof Torch) {
+            localOffset = new Vector3f(2f, 7f, -3f);
+        }
+        if (rightHandItem instanceof Torch) {
+            localOffset = new Vector3f(-2f, 7f, -3f);
+        }
+        if (localOffset == null) {
+            return;
+        }
+
+        Vector3f worldOffset = orientation.mult(localOffset);
+        Vector3f torchLocation = location.add(worldOffset);
+        worldState.setTorchLocation(torchLocation);
     }
 
     /**

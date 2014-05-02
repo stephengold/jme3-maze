@@ -35,8 +35,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import java.util.logging.Logger;
 import jme3utilities.MyAsset;
-import jme3utilities.math.VectorXZ;
-import jme3utilities.navigation.NavVertex;
 
 /**
  * Mapmaker item in the Maze Game. Provides a map view and updates the player's
@@ -78,19 +76,11 @@ public class Mapmaker
      */
     @Override
     public void encounter() {
-        freeItemsState.remove(this);
+        boolean success = freeItemsState.remove(this);
+        assert success;
 
-        System.out.printf("You acquired a %s!%n", getTypeName());
-
-        if (!mapViewState.isEnabled()) {
-            mapViewState.setEnabled(true);
-
-            NavVertex vertex = playerState.getVertex();
-            VectorXZ direction = playerState.getDirection();
-            mapViewState.addMazeLineOfSight(vertex, direction);
-            playerState.setDirection(direction);
-            playerState.setVertex(vertex);
-        }
+        mapViewState.setEnabled(true);
+        System.out.printf("You recruited a %s!%n", getTypeName());
     }
 
     /**
@@ -101,7 +91,7 @@ public class Mapmaker
     @Override
     public Spatial visualizeMain() {
         /*
-         * Represented by a green cube.
+         * Represented by a green cube (placeholder).
          */
         Mesh mesh = new Box(1f, 1f, 1f);
         Geometry cube = new Geometry("mapmaker", mesh);

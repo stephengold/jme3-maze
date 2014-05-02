@@ -84,6 +84,10 @@ public class WorldState
      */
     private MazeLevel[] levels;
     /**
+     * starting point for player
+     */
+    private NavArc startArc;
+    /**
      * topology of the complete maze
      */
     final private NavGraph graph = new NavGraph();
@@ -92,9 +96,9 @@ public class WorldState
      */
     final private Random generator;
     /**
-     * starting point for player
+     * location of "torch" item in world coordinates: set by setTorchLocation()
      */
-    private NavArc startArc;
+    final private Vector3f torchLocation = new Vector3f();
     // *************************************************************************
     // constructors
 
@@ -177,6 +181,15 @@ public class WorldState
     }
 
     /**
+     * Get the location of the torch.
+     *
+     * @return new vector in world coordinates
+     */
+    public Vector3f getTorchLocation() {
+        return torchLocation.clone();
+    }
+
+    /**
      * Determine the number of levels in the maze.
      *
      * @return count (&ge;0)
@@ -204,6 +217,22 @@ public class WorldState
     public static float getVertexSpacing() {
         assert vertexSpacing > corridorWidth : vertexSpacing;
         return vertexSpacing;
+    }
+
+    /**
+     * Test whether the specified location has sufficient light for reading a
+     * map.
+     *
+     * @param location (in world coordinates, not null, unaffected)
+     * @return true if adequately lit, otherwise false
+     */
+    public boolean isLit(Vector3f location) {
+        Validate.nonNull(location, "location");
+
+        float distance = location.distance(torchLocation);
+        boolean result = distance < 9f;
+
+        return result;
     }
 
     /**
@@ -246,6 +275,19 @@ public class WorldState
 
         assert levelIndex >= 0 : levelIndex;
         return levelIndex;
+    }
+
+    /**
+     * Alter the location of the torch.
+     *
+     * @param newLocation (in world coordinates, not null)
+     */
+    public void setTorchLocation(Vector3f newLocation) {
+        torchLocation.set(newLocation);
+        /*
+         * Update the main view.
+         */
+        mainViewState.setTorchLocation(newLocation);
     }
 
     /**

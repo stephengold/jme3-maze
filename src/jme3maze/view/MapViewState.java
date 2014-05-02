@@ -76,10 +76,16 @@ public class MapViewState
     // constants
 
     /**
-     * background color for the map: light gray
+     * background color for the map when readable: light gray
      */
-    final private static ColorRGBA mapBackground =
+    final private static ColorRGBA readableBackgroundColor =
             new ColorRGBA(0.6f, 0.6f, 0.6f, 1f);
+    /**
+     *
+     * background color for the map when unreadable: dark gray
+     */
+    final private static ColorRGBA unreadableBackgroundColor =
+            new ColorRGBA(0.2f, 0.2f, 0.2f, 2f);
     /**
      * ball radius (world units)
      */
@@ -183,6 +189,10 @@ public class MapViewState
      * map icon which represents the player
      */
     private Spatial eyeIcon;
+    /**
+     * view port for this view
+     */
+    private ViewPort insetView;
     // *************************************************************************
     // constructors
 
@@ -229,6 +239,14 @@ public class MapViewState
         if (direction.isZeroLength()) {
             throw new IllegalArgumentException(
                     "direction should have positive length");
+        }
+
+        if (!isEnabled() || !isReadable()) {
+            /*
+             * If the map isn't readable, then it's not
+             * writable either.
+             */
+            return;
         }
 
         VectorXZ cardinal = direction.cardinalize();
@@ -326,6 +344,16 @@ public class MapViewState
     }
 
     /**
+     * Test whether the map is readable.
+     *
+     * @return true if readable, otherwise false
+     */
+    public boolean isReadable() {
+        boolean result = insetView.getScenes().size() > 0;
+        return result;
+    }
+
+    /**
      * Load an icon from a texture asset.
      *
      * @param textureAssetPath (not null)
@@ -386,6 +414,9 @@ public class MapViewState
      */
     public void setPlayerLocation(Vector3f location) {
         Validate.nonNull(location, "location");
+
+        boolean litLocation = worldState.isLit(location);
+        setReadable(litLocation);
         MySpatial.setWorldLocation(avatarNode, location);
     }
 
@@ -410,6 +441,14 @@ public class MapViewState
     final public void setEnabled(boolean newState) {
         if (newState && !isEnabled()) {
             addCamera();
+
+            Vector3f location = playerState.getLocation();
+            setPlayerLocation(location);
+            Quaternion orientation = playerState.getOrientation();
+            setPlayerOrientation(orientation);
+            NavVertex vertex = playerState.getVertex();
+            VectorXZ direction = playerState.getDirection();
+            addMazeLineOfSight(vertex, direction);
         }
 
         super.setEnabled(newState);
@@ -495,9 +534,7 @@ public class MapViewState
         float yViewRadius = 3f * vertexSpacing; // world units
         MyCamera.setYTangent(mapCamera, yViewRadius);
 
-        ViewPort insetView = renderManager.createMainView("inset", mapCamera);
-        insetView.attachScene(mapRootNode);
-        insetView.setBackgroundColor(mapBackground);
+        insetView = renderManager.createMainView("inset", mapCamera);
         insetView.setClearFlags(true, true, true);
         /*
          * Add a control for the downward-looking map camera.
@@ -603,5 +640,24 @@ public class MapViewState
                 MyAsset.createUnshadedMaterial(assetManager, stickColor);
 
         mapRootNode.attachChild(mazeNode);
+    }
+
+    /**
+     * Alter the 'readable' status of the map.
+     *
+     * @param newStatus true to make the map readable, false to blank it out
+     */
+    private void setReadable(boolean newStatus) {
+        boolean oldStatus = isReadable();
+        if (newStatus && !oldStatus) {
+            insetView.attachScene(mapRootNode);
+            insetView.setBackgroundColor(readableBackgroundColor);
+
+        } else if (oldStatus && !newStatus) {
+            insetView.detachScene(mapRootNode);
+            insetView.setBackgroundColor(unreadableBackgroundColor);
+        }
+
+        assert isReadable() == newStatus : isReadable();
     }
 }
