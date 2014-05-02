@@ -25,6 +25,9 @@
  */
 package jme3maze;
 
+import jme3maze.controller.AnalogInputState;
+import jme3maze.controller.InputState;
+import jme3maze.controller.RawInputState;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import java.util.logging.Logger;

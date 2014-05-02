@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.InputState;
+import jme3maze.controller.InputState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.view.MapViewState;
