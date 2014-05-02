@@ -122,9 +122,12 @@ public class MazeGame
         /*
          * Attach controller app states to the application.
          */
+        AnalogInputState analogInputState = new AnalogInputState();
         InputState inputState = new InputState();
         MoveState moveState = new MoveState();
+        RawInputState rawInputState = new RawInputState();
         TurnState turnState = new TurnState();
-        stateManager.attachAll(inputState, moveState, turnState);
+        stateManager.attachAll(analogInputState, inputState, moveState,
+                rawInputState, turnState);
     }
 }

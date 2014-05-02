@@ -28,21 +28,13 @@ package jme3maze;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
-import com.jme3.input.RawInputListener;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.event.JoyAxisEvent;
-import com.jme3.input.event.JoyButtonEvent;
-import com.jme3.input.event.KeyInputEvent;
 import com.jme3.input.event.MouseButtonEvent;
-import com.jme3.input.event.MouseMotionEvent;
-import com.jme3.input.event.TouchEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import java.util.Collection;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
 import jme3utilities.Validate;
@@ -57,10 +49,10 @@ import tonegod.gui.core.Screen;
 import tonegod.gui.core.utils.UIDUtil;
 
 /**
- * App state for getting player input, enabled when the player is stationary.
- * Input is ignored while the player is turning. Input during player moves is
- * processed when the state gets re-enabled, in other words, when the player
- * reaches the destination vertex.
+ * Game app state to handle GUI and hotkey input, enabled when the player is
+ * stationary. Input is ignored while the player is turning. Input during player
+ * moves is processed when the state gets re-enabled, in other words, when the
+ * player reaches the destination vertex.
  * <p>
  * Disabled at creation.
  *
@@ -68,7 +60,7 @@ import tonegod.gui.core.utils.UIDUtil;
  */
 public class InputState
         extends GameAppState
-        implements ActionListener, RawInputListener {
+        implements ActionListener {
     // *************************************************************************
     // constants
 
@@ -130,8 +122,6 @@ public class InputState
 
     /**
      * Instantiate a disabled input state.
-     *
-     * @param player player model instance (not null)
      */
     InputState() {
         setEnabled(false);
@@ -266,95 +256,6 @@ public class InputState
         guiScreen.setUseToolTips(true);
         guiNode.addControl(guiScreen);
         initializeGuiButtons();
-        /*
-         * Set up callback for mouse clicks AFTER instantiating the GUI screen
-         * so that the GUI sees those events first.
-         */
-        inputManager.addRawInputListener(this);
-    }
-    // *************************************************************************
-    // RawInputListener methods
-
-    /**
-     * Callback before each batch of input.
-     */
-    @Override
-    public void beginInput() {
-    }
-
-    /**
-     * Callback after each batch of input.
-     */
-    @Override
-    public void endInput() {
-    }
-
-    /**
-     * Callback for joystick motion events.
-     *
-     * @param event (not null)
-     */
-    @Override
-    public void onJoyAxisEvent(JoyAxisEvent event) {
-    }
-
-    /**
-     * Callback for joystick button events.
-     *
-     * @param event (not null)
-     */
-    @Override
-    public void onJoyButtonEvent(JoyButtonEvent event) {
-    }
-
-    /**
-     * Callback for keyboard events.
-     *
-     * @param event (not null)
-     */
-    @Override
-    public void onKeyEvent(KeyInputEvent event) {
-    }
-
-    /**
-     * Callback for mouse button events.
-     *
-     * @param event (not null)
-     */
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-        if (event.getButtonIndex() == MouseInput.BUTTON_LEFT
-                && event.isPressed()) {
-            float x = event.getX();
-            float y = event.getY();
-            Vector2f click2d = new Vector2f(x, y);
-            /*
-             * If the cursor's hotspot was over an item in the main view,
-             * use that item.
-             */
-            Item item = mainViewState.findItem(click2d);
-            if (item != null) {
-                item.use(true);
-            }
-        }
-    }
-
-    /**
-     * Callback for mouse motion events.
-     *
-     * @param event (not null)
-     */
-    @Override
-    public void onMouseMotionEvent(MouseMotionEvent event) {
-    }
-
-    /**
-     * Callback for touch screen events.
-     *
-     * @param event (not null)
-     */
-    @Override
-    public void onTouchEvent(TouchEvent event) {
     }
     // *************************************************************************
     // SimpleAppState methods

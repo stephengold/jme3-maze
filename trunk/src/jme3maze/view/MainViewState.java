@@ -55,6 +55,7 @@ import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.debug.Printer;
+import jme3utilities.math.MyVector3f;
 import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -116,6 +117,11 @@ public class MainViewState
     final private static Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
     // *************************************************************************
     // fields
+    /**
+     * scene-graph control which links the camera's orientation to that of the
+     * player's avatar
+     */
+    private CameraControl forwardView;
     /**
      * map free items to their spatials
      */
@@ -271,6 +277,23 @@ public class MainViewState
     }
 
     /**
+     * Alter the direction the player is looking relative to their direction of
+     * motion.
+     *
+     * @param newDirection direction in local coordinates (not null, positive
+     * length, unaffected)
+     */
+    public void setLookDirection(Vector3f newDirection) {
+        Validate.nonNull(newDirection, "direction");
+        if (MyVector3f.isZeroLength(newDirection)) {
+            throw new IllegalArgumentException(
+                    "direction should have positive length");
+        }
+
+        forwardView.setLookDirection(newDirection);
+    }
+
+    /**
      * Alter the location of the player's avatar.
      *
      * @param location world coordinates (not null)
@@ -408,8 +431,8 @@ public class MainViewState
          * behind the avatar.
          */
         Vector3f localOffset = new Vector3f(0f, eyeHeight, -5f);
-        CameraControl forwardView = new CameraControl(cam, localOffset,
-                forwardDirection, WorldState.upDirection);
+        forwardView = new CameraControl(cam, localOffset, forwardDirection,
+                WorldState.upDirection);
         avatarNode.addControl(forwardView);
     }
 

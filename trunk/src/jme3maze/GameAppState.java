@@ -36,8 +36,8 @@ import jme3maze.view.MapViewState;
 import jme3utilities.SimpleAppState;
 
 /**
- * Simple app state with protected fields to access all app states of the Maze
- * Game.
+ * Simple app state with protected fields providing access to all app states of
+ * the Maze Game.
  * <p>
  * Enabled at creation.
  *
@@ -56,11 +56,15 @@ public class GameAppState
     // *************************************************************************
     // fields
     /**
+     * app state to handle analog input: set by initialize()
+     */
+    protected AnalogInputState analogInputState;
+    /**
      * app state to manage free items: set by initialize()
      */
     protected FreeItemsState freeItemsState;
     /**
-     * app state for getting player input: set by initialize()
+     * app state to handle GUI and hotkey input: set by initialize()
      */
     protected InputState inputState;
     /**
@@ -79,6 +83,10 @@ public class GameAppState
      * app state to manage the player: set by initialize()
      */
     protected PlayerState playerState;
+    /**
+     * app state to handle raw input: set by initialize()
+     */
+    protected RawInputState rawInputState;
     /**
      * app state to rotate the player: set by initialize()
      */
@@ -100,6 +108,9 @@ public class GameAppState
     public void initialize(AppStateManager sm, Application app) {
         super.initialize(sm, app);
 
+        analogInputState = stateManager.getState(AnalogInputState.class);
+        assert analogInputState != null;
+
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
 
@@ -117,6 +128,9 @@ public class GameAppState
 
         playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;
+
+        rawInputState = stateManager.getState(RawInputState.class);
+        assert rawInputState != null;
 
         turnState = stateManager.getState(TurnState.class);
         assert turnState != null;
