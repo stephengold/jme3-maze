@@ -87,6 +87,10 @@ public class InputState
      */
     final private static String leftActionString = "left";
     /**
+     * action string for resetting the cameras
+     */
+    final private static String resetActionString = "reset";
+    /**
      * action string for turning one arc to the right
      */
     final private static String rightActionString = "right";
@@ -275,6 +279,9 @@ public class InputState
         if (inputManager.hasMapping(leftActionString)) {
             inputManager.deleteMapping(leftActionString);
         }
+        if (inputManager.hasMapping(resetActionString)) {
+            inputManager.deleteMapping(resetActionString);
+        }
         if (inputManager.hasMapping(rightActionString)) {
             inputManager.deleteMapping(rightActionString);
         }
@@ -323,6 +330,13 @@ public class InputState
                  */
                 direction = direction.rotate(-FastMath.HALF_PI);
                 goTurn(direction);
+                break;
+
+            case resetActionString:
+                /*
+                 * Reset the cameras.
+                 */
+                analogInputState.resetCameras();
                 break;
 
             case rightActionString:
@@ -471,6 +485,9 @@ public class InputState
         /*
          * Map hotkeys to action strings.
          */
+        KeyTrigger num0Trigger = new KeyTrigger(KeyInput.KEY_NUMPAD0);
+        inputManager.addMapping(resetActionString, num0Trigger);
+
         KeyTrigger aTrigger = new KeyTrigger(KeyInput.KEY_A);
         KeyTrigger leftTrigger = new KeyTrigger(KeyInput.KEY_LEFT);
         inputManager.addMapping(leftActionString, aTrigger, leftTrigger);
@@ -489,6 +506,7 @@ public class InputState
          */
         inputManager.addListener(this, advanceActionString);
         inputManager.addListener(this, leftActionString);
+        inputManager.addListener(this, resetActionString);
         inputManager.addListener(this, rightActionString);
     }
 }
