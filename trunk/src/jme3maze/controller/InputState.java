@@ -23,7 +23,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze;
+package jme3maze.controller;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
@@ -36,6 +36,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import java.util.Collection;
 import java.util.logging.Logger;
+import jme3maze.GameAppState;
 import jme3maze.items.Item;
 import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
@@ -123,7 +124,7 @@ public class InputState
     /**
      * Instantiate a disabled input state.
      */
-    InputState() {
+    public InputState() {
         setEnabled(false);
     }
     // *************************************************************************

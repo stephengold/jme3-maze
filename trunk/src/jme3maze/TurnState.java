@@ -30,6 +30,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.FastMath;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
@@ -80,9 +81,12 @@ public class TurnState
      * @param finalDirection player's direction when the turn is complete
      * (length=1)
      */
-    void activate(VectorXZ finalDirection) {
-        assert finalDirection != null;
-        assert finalDirection.isUnitVector() : finalDirection;
+    public void activate(VectorXZ finalDirection) {
+        Validate.nonNull(finalDirection, "direction");
+        if (!finalDirection.isUnitVector()) {
+            throw new IllegalArgumentException(
+                    "direction should have length=1");
+        }
         logger.log(Level.INFO, "finalDirection={0}", finalDirection);
 
         this.finalDirection = finalDirection;
