@@ -27,12 +27,12 @@ package jme3maze.items;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
+import com.jme3.texture.Texture;
 import java.util.logging.Logger;
 import jme3utilities.MyAsset;
 
@@ -57,6 +57,15 @@ public class Mapmaker
      */
     final private static String iconAssetPath =
             "Textures/map-icons/mapmaker.png";
+    /**
+     * asset path to the "mapmaker" 3-D model asset
+     */
+    final private static String modelAssetPath =
+            "Models/items/mapmaker/mapmaker.j3o";
+    /**
+     * offset of model from vertex when free
+     */
+    final private static Vector3f modelOffset = new Vector3f(-3f, 0f, 3f);
     // *************************************************************************
     // constructors
 
@@ -90,22 +99,40 @@ public class Mapmaker
      */
     @Override
     public Spatial visualizeMain() {
-        /*
-         * Represented by a green cube (placeholder).
-         */
-        Mesh mesh = new Box(1f, 1f, 1f);
-        Geometry cube = new Geometry("mapmaker", mesh);
+        Node node = (Node) assetManager.loadModel(modelAssetPath);
+        Vector3f offset = new Vector3f(modelOffset);
+        node.setLocalTranslation(offset);
 
-        cube.setLocalScale(0.5f);
+        ColorRGBA brushColor = ColorRGBA.White;
+        Material brushMaterial =
+                MyAsset.createShinyMaterial(assetManager, brushColor);
+        Spatial brush = node.getChild("brush");
+        brush.setMaterial(brushMaterial);
 
-        Vector3f offset = new Vector3f(0f, 4f, 0f); // floating in the air
-        cube.setLocalTranslation(offset);
+        ColorRGBA eyesColor = ColorRGBA.White;
+        Material eyesMaterial =
+                MyAsset.createShinyMaterial(assetManager, eyesColor);
+        Texture eyeTexture = MyAsset.loadTexture(assetManager,
+                "Textures/items/brown_eye.png");
+        eyesMaterial.setTexture("DiffuseMap", eyeTexture);
+        Spatial eyes = node.getChild("eyes");
+        eyes.setMaterial(eyesMaterial);
 
-        ColorRGBA color = new ColorRGBA(0f, 0.5f, 0f, 1f);
-        Material material = MyAsset.createShinyMaterial(assetManager, color);
-        cube.setMaterial(material);
+        ColorRGBA skirtColor = ColorRGBA.Red;
+        Material skirtMaterial =
+                MyAsset.createShinyMaterial(assetManager, skirtColor);
+        skirtMaterial.getAdditionalRenderState().setFaceCullMode(FaceCullMode.Off);
+        Node main = (Node) node.getChild("main");
+        Spatial skirt = main.getChild("main2");
+        skirt.setMaterial(skirtMaterial);
 
-        return cube;
+        ColorRGBA tabletColor = ColorRGBA.Gray;
+        Material tabletMaterial =
+                MyAsset.createShinyMaterial(assetManager, tabletColor);
+        Spatial tablet = node.getChild("tablet");
+        tablet.setMaterial(tabletMaterial);
+
+        return node;
     }
 
     /**
