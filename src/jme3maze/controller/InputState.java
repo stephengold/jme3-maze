@@ -27,9 +27,6 @@ package jme3maze.controller;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
@@ -50,18 +47,17 @@ import tonegod.gui.core.Screen;
 import tonegod.gui.core.utils.UIDUtil;
 
 /**
- * Game app state to handle GUI and hotkey input, enabled when the player is
- * stationary. Input is ignored while the player is turning. Input during player
- * moves is processed when the state gets re-enabled, in other words, when the
- * player reaches the destination vertex.
+ * Game app state to process action strings, enabled when the player is
+ * stationary. Action strings received during player moves are processed when
+ * the state gets re-enabled, in other words, when the player reaches the
+ * destination vertex.
  * <p>
  * Disabled at creation.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class InputState
-        extends GameAppState
-        implements ActionListener {
+        extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -81,28 +77,28 @@ public class InputState
     /**
      * action string for following the current arc
      */
-    final private static String advanceActionString = "advance";
+    final public static String advanceActionString = "advance";
     /**
      * action string for turning one arc to the left
      */
-    final private static String leftActionString = "left";
+    final public static String leftActionString = "left";
     /**
      * action string for resetting the cameras
      */
-    final private static String resetActionString = "reset";
+    final public static String resetActionString = "reset";
     /**
      * action string for turning one arc to the right
      */
-    final private static String rightActionString = "right";
+    final public static String rightActionString = "right";
     /**
      * action string for using the left-hand item
      */
-    final private static String useLeftHandItemActionString =
+    final public static String useLeftHandItemActionString =
             "use leftHandItem";
     /**
      * action string for using the right-hand item
      */
-    final private static String useRightHandItemActionString =
+    final public static String useRightHandItemActionString =
             "use rightHandItem";
     // *************************************************************************
     // fields
@@ -167,6 +163,16 @@ public class InputState
     }
 
     /**
+     * Accept an action to be performed on the next update.
+     *
+     * @param actionString textual description of the action (not null)
+     */
+    public void setAction(String actionString) {
+        Validate.nonNull(actionString, "action string");
+        lastActionString = actionString;
+    }
+
+    /**
      * Alter what item is in the player's left hand.
      *
      * @param newItem may be null
@@ -212,38 +218,10 @@ public class InputState
         }
     }
     // *************************************************************************
-    // ActionListener methods
-
-    /**
-     * Record an action from the keyboard.
-     *
-     * @param actionString textual description of the action (not null)
-     * @param ongoing true if the action is ongoing, otherwise false
-     * @param ignored
-     */
-    @Override
-    public void onAction(String actionString, boolean ongoing, float ignored) {
-        Validate.nonNull(actionString, "action string");
-        /*
-         * Ignore actions which are not ongoing.
-         */
-        if (!ongoing) {
-            return;
-        }
-        /*
-         * Ignore actions requested while the player is turning.
-         */
-        if (turnState.isEnabled()) {
-            return;
-        }
-
-        lastActionString = actionString;
-    }
-    // *************************************************************************
     // GameAppState methods
 
     /**
-     * Initialize this state prior to its first update.
+     * Initialize this state prior to its 1st update.
      *
      * @param stateManager (not null)
      * @param application attaching application (not null)
@@ -252,8 +230,6 @@ public class InputState
     public void initialize(AppStateManager stateManager,
             Application application) {
         super.initialize(stateManager, application);
-
-        initializeHotkeys();
         /*
          * Initialize the GUI.
          */
@@ -261,36 +237,6 @@ public class InputState
         guiScreen.setUseToolTips(true);
         guiNode.addControl(guiScreen);
         initializeGuiButtons();
-    }
-    // *************************************************************************
-    // SimpleAppState methods
-
-    /**
-     * Clean up this state on detach.
-     */
-    @Override
-    public void cleanup() {
-        /*
-         * Unmap action strings.
-         */
-        if (inputManager.hasMapping(advanceActionString)) {
-            inputManager.deleteMapping(advanceActionString);
-        }
-        if (inputManager.hasMapping(leftActionString)) {
-            inputManager.deleteMapping(leftActionString);
-        }
-        if (inputManager.hasMapping(resetActionString)) {
-            inputManager.deleteMapping(resetActionString);
-        }
-        if (inputManager.hasMapping(rightActionString)) {
-            inputManager.deleteMapping(rightActionString);
-        }
-        /*
-         * Unregister this event listener.
-         */
-        inputManager.removeListener(this);
-
-        super.cleanup();
     }
 
     /**
@@ -394,7 +340,7 @@ public class InputState
                 size, padding, iconAssetPath) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent e, boolean t) {
-                onAction(actionString, true, 0f);
+                setAction(actionString);
             }
         };
 
@@ -476,37 +422,5 @@ public class InputState
         actionString = rightActionString;
         tipText = "turn right";
         addActionButton(upperLeft, size, actionString, iconAssetPath, tipText);
-    }
-
-    /**
-     * Map hotkeys to actions.
-     */
-    private void initializeHotkeys() {
-        /*
-         * Map hotkeys to action strings.
-         */
-        KeyTrigger num0Trigger = new KeyTrigger(KeyInput.KEY_NUMPAD0);
-        inputManager.addMapping(resetActionString, num0Trigger);
-
-        KeyTrigger aTrigger = new KeyTrigger(KeyInput.KEY_A);
-        KeyTrigger leftTrigger = new KeyTrigger(KeyInput.KEY_LEFT);
-        inputManager.addMapping(leftActionString, aTrigger, leftTrigger);
-
-        KeyTrigger sTrigger = new KeyTrigger(KeyInput.KEY_S);
-        KeyTrigger upTrigger = new KeyTrigger(KeyInput.KEY_UP);
-        KeyTrigger wTrigger = new KeyTrigger(KeyInput.KEY_W);
-        inputManager.addMapping(advanceActionString, sTrigger, upTrigger,
-                wTrigger);
-
-        KeyTrigger dTrigger = new KeyTrigger(KeyInput.KEY_D);
-        KeyTrigger rightTrigger = new KeyTrigger(KeyInput.KEY_RIGHT);
-        inputManager.addMapping(rightActionString, dTrigger, rightTrigger);
-        /*
-         * Register listeners for the action strings.
-         */
-        inputManager.addListener(this, advanceActionString);
-        inputManager.addListener(this, leftActionString);
-        inputManager.addListener(this, resetActionString);
-        inputManager.addListener(this, rightActionString);
     }
 }

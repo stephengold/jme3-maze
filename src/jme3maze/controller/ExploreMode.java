@@ -1,0 +1,124 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package jme3maze.controller;
+
+import com.jme3.app.Application;
+import com.jme3.app.state.AppStateManager;
+import com.jme3.asset.AssetManager;
+import com.jme3.cursors.plugins.JmeCursor;
+import com.jme3.input.KeyInput;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jme3utilities.MyString;
+import jme3utilities.ui.InputMode;
+
+/**
+ * Input mode to handle hotkeys while the player explores the maze.
+ * <p>
+ * Disabled at creation.
+ *
+ * @author Stephen Gold <sgold@sonic.net>
+ */
+public class ExploreMode
+        extends InputMode {
+    // *************************************************************************
+    // constants
+
+    /**
+     * message logger for this class
+     */
+    final private static Logger logger =
+            Logger.getLogger(ExploreMode.class.getName());
+    /**
+     * asset path to the cursor for this mode
+     */
+    final private static String assetPath = "Textures/cursors/default.cur";
+    // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate a disabled, uninitialized mode.
+     */
+    public ExploreMode() {
+        super("explore");
+    }
+    // *************************************************************************
+    // ActionListener methods
+
+    /**
+     * Process an action from the GUI or keyboard.
+     *
+     * @param actionString textual description of the action (not null)
+     * @param ongoing true if the action is ongoing, otherwise false
+     * @param ignored
+     */
+    @Override
+    public void onAction(String actionString, boolean ongoing, float ignored) {
+        /*
+         * Ignore actions which are not ongoing.
+         */
+        if (!ongoing) {
+            return;
+        }
+
+        logger.log(Level.INFO, "Got action {0}", MyString.quote(actionString));
+
+        if (actionString.equals("close")) {
+            simpleApplication.stop();
+            return;
+        }
+
+        InputState inputState = stateManager.getState(InputState.class);
+        inputState.setAction(actionString);
+    }
+    // *************************************************************************
+    // InputMode methods
+
+    /**
+     * Add the default hotkey bindings. These are the bindings which will be
+     * used if no custom bindings are found.
+     */
+    @Override
+    protected void defaultBindings() {
+        /*
+         * Windows uses:
+         *  KEY_LMETA to open the Windows menu
+         *  KEY_NUMLOCK to toggle keypad key definitions
+         * SimpleApplication pre-assigns:
+         *  KEY_F5 to toggle the stats display
+         *  KEY_C to print camera coordinates
+         *  KEY_M to print memory statistics
+         * And com.jme3.app.state.ScreenshotAppState uses:
+         *  KEY_SYSRQ to save a screenshot
+         *
+         * For now, avoid re-assigning those hotkeys.
+         */
+        bind("close", KeyInput.KEY_ESCAPE);
+        bind(InputState.leftActionString, KeyInput.KEY_A);
+        bind(InputState.rightActionString, KeyInput.KEY_D);
+        bind(InputState.leftActionString, KeyInput.KEY_LEFT);
+        bind(InputState.resetActionString, KeyInput.KEY_NUMPAD0);
+        bind(InputState.rightActionString, KeyInput.KEY_RIGHT);
+        bind(InputState.advanceActionString, KeyInput.KEY_S);
+        bind(InputState.advanceActionString, KeyInput.KEY_UP);
+        bind(InputState.advanceActionString, KeyInput.KEY_W);
+    }
+
+    /**
+     * Initialize this (disabled) mode prior to its 1st update.
+     *
+     * @param stateManager (not null)
+     * @param application (not null)
+     */
+    @Override
+    public void initialize(AppStateManager stateManager,
+            Application application) {
+        AssetManager am = application.getAssetManager();
+        JmeCursor cursor = (JmeCursor) am.loadAsset(assetPath);
+        setCursor(cursor);
+
+        super.initialize(stateManager, application);
+    }
+}
