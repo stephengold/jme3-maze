@@ -25,12 +25,12 @@
  */
 package jme3maze;
 
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.system.AppSettings;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.AnalogInputState;
+import jme3maze.controller.ExploreMode;
 import jme3maze.controller.InputState;
 import jme3maze.controller.RawInputState;
 import jme3maze.model.FreeItemsState;
@@ -39,15 +39,16 @@ import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Misc;
+import jme3utilities.ui.ActionApplication;
 
 /**
- * Desktop simple application to play a maze game. The application's main entry
+ * Desktop action application to play a maze game. The application's main entry
  * point is in this class.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
 public class MazeGame
-        extends SimpleApplication {
+        extends ActionApplication {
     // *************************************************************************
     // constants
 
@@ -100,7 +101,7 @@ public class MazeGame
      * Initialize this application.
      */
     @Override
-    public void simpleInitApp() {
+    public void actionInitializeApplication() {
         /*
          * Disable display of JME statistics.
          * These displays can be re-enabled by pressing the F5 hotkey.
@@ -129,11 +130,15 @@ public class MazeGame
          * Attach controller app states to the application.
          */
         AnalogInputState analogInputState = new AnalogInputState();
+        ExploreMode exploreMode = new ExploreMode();
         InputState inputState = new InputState();
         MoveState moveState = new MoveState();
         RawInputState rawInputState = new RawInputState();
         TurnState turnState = new TurnState();
-        stateManager.attachAll(analogInputState, inputState, moveState,
-                rawInputState, turnState);
+        stateManager.attachAll(analogInputState, exploreMode, inputState,
+                moveState, rawInputState, turnState);
+
+        getDefaultInputMode().setEnabled(false);
+        exploreMode.setEnabled(true);
     }
 }
