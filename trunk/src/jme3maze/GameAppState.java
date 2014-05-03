@@ -25,12 +25,12 @@
  */
 package jme3maze;
 
-import jme3maze.controller.AnalogInputState;
-import jme3maze.controller.InputState;
-import jme3maze.controller.RawInputState;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import java.util.logging.Logger;
+import jme3maze.controller.AnalogInputState;
+import jme3maze.controller.InputState;
+import jme3maze.controller.RawInputState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
@@ -102,7 +102,7 @@ public class GameAppState
     // AbstractAppState methods
 
     /**
-     * Initialize this app state on the first update after it gets attached.
+     * Initialize this app state on the 1st update after it gets attached.
      *
      * @param sm application's render manager (not null)
      * @param app application which owns this state (not null)
