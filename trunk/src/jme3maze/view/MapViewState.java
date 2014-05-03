@@ -429,6 +429,19 @@ public class MapViewState
         Validate.nonNull(orientation, "orientation");
         MySpatial.setWorldOrientation(avatarNode, orientation);
     }
+
+    /**
+     * Alter the camera's field of view.
+     *
+     * @param yViewDiameter vertical diameter of the view (in grid units, &gt;0)
+     */
+    public void setViewDiameter(float yViewDiameter) {
+        Validate.positive(yViewDiameter, "diameter");
+
+        float vertexSpacing = WorldState.getVertexSpacing(); // world units
+        float yViewRadius = vertexSpacing * yViewDiameter / 2f; // world units
+        MyCamera.setYTangent(mapCamera, yViewRadius);
+    }
     // *************************************************************************
     // AbstractAppState methods
 
@@ -457,7 +470,7 @@ public class MapViewState
     // GameAppState methods
 
     /**
-     * Initialize this state prior to its first update.
+     * Initialize this state prior to its 1st update.
      *
      * @param stateManager (not null)
      * @param application attaching application (not null)

@@ -51,6 +51,7 @@ import jme3maze.items.Item;
 import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
+import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
@@ -277,6 +278,17 @@ public class MainViewState
     }
 
     /**
+     * Alter the camera's field of view.
+     *
+     * @param newTangent tangent of the vertical field-of-view half-angle
+     * (&gt;0)
+     */
+    public void setFov(float newTangent) {
+        Validate.positive(newTangent, "tangent");
+        MyCamera.setYTangent(cam, newTangent);
+    }
+
+    /**
      * Alter the direction the player is looking relative to their direction of
      * motion.
      *
@@ -326,7 +338,7 @@ public class MainViewState
     // GameAppState methods
 
     /**
-     * Initialize this state prior to its first update.
+     * Initialize this state prior to its 1st update.
      *
      * @param stateManager (not null)
      * @param application attaching application (not null)

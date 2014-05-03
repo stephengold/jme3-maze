@@ -31,6 +31,7 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +39,7 @@ import jme3maze.GameAppState;
 import jme3utilities.MyCamera;
 import jme3utilities.MyString;
 import jme3utilities.Validate;
+import jme3utilities.math.MyMath;
 import jme3utilities.math.MyVector3f;
 
 /**
@@ -62,9 +64,17 @@ public class AnalogInputState
      */
     final private static float maxTilt = 1f;
     /**
-     * limit for main camera zooming (unknown units)
+     * limit for main camera zooming in (logarithmic units)
      */
-    final private static float maxZoom = 20f;
+    final private static float maxMainZoomIn = 15f;
+    /**
+     * limit for main camera zooming out (logarithmic units)
+     */
+    final private static float maxMainZoomOut = 5f;
+    /**
+     * limit for map camera zooming (logarithmic units)
+     */
+    final private static float maxMapZoom = 5f;
     /**
      * message logger for this class
      */
@@ -97,17 +107,21 @@ public class AnalogInputState
     // *************************************************************************
     // fields
     /**
-     * accumulated amount of main camera pan (leftward from forward)
-     */
-    private float leftPan = 0f;
-    /**
      * accumulated amount of main camera zoom (outward from default)
      */
-    private float outZoom = 0f;
+    private float mainZoomOut = 0f;
+    /**
+     * accumulated amount of map camera zoom (outward from default)
+     */
+    private float mapZoomOut = 0f;
+    /**
+     * accumulated amount of main camera pan (left of forward)
+     */
+    private float panLeft = 0f;
     /**
      * accumulated amount of main camera tilt (upward from horizontal)
      */
-    private float upTilt = 0f;
+    private float tiltUp = 0f;
     // *************************************************************************
     // new methods exposed
 
@@ -115,11 +129,13 @@ public class AnalogInputState
      * Reset the cameras back to their default state.
      */
     public void resetCameras() {
-        leftPan = 0f;
-        outZoom = 0f;
-        upTilt = 0f;
+        mainZoomOut = 0f;
+        mapZoomOut = 0f;
+        panLeft = 0f;
+        tiltUp = 0f;
 
-        updateCamera();
+        updateMainCamera();
+        updateMapCamera();
     }
     // *************************************************************************
     // AnalogListener methods
@@ -174,7 +190,7 @@ public class AnalogInputState
     // GameAppState methods
 
     /**
-     * Initialize this state prior to its first update.
+     * Initialize this state prior to its 1st update.
      *
      * @param stateManager (not null)
      * @param application attaching application (not null)
@@ -232,7 +248,7 @@ public class AnalogInputState
         inputManager.addMapping(wheelTowardsEvent, wheelTowardsTrigger);
         inputManager.addListener(this, wheelTowardsEvent);
 
-        updateCamera();
+        updateMainCamera();
     }
     // *************************************************************************
     // SimpleAppState methods
@@ -260,14 +276,9 @@ public class AnalogInputState
     private void panLeft(float amount) {
         logger.log(Level.INFO, "{0}", amount);
 
-        leftPan += amount;
-        if (leftPan > maxPan) {
-            leftPan = maxPan;
-        }
-        if (leftPan < -maxPan) {
-            leftPan = -maxPan;
-        }
-        updateCamera();
+        panLeft += amount;
+        panLeft = MyMath.clamp(panLeft, maxPan);
+        updateMainCamera();
     }
 
     /**
@@ -278,44 +289,55 @@ public class AnalogInputState
     private void tiltUp(float amount) {
         logger.log(Level.INFO, "{0}", amount);
 
-        upTilt += amount;
-        if (upTilt > maxTilt) {
-            upTilt = maxTilt;
-        }
-        if (upTilt < -maxTilt) {
-            upTilt = -maxTilt;
-        }
-        updateCamera();
+        tiltUp += amount;
+        tiltUp = MyMath.clamp(tiltUp, maxTilt);
+        updateMainCamera();
     }
 
     /**
      * Update the main camera's look direction and field of view.
      */
-    private void updateCamera() {
-        float altitude = upTilt; // radians
-        float azimuth = FastMath.HALF_PI - leftPan; // radians
+    private void updateMainCamera() {
+        float altitude = tiltUp; // radians
+        float azimuth = FastMath.HALF_PI - panLeft; // radians
         Vector3f direction = MyVector3f.fromAltAz(altitude, azimuth);
         mainViewState.setLookDirection(direction);
 
-        float yTangent = FastMath.exp(0.1f * outZoom);
+        float yTangent = FastMath.exp(-0.5f + 0.1f * mainZoomOut);
         MyCamera.setYTangent(cam, yTangent);
     }
 
     /**
-     * Zoom the main camera.
+     * Update the map camera's field of view.
+     */
+    private void updateMapCamera() {
+        if (!mapViewState.isEnabled()) {
+            return;
+        }
+
+        float diameter = 6f * FastMath.exp(0.1f * mapZoomOut); // grid units
+        mapViewState.setViewDiameter(diameter);
+    }
+
+    /**
+     * Zoom a camera.
      *
-     * @param amount positive &rarr; out, negative &rarr; in
+     * @param amount positive &rarr; out, negative &rarr; (logarithmic units)
      */
     private void zoomOut(float amount) {
         logger.log(Level.INFO, "{0}", amount);
 
-        outZoom += amount;
-        if (outZoom > 0f) {
-            outZoom = 0f;
+        Vector2f cursorLocation = inputManager.getCursorPosition();
+        if (mapViewState.isInViewPort(cursorLocation)) {
+            mapZoomOut += amount;
+            mapZoomOut = MyMath.clamp(mapZoomOut, maxMapZoom);
+            updateMapCamera();
+
+        } else {
+            mainZoomOut += amount;
+            mainZoomOut =
+                    FastMath.clamp(mainZoomOut, -maxMainZoomIn, maxMainZoomOut);
+            updateMainCamera();
         }
-        if (outZoom < -maxZoom) {
-            outZoom = -maxZoom;
-        }
-        updateCamera();
     }
 }
