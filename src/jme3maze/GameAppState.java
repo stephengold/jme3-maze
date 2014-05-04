@@ -34,6 +34,8 @@ import jme3maze.controller.RawInputState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
+import jme3maze.view.BigViewState;
+import jme3maze.view.InsetViewState;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.SimpleAppState;
@@ -63,13 +65,21 @@ public class GameAppState
      */
     protected AnalogInputState analogInputState;
     /**
+     * app state to manage the default view: set by initialize()
+     */
+    protected BigViewState bigViewState;
+    /**
      * app state to manage free items: set by initialize()
      */
     protected FreeItemsState freeItemsState;
     /**
-     * app state to handle GUI and hotkey input: set by initialize()
+     * app state to process action strings: set by initialize()
      */
     protected InputState inputState;
+    /**
+     * app state to manage the inset view: set by initialize()
+     */
+    protected InsetViewState insetViewState;
     /**
      * app state to manage the main view: set by initialize()
      */
@@ -114,11 +124,17 @@ public class GameAppState
         analogInputState = stateManager.getState(AnalogInputState.class);
         assert analogInputState != null;
 
+        bigViewState = stateManager.getState(BigViewState.class);
+        assert bigViewState != null;
+
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
 
         inputState = stateManager.getState(InputState.class);
         assert inputState != null;
+
+        insetViewState = stateManager.getState(InsetViewState.class);
+        assert insetViewState != null;
 
         mainViewState = stateManager.getState(MainViewState.class);
         assert mainViewState != null;

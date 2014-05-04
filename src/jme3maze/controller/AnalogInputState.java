@@ -328,7 +328,7 @@ public class AnalogInputState
         logger.log(Level.INFO, "{0}", amount);
 
         Vector2f cursorLocation = inputManager.getCursorPosition();
-        if (mapViewState.isInViewPort(cursorLocation)) {
+        if (mapViewState.isInside(cursorLocation)) {
             mapZoomOut += amount;
             mapZoomOut = MyMath.clamp(mapZoomOut, maxMapZoom);
             updateMapCamera();
