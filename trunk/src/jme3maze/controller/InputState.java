@@ -38,7 +38,6 @@ import jme3maze.items.Item;
 import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
-import jme3utilities.navigation.NavVertex;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
@@ -61,10 +60,6 @@ public class InputState
     // *************************************************************************
     // constants
 
-    /**
-     * tolerance for comparing direction vectors
-     */
-    final private static float epsilon = 1e-4f;
     /**
      * size of inventory icons (as a fraction of the screen's height)
      */
@@ -232,7 +227,8 @@ public class InputState
     @Override
     final public void setEnabled(boolean newState) {
         if (newState && !isEnabled()) {
-            boolean canAdvance = playerState.canAdvance();
+            NavArc advanceArc = playerState.advanceArc();
+            boolean canAdvance = advanceArc != null;
             advanceElement.setIsVisible(canAdvance);
         }
 
@@ -276,18 +272,11 @@ public class InputState
         switch (lastActionString) {
             case advanceActionString:
                 /*
-                 * Pick the most promising arc.
+                 * Attempt to advance the player along a forward arc.
                  */
-                NavVertex vertex = playerState.getVertex();
-                NavArc arc = vertex.findLeastTurn(direction);
-                VectorXZ horizontalDirection = arc.getHorizontalDirection();
-                float dot = direction.dot(horizontalDirection);
-                if (1f - dot < epsilon) {
-                    /*
-                     * The player's direction closely matches the
-                     * horizontal direction of an arc, so follow that arc.
-                     */
-                    goMove(arc);
+                NavArc advanceArc = playerState.advanceArc();
+                if (advanceArc != null) {
+                    goMove(advanceArc);
                 }
                 break;
 

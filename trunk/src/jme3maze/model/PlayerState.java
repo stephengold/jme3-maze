@@ -40,7 +40,7 @@ import jme3utilities.navigation.NavVertex;
 
 /**
  * Game app state to manage the player in the Maze Game. The player has a
- * position in * the world and an inventory of items.
+ * position in the world and an inventory of items.
  * <p>
  * Enabled at creation.
  *
@@ -51,6 +51,10 @@ public class PlayerState
     // *************************************************************************
     // constants
 
+    /**
+     * tolerance for comparing horizontal direction vectors
+     */
+    final private static float epsilon = 1e-4f;
     /**
      * message logger for this class
      */
@@ -106,19 +110,18 @@ public class PlayerState
     // new methods exposed
 
     /**
-     * Test whether the player can advance.
+     * Find an arc which closely matches the player's location and direction.
      *
-     * @return true if can, false if can't
+     * @return pre-existing instance, or null of no match
      */
-    public boolean canAdvance() {
-        VectorXZ cardinal = direction.cardinalize();
-        int rowIncrement = Math.round(cardinal.getX());
-        int columnIncrement = Math.round(cardinal.getZ());
-        MazeLevel level = getMazeLevel();
-        NavVertex nextVertex = level.findNextLineOfSight(vertex, rowIncrement,
-                columnIncrement);
-
-        return nextVertex != null;
+    public NavArc advanceArc() {
+        NavArc bestMatch = vertex.findLeastTurn(direction);
+        VectorXZ horizontalDirection = bestMatch.getHorizontalDirection();
+        float dot = direction.dot(horizontalDirection);
+        if (1f - dot < epsilon) {
+            return bestMatch;
+        }
+        return null;
     }
 
     /**
