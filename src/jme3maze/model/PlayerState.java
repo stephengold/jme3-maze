@@ -106,6 +106,22 @@ public class PlayerState
     // new methods exposed
 
     /**
+     * Test whether the player can advance.
+     *
+     * @return true if can, false if can't
+     */
+    public boolean canAdvance() {
+        VectorXZ cardinal = direction.cardinalize();
+        int rowIncrement = Math.round(cardinal.getX());
+        int columnIncrement = Math.round(cardinal.getZ());
+        MazeLevel level = getMazeLevel();
+        NavVertex nextVertex = level.findNextLineOfSight(vertex, rowIncrement,
+                columnIncrement);
+
+        return nextVertex != null;
+    }
+
+    /**
      * Remove the specified item from this player's inventory.
      *
      * @param item item to remove (not null)
@@ -471,7 +487,7 @@ public class PlayerState
     // GameAppState methods
 
     /**
-     * Initialize this state prior to its first update.
+     * Initialize this state prior to its 1st update.
      *
      * @param stateManager (not null)
      * @param application attaching application (not null)
