@@ -37,8 +37,6 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -64,7 +62,7 @@ import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Game app state to manage the (inset) map view in the Maze Game.
+ * Game app state to manage the map view.
  * <p>
  * Disabled at creation.
  *
@@ -95,26 +93,6 @@ public class MapViewState
      */
     final private static float iconDiameter = 30f;
     /**
-     * bottom edge of the inset view as a fraction of the main view's height,
-     * measured from the bottom edge
-     */
-    final private static float insetBottom = 0.65f;
-    /**
-     * left edge of the inset view as a fraction of the main view's width,
-     * measured from the left edge
-     */
-    final private static float insetLeft = 0.05f;
-    /**
-     * right edge of the inset view as a fraction of the main view's width,
-     * measured from the left edge
-     */
-    final private static float insetRight = 0.35f;
-    /**
-     * top edge of the inset view as a fraction of the main view's height,
-     * measured from the bottom edge
-     */
-    final private static float insetTop = 0.95f;
-    /**
      * stick radius (world units)
      */
     final private static float stickRadius = 2f;
@@ -137,14 +115,6 @@ public class MapViewState
     final private static Vector3f forwardDirection = Vector3f.UNIT_Z;
     // *************************************************************************
     // fields
-    /**
-     * camera for rendering the map: set by addCamera()
-     */
-    private Camera mapCamera;
-    /**
-     * interval between updates (in seconds, &ge;0)
-     */
-    private float updateInterval = 0f;
     /**
      * map free items to their spatials
      */
@@ -190,9 +160,9 @@ public class MapViewState
      */
     private Spatial eyeIcon;
     /**
-     * view port for this view
+     * view to display the map: set in setEnabled()
      */
-    private ViewPort insetView;
+    private View mapView;
     // *************************************************************************
     // constructors
 
@@ -276,17 +246,10 @@ public class MapViewState
     public NavVertex findVertex(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
 
-        if (!isInViewPort(screenLocation)) {
+        if (!mapView.isInside(screenLocation)) {
             return null;
         }
-        /*
-         * Construct a ray based on the screen coordinates.
-         */
-        Vector3f startLocation =
-                mapCamera.getWorldCoordinates(screenLocation, 0f);
-        Vector3f farPoint = mapCamera.getWorldCoordinates(screenLocation, 1f);
-        Vector3f direction = farPoint.subtract(startLocation).normalizeLocal();
-        Ray ray = new Ray(startLocation, direction);
+        Ray ray = mapView.pickRay(screenLocation);
         /*
          * Trace the ray to the nearest geometry.
          */
@@ -319,28 +282,21 @@ public class MapViewState
     }
 
     /**
-     * Test whether the specified screen coordinates are in this view.
+     * Test whether the specified screen coordinates are inside the map.
      *
-     * @param screenLocation screen coordinates (not null, in pixels, measured
-     * from the lower left)
+     * @param screenLocation screen coordinates (in pixels, measured from the
+     * lower left, not null, unaffected)
      * @return true if location is within this view, otherwise false
      */
-    public boolean isInViewPort(Vector2f screenLocation) {
+    public boolean isInside(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
 
-        if (mapCamera == null) {
+        if (!isEnabled()) {
             return false;
         }
-        /*
-         * Scale coordinates to fractions of viewport.
-         */
-        float xFraction = screenLocation.x / mapCamera.getWidth();
-        float yFraction = screenLocation.y / mapCamera.getHeight();
-        if (xFraction > insetLeft && xFraction < insetRight
-                && yFraction > insetBottom && yFraction < insetTop) {
-            return true;
-        }
-        return false;
+        boolean result = mapView.isInside(screenLocation);
+
+        return result;
     }
 
     /**
@@ -349,7 +305,7 @@ public class MapViewState
      * @return true if readable, otherwise false
      */
     public boolean isReadable() {
-        boolean result = insetView.getScenes().size() > 0;
+        boolean result = mapView.getRootNode() != null;
         return result;
     }
 
@@ -440,6 +396,7 @@ public class MapViewState
 
         float vertexSpacing = WorldState.getVertexSpacing(); // world units
         float yViewRadius = vertexSpacing * yViewDiameter / 2f; // world units
+        Camera mapCamera = mapView.getCamera();
         MyCamera.setYTangent(mapCamera, yViewRadius);
     }
     // *************************************************************************
@@ -448,11 +405,13 @@ public class MapViewState
     /**
      * Enable or disable this state.
      *
-     * @param newState true to enable, false to disable
+     * @param newStatus true to enable, false to disable
      */
     @Override
-    final public void setEnabled(boolean newState) {
-        if (newState && !isEnabled()) {
+    final public void setEnabled(boolean newStatus) {
+        if (newStatus && !isEnabled()) {
+            insetViewState.setEnabled(true);
+            mapView = insetViewState;
             addCamera();
 
             Vector3f location = playerState.getLocation();
@@ -464,7 +423,7 @@ public class MapViewState
             addMazeLineOfSight(vertex, direction);
         }
 
-        super.setEnabled(newState);
+        super.setEnabled(newStatus);
     }
     // *************************************************************************
     // GameAppState methods
@@ -490,46 +449,13 @@ public class MapViewState
         //printer.printSubtree(rootNode);
     }
     // *************************************************************************
-    // SimpleAppState methods
-
-    /**
-     * Update this view before each render.
-     *
-     * @param renderManager (not null)
-     */
-    @Override
-    public void render(RenderManager renderManager) {
-        super.render(renderManager);
-        /*
-         * Update logical state here where we can be sure all controls
-         * have been updated.
-         */
-        mapRootNode.updateLogicalState(updateInterval);
-        mapRootNode.updateGeometricState();
-    }
-
-    /**
-     * Update this view before each render.
-     *
-     * @param elapsedTime since previous frame/update (in seconds, &ge;0)
-     */
-    @Override
-    public void update(float elapsedTime) {
-        super.update(elapsedTime);
-        updateInterval = elapsedTime;
-    }
-    // *************************************************************************
     // private methods
 
     /**
-     * Initialize the camera and view port for this view.
+     * Initialize the camera for this view.
      */
     private void addCamera() {
-        /*
-         * The application's default camera provides
-         * a convenient starting point.
-         */
-        mapCamera = cam.clone();
+        Camera mapCamera = mapView.getCamera();
         /*
          * Limit far plane in order to display a single maze level at a time.
          */
@@ -537,18 +463,10 @@ public class MapViewState
         mapCamera.setFrustumFar(levelSpacing);
 
         mapCamera.setParallelProjection(true);
-        /*
-         * Position the inset view port in the upper left corner
-         * of the main view port.
-         */
-        mapCamera.setViewPort(insetLeft, insetRight, insetBottom, insetTop);
 
         float vertexSpacing = WorldState.getVertexSpacing();
         float yViewRadius = 3f * vertexSpacing; // world units
         MyCamera.setYTangent(mapCamera, yViewRadius);
-
-        insetView = renderManager.createMainView("inset", mapCamera);
-        insetView.setClearFlags(true, true, true);
         /*
          * Add a control for the downward-looking map camera.
          */
@@ -658,17 +576,17 @@ public class MapViewState
     /**
      * Alter the 'readable' status of the map.
      *
-     * @param newStatus true to make the map readable, false to blank it out
+     * @param newStatus true to make the map readable, false to black it out
      */
     private void setReadable(boolean newStatus) {
         boolean oldStatus = isReadable();
         if (newStatus && !oldStatus) {
-            insetView.attachScene(mapRootNode);
-            insetView.setBackgroundColor(readableBackgroundColor);
+            mapView.setRootNode(mapRootNode);
+            mapView.setBackgroundColor(readableBackgroundColor);
 
         } else if (oldStatus && !newStatus) {
-            insetView.detachScene(mapRootNode);
-            insetView.setBackgroundColor(unreadableBackgroundColor);
+            mapView.setRootNode(null);
+            mapView.setBackgroundColor(unreadableBackgroundColor);
         }
 
         assert isReadable() == newStatus : isReadable();

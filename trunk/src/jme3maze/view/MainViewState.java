@@ -147,6 +147,10 @@ public class MainViewState
      * point light source for this view
      */
     final private PointLight torch = new PointLight();
+    /**
+     * view to display the scene: set in initialize()
+     */
+    private View mainView;
     // *************************************************************************
     // new methods exposed
 
@@ -163,7 +167,8 @@ public class MainViewState
 
         spatial.setUserData("item", item);
         itemSpatial.put(item, spatial);
-        rootNode.attachChild(spatial);
+        Node root = mainView.getRootNode();
+        root.attachChild(spatial);
     }
 
     /**
@@ -176,21 +181,22 @@ public class MainViewState
     public Item findItem(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
 
-        if (!isInViewPort(screenLocation)) {
+        if (!isInside(screenLocation)) {
             return null;
         }
         /*
          * Construct a ray based on the screen coordinates.
          */
-        Vector3f startLocation = cam.getWorldCoordinates(screenLocation, 0f);
-        Vector3f farPoint = cam.getWorldCoordinates(screenLocation, 1f);
-        Vector3f direction = farPoint.subtract(startLocation).normalizeLocal();
-        Ray ray = new Ray(startLocation, direction);
+        if (!mainView.isInside(screenLocation)) {
+            return null;
+        }
+        Ray ray = mainView.pickRay(screenLocation);
         /*
          * Trace the ray to the nearest geometry.
          */
+        Node root = mainView.getRootNode();
         CollisionResults results = new CollisionResults();
-        rootNode.collideWith(ray, results);
+        root.collideWith(ray, results);
         CollisionResult nearest = results.getClosestCollision();
         if (nearest == null) {
             return null;
@@ -236,26 +242,14 @@ public class MainViewState
     /**
      * Test whether the specified screen coordinates are in this view.
      *
-     * @param screenLocation screen coordinates (not null, in pixels, measured
-     * from the lower left)
+     * @param screenLocation screen coordinates (in pixels, measured from the
+     * lower left, not null, unaffected)
      * @return true if location is within this view, otherwise false
      */
-    public boolean isInViewPort(Vector2f screenLocation) {
+    public boolean isInside(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
-
-        if (mapViewState.isInViewPort(screenLocation)) {
-            return false;
-        }
-        /*
-         * Scale coordinates to fractions of viewport.
-         */
-        float xFraction = screenLocation.x / cam.getWidth();
-        float yFraction = screenLocation.y / cam.getHeight();
-        if (xFraction > 0f && xFraction < 1f
-                && yFraction > 0f && yFraction < 1f) {
-            return true;
-        }
-        return false;
+        boolean result = mainView.isInside(screenLocation);
+        return result;
     }
 
     /**
@@ -348,7 +342,9 @@ public class MainViewState
             Application application) {
         super.initialize(stateManager, application);
 
-        rootNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        mainView = bigViewState;
+        Node root = mainView.getRootNode();
+        root.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
          * Initialize materials for ceiling, floor, and walls.
          */
@@ -386,7 +382,7 @@ public class MainViewState
          * Generate a 3-D representation of each maze level.
          */
         Node mazeNode = new Node("main maze");
-        rootNode.attachChild(mazeNode);
+        root.attachChild(mazeNode);
 
         float corridorWidth = WorldState.getCorridorWidth();
         MazeLevelView mazeLevelView = new MazeLevelView(corridorWidth,
@@ -406,7 +402,7 @@ public class MainViewState
         /*
          * Add avatar to represent the player.
          */
-        rootNode.attachChild(avatarNode);
+        root.attachChild(avatarNode);
         Vector3f location = playerState.getLocation();
         MySpatial.setWorldLocation(avatarNode, location);
         Quaternion orientation = playerState.getOrientation();
@@ -423,7 +419,7 @@ public class MainViewState
              */
             Printer printer = new Printer();
             printer.setPrintTransform(true);
-            printer.printSubtree(rootNode);
+            printer.printSubtree(root);
         }
     }
     // *************************************************************************
@@ -452,7 +448,8 @@ public class MainViewState
      * Add the point light source (with shadows) to represent a torch.
      */
     private void addLight() {
-        rootNode.addLight(torch);
+        Node root = mainView.getRootNode();
+        root.addLight(torch);
 
         float lightIntensity = 1f;
         ColorRGBA pointColor = ColorRGBA.White.mult(lightIntensity);

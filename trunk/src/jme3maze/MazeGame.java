@@ -36,6 +36,8 @@ import jme3maze.controller.RawInputState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
+import jme3maze.view.BigViewState;
+import jme3maze.view.InsetViewState;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Misc;
@@ -123,9 +125,12 @@ public class MazeGame
         /*
          * Attach view app states to the application.
          */
+        BigViewState bigViewState = new BigViewState();
+        InsetViewState insetViewState = new InsetViewState();
         MainViewState mainViewState = new MainViewState();
         MapViewState mapViewState = new MapViewState();
-        stateManager.attachAll(mainViewState, mapViewState);
+        stateManager.attachAll(bigViewState, insetViewState, mainViewState,
+                mapViewState);
         /*
          * Attach controller app states to the application.
          */
