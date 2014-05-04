@@ -70,7 +70,7 @@ public class MoveState
     // constructors
 
     /**
-     * Instantiate a disabled move state. After instantiation, the first method
+     * Instantiate a disabled move state. After instantiation, the 1st method
      * invoked should be initialize().
      */
     MoveState() {
