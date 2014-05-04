@@ -125,6 +125,8 @@ public class ExploreMode
         bind(InputState.advanceActionString, KeyInput.KEY_S);
         bind(InputState.advanceActionString, KeyInput.KEY_UP);
         bind(InputState.advanceActionString, KeyInput.KEY_W);
+        bind(InputState.useRightHandItemActionString, KeyInput.KEY_X);
+        bind(InputState.useLeftHandItemActionString, KeyInput.KEY_Z);
     }
 
     /**
