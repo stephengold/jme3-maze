@@ -26,7 +26,7 @@
 /**
  * View classes for the Maze Game, used to present the state of the game to the
  * player in a visual form. There two views (main and map) each with their own
- * camera and view port. Main is a forward-looking first-person view with shaded
+ * camera and view port. Main is a forward-looking 1st-person view with shaded
  * textures, lit by a point light-source. Map is a top-down orthographic view
  * using unshaded textures.
  */

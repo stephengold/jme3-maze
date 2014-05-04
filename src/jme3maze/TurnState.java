@@ -96,7 +96,7 @@ public class TurnState
     // GameAppState methods
 
     /**
-     * Initialize this state prior to its first update.
+     * Initialize this state prior to its 1st update.
      *
      * @param stateManager (not null)
      * @param application attaching application (not null)
