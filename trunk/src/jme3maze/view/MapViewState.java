@@ -192,7 +192,7 @@ public class MapViewState
         NavVertex vertex = freeItemsState.getVertex(item);
         Vector3f location = vertex.getLocation();
         spatial.move(location);
-
+        spatial.setUserData("item", item);
         itemSpatial.put(item, spatial);
         mapRootNode.attachChild(spatial);
     }
@@ -246,6 +246,9 @@ public class MapViewState
     public NavVertex findVertex(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
 
+        if (!isEnabled() || !isReadable()) {
+            return null;
+        }
         if (!mapView.isInside(screenLocation)) {
             return null;
         }
@@ -261,18 +264,22 @@ public class MapViewState
         }
         Geometry geometry = nearest.getGeometry();
         /*
-         * Check whether the geometry corresponds to a vertex on the
+         * Check whether the geometry corresponds to a vertex or item on the
          * same maze level as the player.
          */
         Spatial spatial = geometry;
         while (spatial != null) {
-            NavVertex vertex = geometry.getUserData("vertex");
+            NavVertex vertex = spatial.getUserData("vertex");
+            if (vertex == null) {
+                Item item = spatial.getUserData("item");
+                if (item != null) {
+                    vertex = freeItemsState.getVertex(item);
+                }
+            }
             if (vertex != null) {
                 MazeLevel level = playerState.getMazeLevel();
                 if (level.contains(vertex)) {
                     return vertex;
-                } else {
-                    return null;
                 }
             }
             spatial = spatial.getParent();

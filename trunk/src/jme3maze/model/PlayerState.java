@@ -29,6 +29,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.items.Item;
@@ -90,6 +91,10 @@ public class PlayerState
      * arc which this player is on: set by constructor
      */
     private NavArc arc;
+    /**
+     * vertex which this player is trying to reach: set by setGoal()
+     */
+    private NavVertex goal;
     /**
      * vertex which this player is at: set by constructor
      */
@@ -162,6 +167,7 @@ public class PlayerState
      * @return new unit vector in world coordinates
      */
     public VectorXZ getDirection() {
+        assert direction != null;
         assert direction.isUnitVector() : direction;
         return direction.clone();
     }
@@ -267,8 +273,34 @@ public class PlayerState
      * @param rotation new direction for the current X-axis (length=1)
      */
     public void rotate(VectorXZ rotation) {
+        Validate.nonNull(rotation, "rotation");
+        if (!rotation.isUnitVector()) {
+            logger.log(Level.SEVERE, "rotation={0}", rotation);
+            throw new IllegalArgumentException(
+                    "rotation should have length=1");
+        }
+
         VectorXZ newDirection = direction.rotate(rotation);
         setDirection(newDirection);
+    }
+
+    /**
+     * Find the shortest path from this player's location to their goal.
+     *
+     * @return 1st arc in the shortest path to the goal (or null if goal is
+     * achieved or unreachable)
+     */
+    public NavArc seekGoal() {
+        if (vertex == null || goal == null) {
+            return null;
+        }
+        if (vertex == goal) {
+            goal = null;
+            return null;
+        }
+        NavArc result = worldState.getGraph().seek(vertex, goal);
+
+        return result;
     }
 
     /**
@@ -313,6 +345,15 @@ public class PlayerState
         if (mapViewState.isEnabled()) {
             mapViewState.setPlayerOrientation(orientation);
         }
+    }
+
+    /**
+     * Alter this player's goal.
+     *
+     * @param newGoal may be null for none
+     */
+    public void setGoal(NavVertex newGoal) {
+        this.goal = newGoal;
     }
 
     /**

@@ -265,6 +265,7 @@ public class InputState
     public void update(float elapsedTime) {
         super.update(elapsedTime);
 
+        NavArc advanceArc = playerState.advanceArc();
         VectorXZ direction = playerState.getDirection();
         /*
          * Process the most recent action string.
@@ -274,7 +275,6 @@ public class InputState
                 /*
                  * Attempt to advance the player along a forward arc.
                  */
-                NavArc advanceArc = playerState.advanceArc();
                 if (advanceArc != null) {
                     goMove(advanceArc);
                 }
@@ -318,7 +318,15 @@ public class InputState
                 break;
 
             default:
-                break;
+                NavArc nextArc = playerState.seekGoal();
+                if (nextArc == null) {
+                    break;
+                } else if (nextArc == advanceArc) {
+                    goMove(advanceArc);
+                } else {
+                    direction = nextArc.getHorizontalDirection();
+                    goTurn(direction);
+                }
         }
 
         lastActionString = "";
