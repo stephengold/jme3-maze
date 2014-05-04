@@ -39,6 +39,7 @@ import com.jme3.math.Vector2f;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.items.Item;
+import jme3utilities.navigation.NavVertex;
 
 /**
  * Game app state to handle raw input such as mouse buttons.
@@ -146,6 +147,15 @@ public class RawInputState
             float x = event.getX();
             float y = event.getY();
             Vector2f click2d = new Vector2f(x, y);
+            /*
+             * If the cursor's hotspot was over a vertex in the map view, then
+             * make that vertex be the player's goal.
+             */
+            NavVertex vertex = mapViewState.findVertex(click2d);
+            if (vertex != null) {
+                playerState.setGoal(vertex);
+                return;
+            }
             /*
              * If the cursor's hotspot was over an item in the main view, then
              * use that item.
