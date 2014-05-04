@@ -103,6 +103,10 @@ public class InputState
     // *************************************************************************
     // fields
     /**
+     * GUI element for the advance button
+     */
+    private Element advanceElement = null;
+    /**
      * GUI element for the left hand's inventory
      */
     private Element leftHandElement = null;
@@ -216,6 +220,23 @@ public class InputState
             rightHandElement = addActionButton(upperLeft, dimensions,
                     useRightHandItemActionString, assetPath, tipText);
         }
+    }
+    // *************************************************************************
+    // AbstractAppState methods
+
+    /**
+     * Enable or disable this state.
+     *
+     * @param newState true to enable, false to disable
+     */
+    @Override
+    final public void setEnabled(boolean newState) {
+        if (newState && !isEnabled()) {
+            boolean canAdvance = playerState.canAdvance();
+            advanceElement.setIsVisible(canAdvance);
+        }
+
+        super.setEnabled(newState);
     }
     // *************************************************************************
     // GameAppState methods
@@ -405,7 +426,8 @@ public class InputState
         String actionString = advanceActionString;
         String iconAssetPath = "Textures/buttons/advance.png";
         String tipText = "advance";
-        addActionButton(upperLeft, size, actionString, iconAssetPath, tipText);
+        advanceElement = addActionButton(upperLeft, size, actionString,
+                iconAssetPath, tipText);
 
         size = descale(0.1f, 0.1f);
         offset = new Vector2f(0.5f, 1f).multLocal(size);
