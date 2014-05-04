@@ -90,7 +90,7 @@ public class Mapmaker
         assert success;
 
         mapViewState.setEnabled(true);
-        System.out.printf("You recruited a %s!%n", getTypeName());
+        System.out.printf("You recruited the %s!%n", getTypeName());
     }
 
     /**

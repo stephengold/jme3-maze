@@ -157,7 +157,7 @@ public class MoveState
 
         } else {
             /*
-             * Activate the input state and await user input.
+             * Activate the input state and await player input.
              */
             inputState.setEnabled(true);
         }
