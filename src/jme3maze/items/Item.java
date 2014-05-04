@@ -273,8 +273,8 @@ public class Item
     }
 
     /**
-     * Use this item, or if it currently has multiple uses, have the user select
-     * a use and do that one.
+     * Use this item, or if it currently has multiple uses, have the player
+     * select a use and do that one.
      *
      * @param freeFlag true if item is free, false if it's in an inventory
      */

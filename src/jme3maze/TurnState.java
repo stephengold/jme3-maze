@@ -84,6 +84,7 @@ public class TurnState
     public void activate(VectorXZ finalDirection) {
         Validate.nonNull(finalDirection, "direction");
         if (!finalDirection.isUnitVector()) {
+            logger.log(Level.SEVERE, "direction={0}", finalDirection);
             throw new IllegalArgumentException(
                     "direction should have length=1");
         }
