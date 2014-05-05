@@ -23,7 +23,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze.view;
+package jme3maze.controller;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
@@ -32,28 +32,28 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 
 /**
- * Interface to manage a view port with at most one scene.
+ * Interface to manage a display slot: a view port with at most one scene.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public interface View {
+public interface DisplaySlot {
 
     /**
-     * Access this view's camera.
+     * Access this slot's camera.
      *
      * @return pre-existing instance
      */
     Camera getCamera();
 
     /**
-     * Access this view's root node.
+     * Access this slot's root node.
      *
      * @return pre-existing instance (or null if none)
      */
     Node getRootNode();
 
     /**
-     * Test whether the specified screen coordinates are inside this view.
+     * Test whether the specified screen coordinates are inside this slot.
      *
      * @param screenLocation screen coordinates (in pixels, measured from the
      * lower left, not null, unaffected)
@@ -62,7 +62,7 @@ public interface View {
     boolean isInside(Vector2f screenLocation);
 
     /**
-     * Using this view's camera, construct a pick ray for the specified screen
+     * Using this slot's camera, construct a pick ray for the specified screen
      * coordinates.
      *
      * @param screenLocation screen coordinates (in pixels, measured from the
@@ -72,14 +72,14 @@ public interface View {
     Ray pickRay(Vector2f screenLocation);
 
     /**
-     * Alter this view's background color.
+     * Alter this slot's background color.
      *
      * @param newColor new color (not null)
      */
     void setBackgroundColor(ColorRGBA newColor);
 
     /**
-     * Alter this view's root node.
+     * Alter this slot's root node.
      *
      * @param newRoot root node (or null for none)
      */

@@ -23,7 +23,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze.view;
+package jme3maze.controller;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
@@ -38,13 +38,13 @@ import jme3maze.GameAppState;
 import jme3utilities.Validate;
 
 /**
- * Game app state to manage the default view.
+ * Game app state to manage the default slot, which includes most of the screen.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class BigViewState
+public class BigSlotState
         extends GameAppState
-        implements View {
+        implements DisplaySlot {
     // *************************************************************************
     // constants
 
@@ -52,12 +52,12 @@ public class BigViewState
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(BigViewState.class.getName());
+            Logger.getLogger(BigSlotState.class.getName());
     // *************************************************************************
-    // View methods
+    // Slot methods
 
     /**
-     * Access this view's camera.
+     * Access this slot's camera.
      *
      * @return pre-existing instance
      */
@@ -69,7 +69,7 @@ public class BigViewState
     }
 
     /**
-     * Access this view's root node.
+     * Access this slot's root node.
      *
      * @return pre-existing instance (or null if none)
      */
@@ -84,17 +84,17 @@ public class BigViewState
     }
 
     /**
-     * Test whether the specified screen coordinates are inside this view.
+     * Test whether the specified screen coordinates are inside this slot.
      *
      * @param screenLocation screen coordinates (in pixels, measured from the
      * lower left, not null, unaffected)
-     * @return true if location is within this view, otherwise false
+     * @return true if location is in this slot, otherwise false
      */
     @Override
     public boolean isInside(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
 
-        if (insetViewState.isInside(screenLocation)) {
+        if (insetSlotState.isInside(screenLocation)) {
             return false;
         }
         /*
@@ -110,7 +110,7 @@ public class BigViewState
     }
 
     /**
-     * Using this view's camera, construct a pick ray for the specified screen
+     * Using this slot's camera, construct a pick ray for the specified screen
      * coordinates.
      *
      * @param screenLocation screen coordinates (in pixels, measured from the
@@ -130,7 +130,7 @@ public class BigViewState
     }
 
     /**
-     * Alter this view's background color.
+     * Alter this slot's background color.
      *
      * @param newColor new color (not null)
      */
@@ -141,7 +141,7 @@ public class BigViewState
     }
 
     /**
-     * Alter this view's root node.
+     * Alter this slot's root node.
      *
      * @param newRoot root node (or null for none)
      */

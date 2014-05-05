@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
+import jme3maze.controller.DisplaySlot;
 import jme3maze.items.Item;
 import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
@@ -116,6 +117,10 @@ public class MapViewState
     // *************************************************************************
     // fields
     /**
+     * slot to display this view: set in setEnabled()
+     */
+    private DisplaySlot slot;
+    /**
      * map free items to their spatials
      */
     final private Map<Item, Spatial> itemSpatial = new TreeMap<>();
@@ -159,10 +164,6 @@ public class MapViewState
      * map icon which represents the player
      */
     private Spatial eyeIcon;
-    /**
-     * view to display the map: set in setEnabled()
-     */
-    private View mapView;
     // *************************************************************************
     // constructors
 
@@ -249,10 +250,10 @@ public class MapViewState
         if (!isEnabled() || !isReadable()) {
             return null;
         }
-        if (!mapView.isInside(screenLocation)) {
+        if (!slot.isInside(screenLocation)) {
             return null;
         }
-        Ray ray = mapView.pickRay(screenLocation);
+        Ray ray = slot.pickRay(screenLocation);
         /*
          * Trace the ray to the nearest geometry.
          */
@@ -301,7 +302,7 @@ public class MapViewState
         if (!isEnabled()) {
             return false;
         }
-        boolean result = mapView.isInside(screenLocation);
+        boolean result = slot.isInside(screenLocation);
 
         return result;
     }
@@ -312,7 +313,7 @@ public class MapViewState
      * @return true if readable, otherwise false
      */
     public boolean isReadable() {
-        boolean result = mapView.getRootNode() != null;
+        boolean result = slot.getRootNode() != null;
         return result;
     }
 
@@ -403,7 +404,7 @@ public class MapViewState
 
         float vertexSpacing = WorldState.getVertexSpacing(); // world units
         float yViewRadius = vertexSpacing * yViewDiameter / 2f; // world units
-        Camera mapCamera = mapView.getCamera();
+        Camera mapCamera = slot.getCamera();
         MyCamera.setYTangent(mapCamera, yViewRadius);
     }
     // *************************************************************************
@@ -417,8 +418,8 @@ public class MapViewState
     @Override
     final public void setEnabled(boolean newStatus) {
         if (newStatus && !isEnabled()) {
-            insetViewState.setEnabled(true);
-            mapView = insetViewState;
+            insetSlotState.setEnabled(true);
+            slot = insetSlotState;
             addCamera();
 
             Vector3f location = playerState.getLocation();
@@ -462,7 +463,7 @@ public class MapViewState
      * Initialize the camera for this view.
      */
     private void addCamera() {
-        Camera mapCamera = mapView.getCamera();
+        Camera mapCamera = slot.getCamera();
         /*
          * Limit far plane in order to display a single maze level at a time.
          */
@@ -588,12 +589,12 @@ public class MapViewState
     private void setReadable(boolean newStatus) {
         boolean oldStatus = isReadable();
         if (newStatus && !oldStatus) {
-            mapView.setRootNode(mapRootNode);
-            mapView.setBackgroundColor(readableBackgroundColor);
+            slot.setRootNode(mapRootNode);
+            slot.setBackgroundColor(readableBackgroundColor);
 
         } else if (oldStatus && !newStatus) {
-            mapView.setRootNode(null);
-            mapView.setBackgroundColor(unreadableBackgroundColor);
+            slot.setRootNode(null);
+            slot.setBackgroundColor(unreadableBackgroundColor);
         }
 
         assert isReadable() == newStatus : isReadable();
