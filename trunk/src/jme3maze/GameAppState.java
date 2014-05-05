@@ -29,13 +29,13 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import java.util.logging.Logger;
 import jme3maze.controller.AnalogInputState;
+import jme3maze.controller.BigSlotState;
 import jme3maze.controller.InputState;
+import jme3maze.controller.InsetSlotState;
 import jme3maze.controller.RawInputState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
-import jme3maze.view.BigViewState;
-import jme3maze.view.InsetViewState;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.SimpleAppState;
@@ -65,9 +65,9 @@ public class GameAppState
      */
     protected AnalogInputState analogInputState;
     /**
-     * app state to manage the default view: set by initialize()
+     * app state to manage the full-screen slot: set by initialize()
      */
-    protected BigViewState bigViewState;
+    protected BigSlotState bigSlotState;
     /**
      * app state to manage free items: set by initialize()
      */
@@ -77,9 +77,9 @@ public class GameAppState
      */
     protected InputState inputState;
     /**
-     * app state to manage the inset view: set by initialize()
+     * app state to manage the inset slot: set by initialize()
      */
-    protected InsetViewState insetViewState;
+    protected InsetSlotState insetSlotState;
     /**
      * app state to manage the main view: set by initialize()
      */
@@ -124,8 +124,8 @@ public class GameAppState
         analogInputState = stateManager.getState(AnalogInputState.class);
         assert analogInputState != null;
 
-        bigViewState = stateManager.getState(BigViewState.class);
-        assert bigViewState != null;
+        bigSlotState = stateManager.getState(BigSlotState.class);
+        assert bigSlotState != null;
 
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
@@ -133,8 +133,8 @@ public class GameAppState
         inputState = stateManager.getState(InputState.class);
         assert inputState != null;
 
-        insetViewState = stateManager.getState(InsetViewState.class);
-        assert insetViewState != null;
+        insetSlotState = stateManager.getState(InsetSlotState.class);
+        assert insetSlotState != null;
 
         mainViewState = stateManager.getState(MainViewState.class);
         assert mainViewState != null;

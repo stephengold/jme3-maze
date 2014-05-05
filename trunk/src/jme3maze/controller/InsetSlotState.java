@@ -23,7 +23,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package jme3maze.view;
+package jme3maze.controller;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
@@ -40,41 +40,41 @@ import jme3maze.GameAppState;
 import jme3utilities.Validate;
 
 /**
- * Game app state to manage an inset view.
+ * Game app state to manage an inset slot.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class InsetViewState
+public class InsetSlotState
         extends GameAppState
-        implements View {
+        implements DisplaySlot {
     // *************************************************************************
     // constants
 
     /**
-     * bottom edge of this inset as a fraction of the main view's height,
-     * measured from the bottom edge
+     * bottom edge of this inset as a fraction of the screen's height, measured
+     * from the bottom edge of the screen
      */
-    final private static float insetBottom = 0.65f;
+    final private static float bottomEdge = 0.65f;
     /**
-     * left edge of this inset as a fraction of the main view's width, measured
-     * from the left edge
+     * left edge of this inset as a fraction of the screen's width, measured
+     * from the left edge of the screen
      */
-    final private static float insetLeft = 0.05f;
+    final private static float leftEdge = 0.05f;
     /**
-     * right edge of this inset as a fraction of the main view's width, measured
-     * from the left edge
+     * right edge of this inset as a fraction of the screen's width, measured
+     * from the left edge of the screen
      */
-    final private static float insetRight = 0.35f;
+    final private static float rightEdge = 0.35f;
     /**
-     * top edge of this inset as a fraction of the main view's height, measured
-     * from the bottom edge
+     * top edge of this inset as a fraction of the screen's height, measured
+     * from the bottom edge of the screen
      */
-    final private static float insetTop = 0.95f;
+    final private static float topEdge = 0.95f;
     /**
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(InsetViewState.class.getName());
+            Logger.getLogger(InsetSlotState.class.getName());
     // *************************************************************************
     // fields
     /**
@@ -89,16 +89,16 @@ public class InsetViewState
     // constructors
 
     /**
-     * Instantiate a disabled inset.
+     * Instantiate a disabled inset in the upper left corner of the screen.
      */
-    public InsetViewState() {
+    public InsetSlotState() {
         setEnabled(false);
     }
     // *************************************************************************
     // AbstractAppState methods
 
     /**
-     * Enable or disable this state.
+     * Enable or disable this app state.
      *
      * @param newStatus true to enable, false to disable
      */
@@ -109,11 +109,9 @@ public class InsetViewState
             insetViewPort = renderManager.createMainView("inset", camera);
             insetViewPort.setClearFlags(true, true, true);
             /*
-             * Position the inset in the upper left corner
-             * of the main view.
+             * Position the inset in the upper left corner of the screen.
              */
-            camera.setViewPort(insetLeft, insetRight, insetBottom,
-                    insetTop);
+            camera.setViewPort(leftEdge, rightEdge, bottomEdge, topEdge);
         }
 
         super.setEnabled(newStatus);
@@ -122,7 +120,7 @@ public class InsetViewState
     // SimpleAppState methods
 
     /**
-     * Update this inset before each render.
+     * Update this slot before each render.
      *
      * @param renderManager (not null)
      */
@@ -150,10 +148,10 @@ public class InsetViewState
         updateInterval = elapsedTime;
     }
     // *************************************************************************
-    // View methods
+    // Slot methods
 
     /**
-     * Access this inset's camera.
+     * Access this slot's camera.
      *
      * @return pre-existing instance
      */
@@ -165,7 +163,7 @@ public class InsetViewState
     }
 
     /**
-     * Access this inset's root node.
+     * Access this slot's root node.
      *
      * @return pre-existing instance (or null if none)
      */
@@ -180,11 +178,11 @@ public class InsetViewState
     }
 
     /**
-     * Test whether the specified screen coordinates are in this inset.
+     * Test whether the specified screen coordinates are in this slot.
      *
      * @param screenLocation screen coordinates (in pixels, measured from the
      * lower left, not null, unaffected)
-     * @return true if location is within this view, otherwise false
+     * @return true if location is within this slot, otherwise false
      */
     @Override
     public boolean isInside(Vector2f screenLocation) {
@@ -194,20 +192,20 @@ public class InsetViewState
             return false;
         }
         /*
-         * Scale coordinates to fractions of the view port.
+         * Scale coordinates to fractions of the view port dimensions.
          */
         Camera camera = getCamera();
         float xFraction = screenLocation.x / camera.getWidth();
         float yFraction = screenLocation.y / camera.getHeight();
-        if (xFraction > insetLeft && xFraction < insetRight
-                && yFraction > insetBottom && yFraction < insetTop) {
+        if (xFraction > leftEdge && xFraction < rightEdge
+                && yFraction > bottomEdge && yFraction < topEdge) {
             return true;
         }
         return false;
     }
 
     /**
-     * Using this inset's camera, construct a pick ray for the specified screen
+     * Using this slot's camera, construct a pick ray for the specified screen
      * coordinates.
      *
      * @param screenLocation screen coordinates (in pixels, measured from the
@@ -226,7 +224,7 @@ public class InsetViewState
     }
 
     /**
-     * Alter this inset's background color.
+     * Alter this slot's background color.
      *
      * @param newColor new color (not null)
      */
@@ -237,7 +235,7 @@ public class InsetViewState
     }
 
     /**
-     * Alter this inset's root node.
+     * Alter this slot's root node.
      *
      * @param newRoot root node (or null for none)
      */

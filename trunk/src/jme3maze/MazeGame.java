@@ -30,14 +30,14 @@ import com.jme3.system.AppSettings;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.AnalogInputState;
+import jme3maze.controller.BigSlotState;
 import jme3maze.controller.ExploreMode;
 import jme3maze.controller.InputState;
+import jme3maze.controller.InsetSlotState;
 import jme3maze.controller.RawInputState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
-import jme3maze.view.BigViewState;
-import jme3maze.view.InsetViewState;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Misc;
@@ -123,16 +123,19 @@ public class MazeGame
         FreeItemsState freeItemsState = new FreeItemsState();
         stateManager.attachAll(worldState, playerState, freeItemsState);
         /*
+         * Attach display slot app states to the application.
+         */
+        BigSlotState bigSlotState = new BigSlotState();
+        InsetSlotState insetSlotState = new InsetSlotState();
+        stateManager.attachAll(bigSlotState, insetSlotState);
+        /*
          * Attach view app states to the application.
          */
-        BigViewState bigViewState = new BigViewState();
-        InsetViewState insetViewState = new InsetViewState();
         MainViewState mainViewState = new MainViewState();
         MapViewState mapViewState = new MapViewState();
-        stateManager.attachAll(bigViewState, insetViewState, mainViewState,
-                mapViewState);
+        stateManager.attachAll(mainViewState, mapViewState);
         /*
-         * Attach controller app states to the application.
+         * Attach input app states to the application.
          */
         AnalogInputState analogInputState = new AnalogInputState();
         ExploreMode exploreMode = new ExploreMode();
@@ -142,7 +145,9 @@ public class MazeGame
         TurnState turnState = new TurnState();
         stateManager.attachAll(analogInputState, exploreMode, inputState,
                 moveState, rawInputState, turnState);
-
+        /*
+         * Enable the "explore" input mode and disable the others.
+         */
         getDefaultInputMode().setEnabled(false);
         exploreMode.setEnabled(true);
     }

@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
+import jme3maze.controller.DisplaySlot;
 import jme3maze.items.Item;
 import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
@@ -124,6 +125,10 @@ public class MainViewState
      */
     private CameraControl forwardView;
     /**
+     * slot to display this view: set in initialize()
+     */
+    private DisplaySlot slot;
+    /**
      * map free items to their spatials
      */
     private Map<Item, Spatial> itemSpatial = new TreeMap<>();
@@ -147,10 +152,6 @@ public class MainViewState
      * point light source for this view
      */
     final private PointLight torch = new PointLight();
-    /**
-     * view to display the scene: set in initialize()
-     */
-    private View mainView;
     // *************************************************************************
     // new methods exposed
 
@@ -167,7 +168,7 @@ public class MainViewState
 
         spatial.setUserData("item", item);
         itemSpatial.put(item, spatial);
-        Node root = mainView.getRootNode();
+        Node root = slot.getRootNode();
         root.attachChild(spatial);
     }
 
@@ -187,14 +188,14 @@ public class MainViewState
         /*
          * Construct a ray based on the screen coordinates.
          */
-        if (!mainView.isInside(screenLocation)) {
+        if (!slot.isInside(screenLocation)) {
             return null;
         }
-        Ray ray = mainView.pickRay(screenLocation);
+        Ray ray = slot.pickRay(screenLocation);
         /*
          * Trace the ray to the nearest geometry.
          */
-        Node root = mainView.getRootNode();
+        Node root = slot.getRootNode();
         CollisionResults results = new CollisionResults();
         root.collideWith(ray, results);
         CollisionResult nearest = results.getClosestCollision();
@@ -248,7 +249,7 @@ public class MainViewState
      */
     public boolean isInside(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
-        boolean result = mainView.isInside(screenLocation);
+        boolean result = slot.isInside(screenLocation);
         return result;
     }
 
@@ -342,8 +343,8 @@ public class MainViewState
             Application application) {
         super.initialize(stateManager, application);
 
-        mainView = bigViewState;
-        Node root = mainView.getRootNode();
+        slot = bigSlotState;
+        Node root = slot.getRootNode();
         root.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
          * Initialize materials for ceiling, floor, and walls.
@@ -448,7 +449,7 @@ public class MainViewState
      * Add the point light source (with shadows) to represent a torch.
      */
     private void addLight() {
-        Node root = mainView.getRootNode();
+        Node root = slot.getRootNode();
         root.addLight(torch);
 
         float lightIntensity = 1f;
