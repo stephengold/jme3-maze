@@ -97,7 +97,7 @@ public class MazeGame
          */
     }
     // *************************************************************************
-    // SimpleApplication methods
+    // ActionApplication methods
 
     /**
      * Initialize this application.
