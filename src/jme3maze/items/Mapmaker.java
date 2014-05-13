@@ -104,22 +104,21 @@ public class Mapmaker
         Vector3f offset = new Vector3f(modelOffset);
         node.setLocalTranslation(offset);
 
-        ColorRGBA brushColor = ColorRGBA.White;
+        ColorRGBA brushColor = ColorRGBA.Red;
         Material brushMaterial =
                 MyAsset.createShinyMaterial(assetManager, brushColor);
         Spatial brush = node.getChild("brush");
         brush.setMaterial(brushMaterial);
 
-        ColorRGBA eyesColor = ColorRGBA.White;
-        Material eyesMaterial =
-                MyAsset.createShinyMaterial(assetManager, eyesColor);
         Texture eyeTexture = MyAsset.loadTexture(assetManager,
                 "Textures/items/brown_eye.png");
+        Material eyesMaterial =
+                MyAsset.createShinyMaterial(assetManager, ColorRGBA.White);
         eyesMaterial.setTexture("DiffuseMap", eyeTexture);
         Spatial eyes = node.getChild("eyes");
         eyes.setMaterial(eyesMaterial);
 
-        ColorRGBA skirtColor = ColorRGBA.Red;
+        ColorRGBA skirtColor = ColorRGBA.White;
         Material skirtMaterial =
                 MyAsset.createShinyMaterial(assetManager, skirtColor);
         RenderState renderState = skirtMaterial.getAdditionalRenderState();
