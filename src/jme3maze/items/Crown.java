@@ -36,7 +36,8 @@ import jme3utilities.MyAsset;
 import jme3utilities.controls.RotationControl;
 
 /**
- * Crown item in the Maze Game. Ends the game.
+ * Item for the Pharaoh's crown in the Maze Game. When encountered, it ends the
+ * game.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -83,11 +84,9 @@ public class Crown
     public void encounter() {
         int moveCount = playerState.getMoveCount();
         if (moveCount == 1) {
-            System.out.printf(
-                    "You traversed the maze in one move!%n");
+            System.out.printf("You traversed the maze in one move!%n");
         } else {
-            System.out.printf(
-                    "You traversed the maze in %d moves.%n",
+            System.out.printf("You traversed the maze in %d moves.%n",
                     moveCount);
         }
         application.stop();
@@ -103,7 +102,9 @@ public class Crown
         Node node = (Node) assetManager.loadModel(modelAssetPath);
         Vector3f offset = new Vector3f(modelOffset);
         node.setLocalTranslation(offset);
-
+        /*
+         * Override the materials in the model.
+         */
         ColorRGBA hedjetColor = ColorRGBA.White;
         Material hedjetMaterial =
                 MyAsset.createShinyMaterial(assetManager, hedjetColor);
