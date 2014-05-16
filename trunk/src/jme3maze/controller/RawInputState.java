@@ -177,6 +177,11 @@ public class RawInputState
      */
     @Override
     public void onMouseMotionEvent(MouseMotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        Vector2f click2d = new Vector2f(x, y);
+        Item item = mainViewState.findItem(click2d);
+        inputState.setMouseItem(item);
     }
 
     /**

@@ -172,7 +172,7 @@ public class InputState
     }
 
     /**
-     * Alter what item is in the player's left hand.
+     * Alter which item is in the player's left hand.
      *
      * @param newItem may be null
      */
@@ -195,7 +195,24 @@ public class InputState
     }
 
     /**
-     * Alter what item is in the player's right hand.
+     * Alter which item is under the mouse pointer.
+     *
+     * @param newItem may be null
+     */
+    public void setMouseItem(Item newItem) {
+        /*
+         * Update the forced tool tip.
+         */
+        if (newItem == null) {
+            guiScreen.releaseForcedToolTip();
+        } else {
+            String tipMessage = newItem.getTypeName();
+            guiScreen.setForcedToolTip(tipMessage);
+        }
+    }
+
+    /**
+     * Alter which item is in the player's right hand.
      *
      * @param newItem may be null
      */
