@@ -177,11 +177,6 @@ public class RawInputState
      */
     @Override
     public void onMouseMotionEvent(MouseMotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        Vector2f click2d = new Vector2f(x, y);
-        Item item = mainViewState.findItem(click2d);
-        inputState.setMouseItem(item);
     }
 
     /**
@@ -206,5 +201,23 @@ public class RawInputState
         inputManager.removeRawInputListener(this);
 
         super.cleanup();
+    }
+
+    /**
+     * Update this state.
+     *
+     * @param elapsedTime since previous frame/update (in seconds, &ge;0)
+     */
+    @Override
+    public void update(float elapsedTime) {
+        super.update(elapsedTime);
+        /*
+         * Check whether the mouse cursor is over a free item and update the
+         * input state accordingly.
+         */
+        Vector2f click2d = inputManager.getCursorPosition();
+        Item item = mainViewState.findItem(click2d);
+        boolean freeFlag = true;
+        inputState.setMouseItem(item, freeFlag);
     }
 }

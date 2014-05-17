@@ -157,17 +157,22 @@ public class Item
      * @return description suitable for a tool tip, or null if no uses
      */
     public String describeUse(boolean freeFlag) {
+        if (freeFlag && !isWithinReach()) {
+            String result = String.format("%s: out of reach", getTypeName());
+            return result;
+        }
+
         List<String> possibleUses = findUses(freeFlag);
         int numUses = possibleUses.size();
 
         String result;
         if (numUses > 1) {
-            result = String.format("use this %s", typeName);
+            result = String.format("%s: click for menu", typeName);
         } else if (numUses == 1) {
             String use = possibleUses.get(0);
             result = String.format("%s this %s", use, typeName);
         } else {
-            result = null;
+            result = getTypeName();
         }
 
         return result;
@@ -226,7 +231,7 @@ public class Item
     }
 
     /**
-     * Test whether this item is within the player's reach.
+     * Test whether this free item is within the player's reach.
      *
      * @return true if within reach, otherwise false
      */
