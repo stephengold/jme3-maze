@@ -178,6 +178,7 @@ public class InputState
      */
     public void setLeftHandItem(Item newItem) {
         if (leftHandElement != null) {
+            leftHandElement.setToolTipText(null); // TODO
             guiScreen.removeElement(leftHandElement);
         }
         if (newItem != null) {
@@ -198,16 +199,18 @@ public class InputState
      * Alter which item is under the mouse pointer.
      *
      * @param newItem may be null
+     * @param freeFlag if newItem != null, true &rarr; free item, false &rarr;
+     * inventory item
      */
-    public void setMouseItem(Item newItem) {
+    public void setMouseItem(Item newItem, boolean freeFlag) {
         /*
-         * Update the forced tool tip.
+         * Update the GUI's "forced" tool tip.
          */
         if (newItem == null) {
             guiScreen.releaseForcedToolTip();
         } else {
-            String tipMessage = newItem.getTypeName();
-            guiScreen.setForcedToolTip(tipMessage);
+            String text = newItem.describeUse(freeFlag);
+            guiScreen.setForcedToolTip(text);
         }
     }
 
@@ -218,6 +221,7 @@ public class InputState
      */
     public void setRightHandItem(Item newItem) {
         if (rightHandElement != null) {
+            rightHandElement.setToolTipText(null); // TODO
             guiScreen.removeElement(rightHandElement);
         }
         if (newItem != null) {
@@ -246,6 +250,11 @@ public class InputState
         if (newState && !isEnabled()) {
             NavArc advanceArc = playerState.advanceArc();
             boolean canAdvance = advanceArc != null;
+            if (canAdvance) { // TODO
+                advanceElement.setToolTipText("advance");
+            } else {
+                advanceElement.setToolTipText(null);
+            }
             advanceElement.setIsVisible(canAdvance);
         }
 
@@ -272,6 +281,8 @@ public class InputState
         guiNode.addControl(guiScreen);
         initializeGuiButtons();
     }
+    // *************************************************************************
+    // SimpleAppState methods
 
     /**
      * Update this state by processing the last action string.
@@ -380,10 +391,7 @@ public class InputState
         };
 
         guiScreen.addElement(button);
-        if (tipText != null) {
-            String toolTipText = String.format("click to %s", tipText);
-            button.setToolTipText(toolTipText);
-        }
+        button.setToolTipText(tipText);
 
         return button;
     }
