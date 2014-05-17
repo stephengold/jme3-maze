@@ -496,10 +496,10 @@ public class PlayerState
     public void updateTorchLocation() {
         Vector3f localOffset = null;
         if (leftHandItem instanceof Torch) {
-            localOffset = new Vector3f(2f, 7f, -3f);
+            localOffset = new Vector3f(-2f, 7f, -3f);
         }
         if (rightHandItem instanceof Torch) {
-            localOffset = new Vector3f(-2f, 7f, -3f);
+            localOffset = new Vector3f(2f, 7f, -3f);
         }
         if (localOffset == null) {
             return;
