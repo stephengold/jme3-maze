@@ -153,7 +153,8 @@ public class AssetProcessor
      */
     private void processItemModels() {
         String[] paths = {
-            "ankh/ankh", "crown/crown", "mapmaker/mapmaker", "torch/torch"
+            "ankh/ankh", "crown/crown", "mapmaker/mapmaker", "mummy/mummy", 
+            "torch/torch"
         };
         processModelFolder("items", paths);
     }
