@@ -135,6 +135,10 @@ public class Mummy
         Mapmaker npc = new Mapmaker(application);
         NavVertex vertex = playerState.getVertex();
         freeItemsState.add(npc, vertex);
+
+        String message =
+                String.format("You resurrected the %s.", getTypeName());
+        inputState.alert(message);
     }
 
     /**

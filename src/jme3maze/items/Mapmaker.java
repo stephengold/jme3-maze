@@ -113,7 +113,9 @@ public class Mapmaker
         assert success;
 
         mapViewState.setEnabled(true);
-        System.out.printf("You recruited the %s!%n", getTypeName());
+
+        String message = String.format("You recruited the %s.", getTypeName());
+        inputState.alert(message);
     }
 
     /**

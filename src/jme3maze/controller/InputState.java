@@ -41,6 +41,7 @@ import jme3utilities.navigation.NavArc;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
+import tonegod.gui.controls.windows.AlertBox;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import tonegod.gui.core.utils.UIDUtil;
@@ -98,17 +99,21 @@ public class InputState
     // *************************************************************************
     // fields
     /**
+     * GUI element for alerts
+     */
+    private AlertBox alertBox;
+    /**
      * GUI element for the advance button
      */
-    private Element advanceElement = null;
+    private Element advanceElement;
     /**
      * GUI element for the left hand's inventory
      */
-    private Element leftHandElement = null;
+    private Element leftHandElement;
     /**
      * GUI element for the right hand's inventory
      */
-    private Element rightHandElement = null;
+    private Element rightHandElement;
     /**
      * GUI screen: set by initialize()
      */
@@ -128,6 +133,19 @@ public class InputState
     }
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Display an alert message.
+     *
+     * @param message message text (not null)
+     */
+    public void alert(String message) {
+        Validate.nonNull(message, "message");
+        //System.out.println(message);
+
+        alertBox.setMsg(message);
+        alertBox.show();
+    }
 
     /**
      * Select a use for the specified item from a popup menu.
@@ -221,7 +239,6 @@ public class InputState
      */
     public void setRightHandItem(Item newItem) {
         if (rightHandElement != null) {
-            rightHandElement.setToolTipText(null); // TODO
             guiScreen.removeElement(rightHandElement);
         }
         if (newItem != null) {
@@ -279,6 +296,7 @@ public class InputState
         guiScreen = new Screen(application);
         guiScreen.setUseToolTips(true);
         guiNode.addControl(guiScreen);
+        initializeAlertBox();
         initializeGuiButtons();
     }
     // *************************************************************************
@@ -414,7 +432,7 @@ public class InputState
     /**
      * Activate the move state for a specified arc.
      *
-     * @param arc not null
+     * @param arc arc which the player will follow (not null)
      */
     private void goMove(NavArc arc) {
         assert arc != null;
@@ -427,7 +445,8 @@ public class InputState
     /**
      * Activate the turn state for a specified direction.
      *
-     * @param newDirection (length=1)
+     * @param newDirection direction the player will turn relative to current
+     * direction (not null, length=1)
      */
     private void goTurn(VectorXZ newDirection) {
         assert newDirection != null;
@@ -435,6 +454,23 @@ public class InputState
 
         setEnabled(false);
         turnState.activate(newDirection);
+    }
+
+    /**
+     * Create a reusable alert box in the GUI.
+     */
+    private void initializeAlertBox() {
+        Vector2f size = descale(0.55f, 0.3f);
+        Vector2f upperLeft = descale(0.4f, 0.05f);
+        alertBox = new AlertBox(guiScreen, "alert", upperLeft, size) {
+            @Override
+            public void onButtonOkPressed(MouseButtonEvent e, boolean toggled) {
+                hide();
+            }
+        };
+        guiScreen.addElement(alertBox);
+        alertBox.setButtonOkText("dismiss alert");
+        alertBox.hide();
     }
 
     /**

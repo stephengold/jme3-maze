@@ -87,7 +87,8 @@ public class Ankh
         success = freeItemsState.remove(this);
         assert success : this;
 
-        System.out.printf("You picked up an %s.%n", getTypeName());
+        String message = String.format("You picked up an %s.", getTypeName());
+        inputState.alert(message);
     }
 
     /**

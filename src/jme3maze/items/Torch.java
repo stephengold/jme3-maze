@@ -128,7 +128,8 @@ public class Torch
 
         playerState.updateTorchLocation();
 
-        System.out.printf("You picked up the %s.%n", getTypeName());
+        String message = String.format("You picked up the %s.", getTypeName());
+        inputState.alert(message);
     }
 
     /**

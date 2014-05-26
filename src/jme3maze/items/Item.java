@@ -274,7 +274,8 @@ public class Item
         success = freeItemsState.remove(this);
         assert success : this;
 
-        System.out.printf("You took a %s.%n", getTypeName());
+        String message = String.format("You took a %s.", getTypeName());
+        inputState.alert(message);
     }
 
     /**
