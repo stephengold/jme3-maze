@@ -82,13 +82,16 @@ public class Crown
      */
     @Override
     public void encounter() {
+        String message;
         int moveCount = playerState.getMoveCount();
         if (moveCount == 1) {
-            System.out.printf("You traversed the maze in one move!%n");
+            message = "You traversed the maze in one move!";
         } else {
-            System.out.printf("You traversed the maze in %d moves.%n",
+            message = String.format("You traversed the maze in %d moves.",
                     moveCount);
         }
+        inputState.alert(message);
+
         application.stop();
     }
 
