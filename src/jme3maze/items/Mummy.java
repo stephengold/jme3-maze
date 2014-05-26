@@ -27,25 +27,22 @@ package jme3maze.items;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState;
-import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.texture.Texture;
 import java.util.List;
 import java.util.logging.Logger;
 import jme3utilities.MyAsset;
 import jme3utilities.Validate;
+import jme3utilities.navigation.NavVertex;
 
 /**
- * Mapmaker item in the Maze Game. Provides a map view and updates the player's
- * maps.
+ * Mummy item in the Maze Game. Can be converted to a non-player character.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
-public class Mapmaker
+public class Mummy
         extends Item {
     // *************************************************************************
     // constants
@@ -54,21 +51,21 @@ public class Mapmaker
      * message logger for this class
      */
     final private static Logger logger =
-            Logger.getLogger(Mapmaker.class.getName());
+            Logger.getLogger(Mummy.class.getName());
     /**
-     * asset path to the "mapmaker" icon asset
+     * asset path to the "mummy" icon asset
      */
     final private static String iconAssetPath =
-            "Textures/map-icons/mapmaker.png";
+            "Textures/map-icons/mummy.png";
     /**
-     * asset path to the "mapmaker" 3-D model asset
+     * asset path to the "mummy" 3-D model asset
      */
     final private static String modelAssetPath =
-            "Models/items/mapmaker/mapmaker.j3o";
+            "Models/items/mummy/mummy.j3o";
     /**
-     * description for "recruit" use
+     * description for "with ankh" use
      */
-    final protected static String recruitUse = "recruit";
+    final protected static String withAnkhUse = "use ankh with";
     /**
      * offset of model from vertex when free
      */
@@ -77,57 +74,46 @@ public class Mapmaker
     // constructors
 
     /**
-     * Instantiate the mapmaker.
+     * Instantiate a mummy.
      *
      * @param application (not null)
      */
-    public Mapmaker(SimpleApplication application) {
-        super("mapmaker", application);
+    public Mummy(SimpleApplication application) {
+        super("mummy", application);
     }
     // *************************************************************************
     // Item methods
 
     /**
-     * Enumerate all current uses for the mapmaker.
+     * Enumerate all current uses for this mummy.
      *
-     * @param freeFlag true if mapmaker is free, false if it's in inventory
+     * @param freeFlag true if this mummy is free, false if it's in inventory
      * @return new instance
      */
     @Override
     public List<String> findUses(boolean freeFlag) {
         List<String> uses = super.findUses(freeFlag);
-
         uses.remove(takeUse);
-        if (freeFlag && isWithinReach()) {
-            uses.add(recruitUse);
+        if (freeFlag && isWithinReach()
+                && playerState.findItem(Ankh.class) != null) {
+            uses.add(withAnkhUse);
         }
 
         return uses;
     }
 
     /**
-     * Recruit the mapmaker.
-     */
-    public void recruit() {
-        boolean success = freeItemsState.remove(this);
-        assert success;
-
-        mapViewState.setEnabled(true);
-        System.out.printf("You recruited the %s!%n", getTypeName());
-    }
-
-    /**
-     * Use the mapmaker in the specified manner.
+     * Use this mummy in the specified manner.
      *
-     * @param useDescription how to use the mapmaker (not null)
+     * @param useDescription how to use this mummy (not null)
      */
     @Override
     public void use(String useDescription) {
         Validate.nonNull(useDescription, "description");
 
         switch (useDescription) {
-            case recruitUse:
-                recruit();
+            case withAnkhUse:
+                useWithAnkh();
                 break;
 
             default:
@@ -136,7 +122,23 @@ public class Mapmaker
     }
 
     /**
-     * Visualize the mapmaker in the main view.
+     * Use this mummy with an ankh in the player's inventory. This converts the
+     * mummy to a non-player character.
+     */
+    public void useWithAnkh() {
+        Ankh ankh = playerState.findItem(Ankh.class);
+        assert ankh != null;
+        playerState.remove(ankh);
+
+        freeItemsState.remove(this);
+
+        Mapmaker npc = new Mapmaker(application);
+        NavVertex vertex = playerState.getVertex();
+        freeItemsState.add(npc, vertex);
+    }
+
+    /**
+     * Visualize this mummy in the main view.
      *
      * @return new unparented instance
      */
@@ -146,40 +148,15 @@ public class Mapmaker
         Vector3f offset = new Vector3f(modelOffset);
         node.setLocalTranslation(offset);
 
-        ColorRGBA brushColor = ColorRGBA.Red;
-        Material brushMaterial =
-                MyAsset.createShinyMaterial(assetManager, brushColor);
-        Spatial brush = node.getChild("brush");
-        brush.setMaterial(brushMaterial);
-
-        Texture eyeTexture = MyAsset.loadTexture(assetManager,
-                "Textures/items/brown_eye.png");
-        Material eyesMaterial =
-                MyAsset.createShinyMaterial(assetManager, ColorRGBA.White);
-        eyesMaterial.setTexture("DiffuseMap", eyeTexture);
-        Spatial eyes = node.getChild("eyes");
-        eyes.setMaterial(eyesMaterial);
-
-        ColorRGBA skirtColor = ColorRGBA.White;
-        Material skirtMaterial =
-                MyAsset.createShinyMaterial(assetManager, skirtColor);
-        RenderState renderState = skirtMaterial.getAdditionalRenderState();
-        renderState.setFaceCullMode(FaceCullMode.Off);
-        Node main = (Node) node.getChild("main");
-        Spatial skirt = main.getChild("main2");
-        skirt.setMaterial(skirtMaterial);
-
-        ColorRGBA tabletColor = ColorRGBA.Gray;
-        Material tabletMaterial =
-                MyAsset.createShinyMaterial(assetManager, tabletColor);
-        Spatial tablet = node.getChild("tablet");
-        tablet.setMaterial(tabletMaterial);
+        ColorRGBA color = ColorRGBA.White;
+        Material material = MyAsset.createShinyMaterial(assetManager, color);
+        node.setMaterial(material);
 
         return node;
     }
 
     /**
-     * Visualize the mapmaker in the map view.
+     * Visualize this mummy in the map view.
      *
      * @return new unparented instance
      */

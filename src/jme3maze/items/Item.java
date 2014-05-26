@@ -48,8 +48,8 @@ import jme3utilities.Validate;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Generic collectible item in the Maze Game. Each item has a named type. Item
- * instances may share the same type.
+ * Generic collectible item in the Maze Game. Each item has a named type.
+ * Distinct instances may share the same type.
  *
  * @author Stephen Gold <sgold@sonic.net>
  */
@@ -82,7 +82,7 @@ public class Item
     /**
      * description for "take" use
      */
-    final private static String takeUse = "take";
+    final protected static String takeUse = "take";
     // *************************************************************************
     // fields
     /**
@@ -278,7 +278,7 @@ public class Item
     }
 
     /**
-     * Use this item, or if it currently has multiple uses, have the player
+     * Use this item, or if it currently has multiple uses, let the player
      * select a use and do that one.
      *
      * @param freeFlag true if item is free, false if it's in an inventory

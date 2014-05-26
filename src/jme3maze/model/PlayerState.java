@@ -158,9 +158,11 @@ public class PlayerState
      * @return item found, otherwise null
      */
     public <T extends Item> T findItem(Class<T> itemClass) {
-        if (itemClass.isAssignableFrom(leftHandItem.getClass())) {
+        if (leftHandItem != null
+                && itemClass.isAssignableFrom(leftHandItem.getClass())) {
             return (T) leftHandItem;
-        } else if (itemClass.isAssignableFrom(rightHandItem.getClass())) {
+        } else if (rightHandItem != null
+                && itemClass.isAssignableFrom(rightHandItem.getClass())) {
             return (T) rightHandItem;
         }
         return null;
