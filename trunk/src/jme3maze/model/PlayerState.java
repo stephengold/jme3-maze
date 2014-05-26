@@ -152,6 +152,21 @@ public class PlayerState
     }
 
     /**
+     * Find a particular class of item in this player's inventory.
+     *
+     * @param itemClass item class to search for
+     * @return item found, otherwise null
+     */
+    public <T extends Item> T findItem(Class<T> itemClass) {
+        if (itemClass.isAssignableFrom(leftHandItem.getClass())) {
+            return (T) leftHandItem;
+        } else if (itemClass.isAssignableFrom(rightHandItem.getClass())) {
+            return (T) rightHandItem;
+        }
+        return null;
+    }
+
+    /**
      * Access this player's current navigation arc.
      *
      * @return pre-existing instance
@@ -265,6 +280,27 @@ public class PlayerState
     public boolean isRightHandEmpty() {
         boolean result = rightHandItem == null;
         return result;
+    }
+
+    /**
+     * Remove an item from the player's inventory.
+     *
+     * @param item item to remove (not null)
+     * @return true if successful, false if item is not found
+     */
+    public boolean remove(Item item) {
+        Validate.nonNull(item, "item");
+
+        if (item == leftHandItem) {
+            setLeftHandItem(null);
+            return true;
+
+        } else if (item == rightHandItem) {
+            setRightHandItem(null);
+            return true;
+        }
+
+        return false;
     }
 
     /**
