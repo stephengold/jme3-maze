@@ -37,6 +37,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -175,8 +176,8 @@ public class MainViewState
     /**
      * Find the item (if any) in this view at the specified screen coordinates.
      *
-     * @param screenLocation screen coordinates (not null, in pixels, measured
-     * from the lower left)
+     * @param screenLocation screen coordinates (in pixels, measured from the
+     * lower left, not null, unaffected)
      * @return pre-existing vertex or null for none
      */
     public Item findItem(Vector2f screenLocation) {
@@ -241,6 +242,16 @@ public class MainViewState
     }
 
     /**
+     * Access this view's display slot.
+     *
+     * @return pre-existing instance
+     */
+    public DisplaySlot getSlot() {
+        assert slot != null;
+        return slot;
+    }
+
+    /**
      * Test whether the specified screen coordinates are in this view.
      *
      * @param screenLocation screen coordinates (in pixels, measured from the
@@ -280,7 +291,9 @@ public class MainViewState
      */
     public void setFov(float newTangent) {
         Validate.positive(newTangent, "tangent");
-        MyCamera.setYTangent(cam, newTangent);
+        
+        Camera slotCamera = slot.getCamera();
+        MyCamera.setYTangent(slotCamera, newTangent);
     }
 
     /**
@@ -357,8 +370,7 @@ public class MainViewState
                     ColorRGBA.White);
         }
 
-        Texture floorTexture =
-                MyAsset.loadTexture(assetManager, pondAssetPath);
+        Texture floorTexture = MyAsset.loadTexture(assetManager, pondAssetPath);
         if (shadedFlag) {
             floorMaterial =
                     MyAsset.createShadedMaterial(assetManager, floorTexture);
@@ -440,8 +452,9 @@ public class MainViewState
          * behind the avatar.
          */
         Vector3f localOffset = new Vector3f(0f, eyeHeight, -5f);
-        forwardView = new CameraControl(cam, localOffset, forwardDirection,
-                WorldState.upDirection);
+        Camera slotCamera = slot.getCamera();
+        forwardView = new CameraControl(slotCamera, localOffset,
+                forwardDirection, WorldState.upDirection);
         avatarNode.addControl(forwardView);
     }
 
