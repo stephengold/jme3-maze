@@ -38,7 +38,7 @@ import jme3maze.GameAppState;
 import jme3maze.items.Ankh;
 import jme3maze.items.Crown;
 import jme3maze.items.Item;
-import jme3maze.items.Mapmaker;
+import jme3maze.items.Mummy;
 import jme3maze.items.Torch;
 import jme3utilities.Validate;
 import jme3utilities.math.Noise;
@@ -239,15 +239,15 @@ public class FreeItemsState
             add(ankh, ankhVertex);
         }
         /*
-         * Place the mapmaker at a random vertex exactly six hops
+         * Place a mummy at a random vertex exactly six hops
          * from the starting point.
          */
         options = graph.findByHops(6, startVertex);
         options.remove(goalVertex);
-        NavVertex mapmakerVertex = (NavVertex) Noise.pick(options, generator);
-        if (mapmakerVertex != null) {
-            Mapmaker mapmaker = new Mapmaker(simpleApplication);
-            add(mapmaker, mapmakerVertex);
+        NavVertex mummyVertex = (NavVertex) Noise.pick(options, generator);
+        if (mummyVertex != null) {
+            Mummy mummy = new Mummy(simpleApplication);
+            add(mummy, mummyVertex);
         }
     }
 }
