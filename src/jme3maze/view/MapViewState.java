@@ -420,6 +420,7 @@ public class MapViewState
         if (newStatus && !isEnabled()) {
             insetSlotState.setEnabled(true);
             slot = insetSlotState;
+            slot.setRootNode(null);
             addCamera();
 
             Vector3f location = playerState.getLocation();
@@ -454,7 +455,7 @@ public class MapViewState
          */
         Printer printer = new Printer();
         printer.setPrintTransform(true);
-        //printer.printSubtree(rootNode);
+        //printer.printSubtree(mapRootNode);
     }
     // *************************************************************************
     // private methods

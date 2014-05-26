@@ -106,12 +106,17 @@ public class InsetSlotState
     final public void setEnabled(boolean newStatus) {
         if (!isEnabled() && newStatus) {
             Camera camera = cam.clone();
-            insetViewPort = renderManager.createMainView("inset", camera);
-            insetViewPort.setClearFlags(true, true, true);
+            camera.setName("inset camera");
             /*
-             * Position the inset in the upper left corner of the screen.
+             * Locate the inset in the upper left corner of the screen.
              */
             camera.setViewPort(leftEdge, rightEdge, bottomEdge, topEdge);
+
+            insetViewPort = renderManager.createMainView("inset", camera);
+            insetViewPort.setClearFlags(true, true, true);
+
+            Node root = new Node("inset root node");
+            setRootNode(root);
         }
 
         super.setEnabled(newStatus);
@@ -132,8 +137,14 @@ public class InsetSlotState
          * have been updated.
          */
         for (Spatial node : insetViewPort.getScenes()) {
-            node.updateLogicalState(updateInterval);
-            node.updateGeometricState();
+            /*
+             * The logical state of the default root node is
+             * updated by SimpleApplication.update().
+             */
+            if (node != rootNode && node != null) {
+                node.updateLogicalState(updateInterval);
+                node.updateGeometricState();
+            }
         }
     }
 

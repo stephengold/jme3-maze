@@ -25,11 +25,14 @@
  */
 package jme3maze.controller;
 
+import com.jme3.app.Application;
+import com.jme3.app.state.AppStateManager;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.List;
@@ -53,6 +56,67 @@ public class BigSlotState
      */
     final private static Logger logger =
             Logger.getLogger(BigSlotState.class.getName());
+    // *************************************************************************
+    // fields
+    /**
+     * interval between updates (in seconds, &ge;0): set by update()
+     */
+    private float updateInterval = 0f;
+    // *************************************************************************
+    // GameAppState methods
+
+    /**
+     * Initialize this state prior to its 1st update.
+     *
+     * @param stateManager (not null)
+     * @param application attaching application (not null)
+     */
+    @Override
+    public void initialize(AppStateManager stateManager,
+            Application application) {
+        super.initialize(stateManager, application);
+        /*
+         * Name the camera in order to ease debugging.
+         */
+        cam.setName("default camera");
+    }
+    // *************************************************************************
+    // SimpleAppState methods
+
+    /**
+     * Update this slot before each render.
+     *
+     * @param renderManager (not null)
+     */
+    @Override
+    public void render(RenderManager renderManager) {
+        super.render(renderManager);
+        /*
+         * Update logical state here, where we can be sure all controls
+         * have been updated.
+         */
+        for (Spatial node : viewPort.getScenes()) {
+            /*
+             * The logical state of the default root node is
+             * updated by SimpleApplication.update().
+             */
+            if (node != rootNode && node != null) {
+                node.updateLogicalState(updateInterval);
+                node.updateGeometricState();
+            }
+        }
+    }
+
+    /**
+     * Update this slot before each render.
+     *
+     * @param elapsedTime since previous frame/update (in seconds, &ge;0)
+     */
+    @Override
+    public void update(float elapsedTime) {
+        super.update(elapsedTime);
+        updateInterval = elapsedTime;
+    }
     // *************************************************************************
     // Slot methods
 

@@ -33,6 +33,7 @@ import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
@@ -304,7 +305,8 @@ public class AnalogInputState
         mainViewState.setLookDirection(direction);
 
         float yTangent = FastMath.exp(-0.5f + 0.1f * mainZoomOut);
-        MyCamera.setYTangent(cam, yTangent);
+        Camera mainCamera = mainViewState.getSlot().getCamera();
+        MyCamera.setYTangent(mainCamera, yTangent);
     }
 
     /**
@@ -333,7 +335,7 @@ public class AnalogInputState
             mapZoomOut = MyMath.clamp(mapZoomOut, maxMapZoom);
             updateMapCamera();
 
-        } else {
+        } else if (mainViewState.isInside(cursorLocation)) {
             mainZoomOut += amount;
             mainZoomOut =
                     FastMath.clamp(mainZoomOut, -maxMainZoomIn, maxMainZoomOut);
