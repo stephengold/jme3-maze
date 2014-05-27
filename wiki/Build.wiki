@@ -12,7 +12,21 @@ The hardware and software requirements of the SDK are documented at http://hub.j
 
 == Plugins ==
 
-You will need the following plugins:  [http://hub.jmonkeyengine.org/wiki/doku.php/jme3:contributions:tonegodgui tonegodGUI] and [https://code.google.com/p/jme3-utilities/wiki/SkyControl SkyControl].
+You will need the following plugins:  [http://hub.jmonkeyengine.org/wiki/doku.php/jme3:contributions:tonegodgui tonegodGUI] and [https://code.google.com/p/jme3-utilities/wiki/SkyControl SkyControl].  These can be downloaded from the "jMonkeyPlatform User Contributions" update center.
+
+To install plugins:
+  * Open the Plugins dialog in the IDE:
+    * Menu bar -> "Tools" -> "Plugins"
+  * Click on the "Settings" tab.
+  * Make sure the box next to "JMonkeyEngine SDK User Contributions" is checked.
+    * If it isn't, check the box.
+  * Click on the "Available Plugins" tab.
+  * Click on the "Name" button in the header to sort by name.
+  * Check the "Install" box next to each plugin you wish to install.
+  * Click on the "Install" button.
+  * Follow the instructions of the Plugin Installer wizard, (reading and) accepting all license agreements.
+
+It's normal to get a validation warning telling you that the plugins are unsigned.  It's normal to restart the IDE after installing plugins.
 
 == Source files ==
 
@@ -32,7 +46,7 @@ Check out the Maze Game source files using Subversion:
 == Project configuration ==
 
  * (optional) Rename the project:
-   * Right-click on the jme3-utilities project in the "Projects" window.
+   * Right-click on the "maze" project in the "Projects" window.
    * Select "Rename...".
    * Type a new name in the text box.
    * Click on the "Rename" button.
