@@ -136,8 +136,8 @@ public class Mummy
         NavVertex vertex = playerState.getVertex();
         freeItemsState.add(npc, vertex);
 
-        String message =
-                String.format("You resurrected the %s.", getTypeName());
+        String message = "Using the ankh's mystical powers, "
+                + "you resurrected the mapmaker.";
         inputState.alert(message);
     }
 
