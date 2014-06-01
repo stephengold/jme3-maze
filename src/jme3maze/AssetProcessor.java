@@ -105,6 +105,17 @@ public class AssetProcessor
     // private methods
 
     /**
+     * Process models in the "Models/items" subfolder.
+     */
+    private void processItemModels() {
+        String[] paths = {
+            "ankh/ankh", "crown/crown", "mapmaker/mapmaker", "mummy/mummy",
+            "torch/torch"
+        };
+        processModelFolder("items", paths);
+    }
+
+    /**
      * Convert a Blender model asset to J3O format.
      *
      * @param path (not null)
@@ -146,17 +157,6 @@ public class AssetProcessor
             String assetPath = String.format("%s/%s", folderPath, modelPath);
             processModel(assetPath);
         }
-    }
-
-    /**
-     * Process models in the "Models/items" subfolder.
-     */
-    private void processItemModels() {
-        String[] paths = {
-            "ankh/ankh", "crown/crown", "mapmaker/mapmaker", "mummy/mummy", 
-            "torch/torch"
-        };
-        processModelFolder("items", paths);
     }
 
     /**

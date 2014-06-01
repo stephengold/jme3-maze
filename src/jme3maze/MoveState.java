@@ -82,16 +82,16 @@ public class MoveState
     /**
      * Enable or disable this state.
      *
-     * @param newState true to enable, false to disable
+     * @param newStatus true to enable, false to disable
      */
     @Override
-    final public void setEnabled(boolean newState) {
-        if (newState && !isEnabled()) {
+    final public void setEnabled(boolean newStatus) {
+        if (newStatus && !isEnabled()) {
             playerState.incrementMoveCount();
             distanceTraveled = 0f;
         }
 
-        super.setEnabled(newState);
+        super.setEnabled(newStatus);
     }
     // *************************************************************************
     // SimpleAppState methods
