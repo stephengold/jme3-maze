@@ -24,7 +24,7 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * Controller classes for the Maze Game, including the app states which hand
+ * Controller classes for the Maze Game, including the app states which handle
  * input events and manage the screen layout.
  */
 package jme3maze.controller;

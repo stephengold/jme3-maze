@@ -36,7 +36,7 @@ import jme3utilities.MyString;
 import jme3utilities.ui.InputMode;
 
 /**
- * Input mode to handle hotkeys while the player explores the maze.
+ * Input mode for when the player is exploring the maze.
  * <p>
  * Disabled at creation.
  *
@@ -130,7 +130,7 @@ public class ExploreMode
     }
 
     /**
-     * Initialize this (disabled) mode prior to its 1st update.
+     * Initialize this input mode prior to its 1st update.
      *
      * @param stateManager (not null)
      * @param application (not null)
