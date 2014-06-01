@@ -42,7 +42,7 @@ import jme3maze.items.Item;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Game app state to handle raw input such as mouse buttons.
+ * Game app state to handle raw input (such as mouse buttons) in explore mode.
  * <p>
  * Enabled at creation.
  *

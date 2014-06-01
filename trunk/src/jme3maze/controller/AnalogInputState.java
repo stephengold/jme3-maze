@@ -44,7 +44,7 @@ import jme3utilities.math.MyMath;
 import jme3utilities.math.MyVector3f;
 
 /**
- * Game app state to handle analog input from the mouse.
+ * Game app state to handle analog input in explore mode.
  * <p>
  * Enabled at creation.
  *
