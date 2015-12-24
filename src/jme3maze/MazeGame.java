@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@ import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Misc;
+import jme3utilities.MyString;
 import jme3utilities.ui.ActionApplication;
 
 /**
@@ -81,6 +82,10 @@ public class MazeGame
          */
         Misc.setLoggingLevels(Level.WARNING);
         /*
+         * Lower the logging level for this class.
+         */
+        logger.setLevel(Level.INFO);
+        /*
          * Instantiate the application.
          */
         MazeGame application = new MazeGame();
@@ -104,6 +109,11 @@ public class MazeGame
      */
     @Override
     public void actionInitializeApplication() {
+        /*
+         * Log the jME3-utilities version string.
+         */
+        logger.log(Level.INFO, "jME3-utilities version is {0}",
+                MyString.quote(Misc.getVersionShort()));
         /*
          * Disable display of JME statistics.
          * These displays can be re-enabled by pressing the F5 hotkey.
