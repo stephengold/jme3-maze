@@ -59,7 +59,7 @@ Clone the Maze Game source files using Git:
     a non-existent subfolder of such a folder.
  8. Make sure the "Scan for NetBeans Projects after Checkout" box is checked.
  9. Click on the "Finish" button.
-10. When asked whether to open the project, click the "Open Project" button.
+ 9. When asked whether to open the project, click the "Open Project" button.
 
 ### Project configuration
 
