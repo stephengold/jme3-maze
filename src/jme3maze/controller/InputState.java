@@ -178,6 +178,8 @@ public class InputState
      * @param freeFlag true if item is free, false if it's in an inventory
      */
     public void selectUse(final Item item, boolean freeFlag) {
+        Validate.nonNull(item, "item");
+
         Vector2f cursorPosition = inputManager.getCursorPosition();
         Vector2f upperLeft = cursorPosition.clone();
         boolean scrollable = false;
@@ -207,10 +209,11 @@ public class InputState
     /**
      * Accept an action to be performed on the next update.
      *
-     * @param actionString textual description of the action (not null)
+     * @param actionString textual description of the action (not null, not
+     * empty)
      */
     public void setAction(String actionString) {
-        Validate.nonNull(actionString, "action string");
+        Validate.nonEmpty(actionString, "action string");
         lastActionString = actionString;
     }
 
@@ -235,6 +238,15 @@ public class InputState
             String tipText = newItem.describeUse(freeFlag);
             leftHandElement = addActionButton(upperLeft, dimensions,
                     useLeftHandItemActionString, assetPath, tipText);
+        }
+        /*
+         * Update the right-hand tooltip.
+         */
+        Item rightHandItem = playerState.getRightHandItem();
+        if (rightHandItem != null) {
+            boolean freeFlag = false;
+            String tipText = rightHandItem.describeUse(freeFlag);
+            rightHandElement.setToolTipText(tipText);
         }
     }
 
@@ -277,6 +289,15 @@ public class InputState
             String tipText = newItem.describeUse(freeFlag);
             rightHandElement = addActionButton(upperLeft, dimensions,
                     useRightHandItemActionString, assetPath, tipText);
+        }
+        /*
+         * Update the left-hand tooltip.
+         */
+        Item leftHandItem = playerState.getLeftHandItem();
+        if (leftHandItem != null) {
+            boolean freeFlag = false;
+            String tipText = leftHandItem.describeUse(freeFlag);
+            leftHandElement.setToolTipText(tipText);
         }
     }
     // *************************************************************************

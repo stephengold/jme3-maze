@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -189,6 +189,24 @@ public class PlayerState
         return direction.clone();
     }
 
+    /**
+     * Read the item in this player's left hand.
+     *
+     * @return pre-existing instance or null if none
+     */
+    public Item getLeftHandItem() {
+        return leftHandItem;
+    }
+    
+    /**
+     * Read the item in this player's right hand.
+     *
+     * @return pre-existing instance or null if none
+     */
+    public Item getRightHandItem() {
+        return rightHandItem;
+    }
+    
     /**
      * Copy this player's location.
      *
