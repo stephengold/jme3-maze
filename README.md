@@ -8,7 +8,7 @@ Uses jMonkeyEngine, tonegodGUI, and sgold's utilities.
 
 This project was formerly hosted at https://code.google.com/p/jme3-maze/
 
-The source files are in JDK 7 format with CRLF line endings.
+The source files are in JDK 7 format.
 
 
 ## How to build the maze game
