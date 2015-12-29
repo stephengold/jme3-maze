@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -79,7 +79,7 @@ public class Torch
      * @param application (not null)
      */
     public Torch(SimpleApplication application) {
-        super("torch", application);
+        super("TORCH", application);
     }
     // *************************************************************************
     // new methods exposed
@@ -127,9 +127,7 @@ public class Torch
         assert success : this;
 
         playerState.updateTorchLocation();
-
-        String message = String.format("You picked up the %s.", getTypeName());
-        inputState.alert(message);
+        inputState.alert("TOOK_TORCH");
     }
 
     /**

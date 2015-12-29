@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ public class Ankh
      * @param application (not null)
      */
     public Ankh(SimpleApplication application) {
-        super("ankh", application);
+        super("ANKH", application);
     }
     // *************************************************************************
     // Item methods
@@ -87,8 +87,7 @@ public class Ankh
         success = freeItemsState.remove(this);
         assert success : this;
 
-        String message = String.format("You picked up an %s.", getTypeName());
-        inputState.alert(message);
+        inputState.alert("TOOK_ANKH");
     }
 
     /**

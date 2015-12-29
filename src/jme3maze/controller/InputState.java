@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import java.util.Collection;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.items.Item;
@@ -135,15 +136,38 @@ public class InputState
     // new methods exposed
 
     /**
-     * Display an alert message.
+     * Display a simple alert message.
      *
-     * @param message message text (not null)
+     * @param messageKey resource key of alert message text (not null, not
+     * empty)
      */
-    public void alert(String message) {
-        Validate.nonNull(message, "message");
-        //System.out.println(message);
+    public void alert(String messageKey) {
+        Validate.nonEmpty(messageKey, "messageKey");
 
-        alertBox.setMsg(message);
+        ResourceBundle alerts = localeState.getAlertsBundle();
+        String messageText = alerts.getString(messageKey);
+
+        //System.out.println(text);
+        alertBox.setMsg(messageText);
+        alertBox.show();
+    }
+
+    /**
+     * Display a formatted alert message.
+     *
+     * @param formatKey resource key of alert message format (not null, not
+     * empty)
+     * @param args arguments for the format specifiers (if any)
+     */
+    public void alert(String formatKey, Object... args) {
+        Validate.nonEmpty(formatKey, "formatKey");
+
+        ResourceBundle alerts = localeState.getAlertsBundle();
+        String format = alerts.getString(formatKey);
+        String messageText = String.format(format, args);
+
+        //System.out.println(text);
+        alertBox.setMsg(messageText);
         alertBox.show();
     }
 
@@ -167,12 +191,13 @@ public class InputState
         };
         guiScreen.addElement(popupMenu);
 
+        ResourceBundle labels = localeState.getLabelsBundle();
         Collection<String> uses = item.findUses(freeFlag);
         for (String use : uses) {
-            String caption = use;
+            String label = labels.getString(use);
             Object value = use;
             Menu subMenu = null;
-            popupMenu.addMenuItem(caption, value, subMenu);
+            popupMenu.addMenuItem(label, value, subMenu);
         }
 
         Menu caller = null;
@@ -268,7 +293,9 @@ public class InputState
             NavArc advanceArc = playerState.advanceArc();
             boolean canAdvance = advanceArc != null;
             if (canAdvance) { // TODO
-                advanceElement.setToolTipText("advance");
+                ResourceBundle labels = localeState.getLabelsBundle();
+                String tipText = labels.getString("ADVANCE");
+                advanceElement.setToolTipText(tipText);
             } else {
                 advanceElement.setToolTipText(null);
             }
@@ -469,7 +496,11 @@ public class InputState
             }
         };
         guiScreen.addElement(alertBox);
-        alertBox.setButtonOkText("dismiss alert");
+
+        ResourceBundle labels = localeState.getLabelsBundle();
+        String buttonLabel = labels.getString("DISMISS_ALERT");
+        alertBox.setButtonOkText(buttonLabel);
+
         alertBox.hide();
     }
 
@@ -477,13 +508,15 @@ public class InputState
      * Create GUI buttons and map them to actions.
      */
     private void initializeGuiButtons() {
+        ResourceBundle labels = localeState.getLabelsBundle();
+
         Vector2f size = descale(0.15f, 0.15f);
         Vector2f offset = new Vector2f(0.5f, 1f).multLocal(size);
         Vector2f bottomCenter = descale(0.5f, 0.95f);
         Vector2f upperLeft = bottomCenter.subtract(offset);
         String actionString = advanceActionString;
         String iconAssetPath = "Textures/buttons/advance.png";
-        String tipText = "advance";
+        String tipText = labels.getString("ADVANCE");
         advanceElement = addActionButton(upperLeft, size, actionString,
                 iconAssetPath, tipText);
 
@@ -491,16 +524,16 @@ public class InputState
         offset = new Vector2f(0.5f, 1f).multLocal(size);
         bottomCenter = descale(0.35f, 0.95f);
         upperLeft = bottomCenter.subtract(offset);
-        iconAssetPath = "Textures/buttons/left.png";
         actionString = leftActionString;
-        tipText = "turn left";
+        iconAssetPath = "Textures/buttons/left.png";
+        tipText = labels.getString("TURN_LEFT");
         addActionButton(upperLeft, size, actionString, iconAssetPath, tipText);
 
         bottomCenter = descale(0.65f, 0.95f);
         upperLeft = bottomCenter.subtract(offset);
-        iconAssetPath = "Textures/buttons/right.png";
         actionString = rightActionString;
-        tipText = "turn right";
+        iconAssetPath = "Textures/buttons/right.png";
+        tipText = labels.getString("TURN_RIGHT");
         addActionButton(upperLeft, size, actionString, iconAssetPath, tipText);
     }
 }

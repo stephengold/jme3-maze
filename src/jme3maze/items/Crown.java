@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ public class Crown
      * @param application (not null)
      */
     public Crown(SimpleApplication application) {
-        super("crown", application);
+        super("CROWN", application);
     }
     // *************************************************************************
     // Item methods
@@ -82,15 +82,12 @@ public class Crown
      */
     @Override
     public void encounter() {
-        String message;
         int moveCount = playerState.getMoveCount();
         if (moveCount == 1) {
-            message = "You traversed the maze in one move!";
+            inputState.alert("ONE_MOVE");
         } else {
-            message = String.format("You traversed the maze in %d moves.",
-                    moveCount);
+            inputState.alert("MANY_MOVES", moveCount);
         }
-        inputState.alert(message);
 
         application.stop();
     }

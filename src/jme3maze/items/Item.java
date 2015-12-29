@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.InputState;
+import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.view.MapViewState;
@@ -65,24 +67,24 @@ public class Item
     /**
      * description for "discard" use
      */
-    final private static String discardUse = "discard";
+    final private static String discardUse = "DISCARD";
     /**
      * asset path to the "unknown" icon asset
      */
     final private static String iconAssetPath =
             "Textures/map-icons/unknown.png";
     /**
-     * description for "shift to left hand" use
+     * description for "SHIFT_LEFT" use
      */
-    final private static String shiftLeftUse = "shift to left hand";
+    final private static String shiftLeftUse = "SHIFT_LEFT";
     /**
-     * description for "shift to right hand" use
+     * description for "SHIFT_RIGHT" use
      */
-    final private static String shiftRightUse = "shift to right hand";
+    final private static String shiftRightUse = "SHIFT_RIGHT";
     /**
-     * description for "take" use
+     * description for "TAKE" use
      */
-    final protected static String takeUse = "take";
+    final protected static String takeUse = "TAKE";
     // *************************************************************************
     // fields
     /**
@@ -102,6 +104,10 @@ public class Item
      */
     final protected InputState inputState;
     /**
+     * locale: set by constructor
+     */
+    final protected LocaleState localeState;
+    /**
      * map view: set by constructor
      */
     final protected MapViewState mapViewState;
@@ -113,6 +119,10 @@ public class Item
      * application: set by constructor
      */
     final protected SimpleApplication application;
+    /**
+     * localized name of this item's type: set by constructor
+     */
+    final private String localTypeName;
     /**
      * name of this item's type: set by constructor
      */
@@ -126,39 +136,53 @@ public class Item
      * @param typeName (not null, not empty)
      */
     Item(String typeName, SimpleApplication application) {
-        assert typeName != null;
-        assert typeName.length() > 0 : typeName;
+        Validate.nonEmpty(typeName, "typeName");
         Validate.nonNull(application, "application");
 
         this.typeName = typeName;
+
         this.application = application;
         assetManager = application.getAssetManager();
         stateManager = application.getStateManager();
-
+        /*
+         * Initialize appState references.
+         */
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
 
         inputState = stateManager.getState(InputState.class);
         assert inputState != null;
 
+        localeState = stateManager.getState(LocaleState.class);
+        assert localeState != null;
+
         mapViewState = stateManager.getState(MapViewState.class);
         assert mapViewState != null;
 
         playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;
+        /*
+         * Initialize localization data.
+         */
+        ResourceBundle types = localeState.getTypesBundle();
+        localTypeName = types.getString(typeName);
+        assert localTypeName != null;
+        assert localTypeName.length() > 0;
     }
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Describe how this item is used.
+     * Describe how this item may be used.
      *
      * @param freeFlag true if item is free, false if it's in an inventory
-     * @return description suitable for a tool tip, or null if no uses
+     * @return localized description suitable for a tool tip, or null if no uses
      */
     public String describeUse(boolean freeFlag) {
+        ResourceBundle labels = localeState.getLabelsBundle();
         if (freeFlag && !isWithinReach()) {
-            String result = String.format("%s: out of reach", getTypeName());
+            String format = labels.getString("OUT_OF_REACH");
+            String result = String.format(format, localTypeName);
             return result;
         }
 
@@ -167,12 +191,15 @@ public class Item
 
         String result;
         if (numUses > 1) {
-            result = String.format("%s: click for menu", typeName);
+            String format = labels.getString("CLICK_FOR_MENU");
+            result = String.format(format, localTypeName);
         } else if (numUses == 1) {
+            String format = labels.getString("SINGLE_USE");
             String use = possibleUses.get(0);
-            result = String.format("%s this %s", use, typeName);
+            String localUse = labels.getString(use);
+            result = String.format(format, localUse, localTypeName);
         } else {
-            result = getTypeName();
+            result = localTypeName;
         }
 
         return result;
@@ -226,8 +253,19 @@ public class Item
      */
     public String getTypeName() {
         assert typeName != null;
-        assert typeName.length() > 0 : typeName;
+        assert typeName.length() > 0;
         return typeName;
+    }
+
+    /**
+     * Read the localized name of this item's type.
+     *
+     * @return localized name of this item's type (not null, not empty)
+     */
+    public String getLocalTypeName() {
+        assert localTypeName != null;
+        assert localTypeName.length() > 0;
+        return localTypeName;
     }
 
     /**
@@ -274,8 +312,7 @@ public class Item
         success = freeItemsState.remove(this);
         assert success : this;
 
-        String message = String.format("You took a %s.", getTypeName());
-        inputState.alert(message);
+        inputState.alert("TOOK", typeName);
     }
 
     /**
@@ -297,10 +334,10 @@ public class Item
     /**
      * Use this item in the specified manner.
      *
-     * @param useDescription how to use this item (not null)
+     * @param useDescription how to use this item (not null, not empty)
      */
     public void use(String useDescription) {
-        Validate.nonNull(useDescription, "description");
+        Validate.nonEmpty(useDescription, "description");
 
         switch (useDescription) {
             case discardUse:
@@ -370,8 +407,8 @@ public class Item
      */
     @Override
     public int compareTo(Item otherItem) {
-        String otherName = otherItem.getTypeName();
-        return typeName.compareTo(otherName);
+        String otherType = otherItem.typeName;
+        return typeName.compareTo(otherType);
     }
     // *************************************************************************
     // Object methods
@@ -391,7 +428,7 @@ public class Item
 
         } else if (otherObject instanceof Item) {
             Item otherItem = (Item) otherObject;
-            String otherType = otherItem.getTypeName();
+            String otherType = otherItem.typeName;
             result = typeName.equals(otherType);
         }
 
@@ -413,6 +450,7 @@ public class Item
      * De-serialize this item, for example when loading from a J3O file.
      *
      * @param importer (not null)
+     * @throws IOException
      */
     @Override
     public void read(JmeImporter importer)
@@ -424,6 +462,7 @@ public class Item
      * Serialize this item, for example when saving to a J3O file.
      *
      * @param exporter (not null)
+     * @throws IOException
      */
     @Override
     public void write(JmeExporter exporter)

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ public class Mapmaker
     /**
      * description for "recruit" use
      */
-    final protected static String recruitUse = "recruit";
+    final protected static String recruitUse = "RECRUIT";
     /**
      * offset of model from vertex when free
      */
@@ -82,7 +82,7 @@ public class Mapmaker
      * @param application (not null)
      */
     public Mapmaker(SimpleApplication application) {
-        super("mapmaker", application);
+        super("MAPMAKER", application);
     }
     // *************************************************************************
     // Item methods
@@ -113,9 +113,7 @@ public class Mapmaker
         assert success;
 
         mapViewState.setEnabled(true);
-
-        String message = String.format("You recruited the %s.", getTypeName());
-        inputState.alert(message);
+        inputState.alert("RECRUITED", getLocalTypeName());
     }
 
     /**

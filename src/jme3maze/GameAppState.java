@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ import jme3maze.controller.BigSlotState;
 import jme3maze.controller.InputState;
 import jme3maze.controller.InsetSlotState;
 import jme3maze.controller.RawInputState;
+import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
@@ -80,6 +81,10 @@ public class GameAppState
      * app state to manage the inset slot: set by initialize()
      */
     protected InsetSlotState insetSlotState;
+    /**
+     * app state to manage localization: set by initialize()
+     */
+    protected LocaleState localeState;
     /**
      * app state to manage the main view: set by initialize()
      */
@@ -135,6 +140,9 @@ public class GameAppState
 
         insetSlotState = stateManager.getState(InsetSlotState.class);
         assert insetSlotState != null;
+
+        localeState = stateManager.getState(LocaleState.class);
+        assert localeState != null;
 
         mainViewState = stateManager.getState(MainViewState.class);
         assert mainViewState != null;

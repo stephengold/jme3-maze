@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2015, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@ public class Mummy
     /**
      * description for "with ankh" use
      */
-    final protected static String withAnkhUse = "use ankh with";
+    final protected static String withAnkhUse = "USE_ANKH_WITH";
     /**
      * offset of model from vertex when free
      */
@@ -79,7 +79,7 @@ public class Mummy
      * @param application (not null)
      */
     public Mummy(SimpleApplication application) {
-        super("mummy", application);
+        super("MUMMY", application);
     }
     // *************************************************************************
     // Item methods
@@ -136,9 +136,7 @@ public class Mummy
         NavVertex vertex = playerState.getVertex();
         freeItemsState.add(npc, vertex);
 
-        String message = "Using the ankh's mystical powers, "
-                + "you resurrected the mapmaker.";
-        inputState.alert(message);
+        inputState.alert("RESURRECTED_MAPMAKER");
     }
 
     /**

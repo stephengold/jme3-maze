@@ -35,6 +35,7 @@ import jme3maze.controller.ExploreMode;
 import jme3maze.controller.InputState;
 import jme3maze.controller.InsetSlotState;
 import jme3maze.controller.RawInputState;
+import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
@@ -98,7 +99,7 @@ public class MazeGame
 
         application.start();
         /*
-         * ... and onward to MazeGame.simpleInitApp()!
+         * ... and onward to MazeGame.actionInitializeApplication()!
          */
     }
     // *************************************************************************
@@ -125,6 +126,11 @@ public class MazeGame
          */
         ScreenshotAppState screenShotState = new ScreenshotAppState();
         stateManager.attach(screenShotState);
+        /*
+         * Attach localization app state to the application.
+         */
+        LocaleState localeState = new LocaleState();
+        stateManager.attach(localeState);
         /*
          * Attach model app states to the application.
          */
