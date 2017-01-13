@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2015, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -407,7 +407,7 @@ public class Item
      */
     @Override
     public int compareTo(Item otherItem) {
-        String otherType = otherItem.typeName;
+        String otherType = otherItem.getTypeName();
         return typeName.compareTo(otherType);
     }
     // *************************************************************************
@@ -428,7 +428,7 @@ public class Item
 
         } else if (otherObject instanceof Item) {
             Item otherItem = (Item) otherObject;
-            String otherType = otherItem.typeName;
+            String otherType = otherItem.getTypeName();
             result = typeName.equals(otherType);
         }
 
