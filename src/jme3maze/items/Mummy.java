@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2015, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -105,11 +105,11 @@ public class Mummy
     /**
      * Use this mummy in the specified manner.
      *
-     * @param useDescription how to use this mummy (not null)
+     * @param useDescription how to use this mummy (not null, not empty)
      */
     @Override
     public void use(String useDescription) {
-        Validate.nonNull(useDescription, "description");
+        Validate.nonEmpty(useDescription, "description");
 
         switch (useDescription) {
             case withAnkhUse:

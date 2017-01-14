@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,6 @@ import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.debug.Printer;
-import jme3utilities.math.MyVector3f;
 import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -291,7 +290,7 @@ public class MainViewState
      */
     public void setFov(float newTangent) {
         Validate.positive(newTangent, "tangent");
-        
+
         Camera slotCamera = slot.getCamera();
         MyCamera.setYTangent(slotCamera, newTangent);
     }
@@ -304,12 +303,7 @@ public class MainViewState
      * length, unaffected)
      */
     public void setLookDirection(Vector3f newDirection) {
-        Validate.nonNull(newDirection, "direction");
-        if (MyVector3f.isZeroLength(newDirection)) {
-            throw new IllegalArgumentException(
-                    "direction should have positive length");
-        }
-
+        Validate.nonZero(newDirection, "direction");
         forwardView.setLookDirection(newDirection);
     }
 

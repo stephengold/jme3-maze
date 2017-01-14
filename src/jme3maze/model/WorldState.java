@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,9 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.Collection;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3utilities.Validate;
-import jme3utilities.math.MyVector3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -297,12 +295,7 @@ public class WorldState
      * @return new instance
      */
     public static Quaternion toOrientation(Vector3f direction) {
-        Validate.nonNull(direction, "direction");
-        if (MyVector3f.isZeroLength(direction)) {
-            logger.log(Level.SEVERE, "direction={0}", direction);
-            throw new IllegalArgumentException(
-                    "direction should have positive length");
-        }
+        Validate.nonZero(direction, "direction");
 
         Quaternion result = new Quaternion();
         result.lookAt(direction, upDirection);
