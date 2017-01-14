@@ -24,25 +24,43 @@ The source files are in JDK 7 format.
 The hardware and software requirements of the SDK are documented at 
 http://hub.jmonkeyengine.org/wiki/doku.php/jme3:requirements
 
-### Plugins
+### Dependencies
 
-You will need the following plugins: tonegodGUI and SkyControl. These can be 
-downloaded from the "jMonkeyPlatform User Contributions" update center.
+You will need JARs from the tonegodGUI and jme3-utilities projects. 
+Source files can be cloned from GitHub:
 
-To install plugins:
- 1. Open the Plugins dialog in the IDE:
-   + Menu bar -> "Tools" -> "Plugins"
- 2. Click on the "Settings" tab.
- 3. Make sure the box next to "JMonkeyEngine SDK User Contributions" is checked.
- 4. Click on the "Available Plugins" tab.
- 5. Click on the "Name" button in the header to sort by name.
- 6. Check the "Install" box next to each plugin you wish to install.
- 7. Click on the "Install" button.
- 8. Follow the instructions of the Plugin Installer wizard, (reading and) 
-    accepting all license agreements.
+Clone the tonegodGUI source files using Git:
+ 1. Open the Clone wizard in the IDE:
+   + Menu bar -> "Team" -> "Git" -> "Clone..."
+ 2. For "Repository URL:" specify 
+    "https://github.com/stephengold/tonegodgui.git" (without the quotes).
+ 3. Clear the "User:" and "Password:" text boxes.
+ 4. Click on the "Next >" button.
+ 5. Make sure the "master" remote branch is checked.
+ 6. Click on the "Next >" button again.
+ 7. For "Parent Directory:" specify a writable folder on a local filesystem.
+ 8. Make sure the "Scan for NetBeans Projects after Checkout" box is checked.
+ 9. Click on the "Finish" button.
+10. When asked whether to open the project, click the "Open Project" button.
 
-It's normal to get a validation warning telling you that the plugins are
-unsigned. It's normal to restart the IDE after installing plugins.
+Build the tonegodgui-0.0.1.jar:
+ 1. Right-click on the new project in the "Projects" window.
+ 2. Select "Clean and Build".
+
+Clone the jme3-utilities source files using Git:
+ 1. Open the Clone wizard in the IDE:
+   + Menu bar -> "Team" -> "Git" -> "Clone..."
+ 2. For "Repository URL:" specify 
+    "https://github.com/stephengold/jme3-utilities.git" (without the quotes).
+ 3. Clear the "User:" and "Password:" text boxes.
+ 4. Click on the "Next >" button.
+ 5. Make sure the "master" remote branch is checked.
+ 6. Click on the "Next >" button again.
+ 7. For "Parent Directory:" specify the same writable folder you specified 
+    for tonegodGUI.
+ 8. Make sure the "Scan for NetBeans Projects after Checkout" box is checked.
+ 9. Click on the "Finish" button.
+10. When asked whether to open the project, click the "Open Project" button.
 
 ### Source files
 
@@ -55,11 +73,11 @@ Clone the Maze Game source files using Git:
  4. Click on the "Next >" button.
  5. Make sure the "master" remote branch is checked.
  6. Click on the "Next >" button again.
- 7. For "Parent Directory:" specify a writable folder on a local filesystem or 
-    a non-existent subfolder of such a folder.
+ 7. For "Parent Directory:" specify the same writable folder you specified 
+    for tonegodGUI.
  8. Make sure the "Scan for NetBeans Projects after Checkout" box is checked.
  9. Click on the "Finish" button.
- 9. When asked whether to open the project, click the "Open Project" button.
+10. When asked whether to open the project, click the "Open Project" button.
 
 ### Project configuration
 
