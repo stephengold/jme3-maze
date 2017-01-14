@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2015, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -154,6 +154,7 @@ public class PlayerState
     /**
      * Find a particular class of item in this player's inventory.
      *
+     * @param <T>
      * @param itemClass item class to search for
      * @return item found, otherwise null
      */
@@ -179,14 +180,14 @@ public class PlayerState
     }
 
     /**
-     * Copy this player's direction.
+     * Read this player's direction.
      *
-     * @return new unit vector in world coordinates
+     * @return unit vector in world coordinates
      */
     public VectorXZ getDirection() {
         assert direction != null;
         assert direction.isUnitVector() : direction;
-        return direction.clone();
+        return direction;
     }
 
     /**
@@ -197,7 +198,7 @@ public class PlayerState
     public Item getLeftHandItem() {
         return leftHandItem;
     }
-    
+
     /**
      * Read the item in this player's right hand.
      *
@@ -206,7 +207,7 @@ public class PlayerState
     public Item getRightHandItem() {
         return rightHandItem;
     }
-    
+
     /**
      * Copy this player's location.
      *
