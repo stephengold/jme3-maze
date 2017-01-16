@@ -27,6 +27,7 @@ package jme3maze;
 
 import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.system.AppSettings;
+import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.AnalogInputState;
@@ -110,6 +111,11 @@ public class MazeGame
      */
     @Override
     public void actionInitializeApplication() {
+        /*
+         * Log the jME3 version string.
+         */
+        logger.log(Level.INFO, "jME3-core version is {0}",
+                MyString.quote(JmeVersion.FULL_NAME));
         /*
          * Log the jME3-utilities version string.
          */
