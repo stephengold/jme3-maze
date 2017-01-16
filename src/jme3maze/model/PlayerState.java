@@ -161,10 +161,14 @@ public class PlayerState
     public <T extends Item> T findItem(Class<T> itemClass) {
         if (leftHandItem != null
                 && itemClass.isAssignableFrom(leftHandItem.getClass())) {
-            return (T) leftHandItem;
+            @SuppressWarnings("unchecked")
+            T result = (T) leftHandItem;
+            return result;
         } else if (rightHandItem != null
                 && itemClass.isAssignableFrom(rightHandItem.getClass())) {
-            return (T) rightHandItem;
+            @SuppressWarnings("unchecked")
+            T result = (T) rightHandItem;
+            return result;
         }
         return null;
     }
