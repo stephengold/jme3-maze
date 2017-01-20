@@ -53,7 +53,7 @@ import jme3utilities.navigation.NavVertex;
  * Generic collectible item in the Maze Game. Each item has a named type.
  * Distinct instances may share the same type.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class Item
         implements Comparable<Item>, Savable {

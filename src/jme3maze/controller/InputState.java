@@ -55,7 +55,7 @@ import tonegod.gui.core.utils.UIDUtil;
  * <p>
  * Disabled at creation.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class InputState
         extends GameAppState {

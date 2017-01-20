@@ -43,7 +43,7 @@ import jme3utilities.navigation.NavVertex;
  * <p>
  * Enabled at creation.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class WorldState
         extends GameAppState {

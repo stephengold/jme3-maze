@@ -40,7 +40,7 @@ import jme3utilities.navigation.NavVertex;
 /**
  * Mummy item in the Maze Game. Can be converted to a non-player character.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class Mummy
         extends Item {

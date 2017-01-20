@@ -44,7 +44,7 @@ import jme3utilities.navigation.NavVertex;
  * <p>
  * Enabled at creation.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class PlayerState
         extends GameAppState {
@@ -153,7 +153,8 @@ public class PlayerState
     /**
      * Find a particular class of item in this player's inventory.
      *
-     * @param <T> class to find
+     * @param <T> class found
+     * @param itemClass class to match against
      * @return item found, otherwise null
      */
     public <T extends Item> T findItem(Class<T> itemClass) {

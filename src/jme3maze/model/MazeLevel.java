@@ -45,7 +45,7 @@ import jme3utilities.navigation.NavVertex;
  * A level of the maze, consisting of a rectangular grid of uniformly-spaced
  * vertices embedded in the overall navigation graph.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class MazeLevel {
     // *************************************************************************

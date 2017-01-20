@@ -40,7 +40,7 @@ import jme3utilities.ui.InputMode;
  * <p>
  * Disabled at creation.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class ExploreMode
         extends InputMode {
