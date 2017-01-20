@@ -437,6 +437,7 @@ public class Item
 
     /**
      * Generate the hash code for this item.
+     * @return value for use in hashing
      */
     @Override
     public int hashCode() {
@@ -450,7 +451,7 @@ public class Item
      * De-serialize this item, for example when loading from a J3O file.
      *
      * @param importer (not null)
-     * @throws IOException
+     * @throws IOException from importer
      */
     @Override
     public void read(JmeImporter importer)
@@ -462,7 +463,7 @@ public class Item
      * Serialize this item, for example when saving to a J3O file.
      *
      * @param exporter (not null)
-     * @throws IOException
+     * @throws IOException from exporter
      */
     @Override
     public void write(JmeExporter exporter)

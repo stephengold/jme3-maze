@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -271,8 +271,8 @@ public class MazeLevel {
     /**
      * Access the vertex in the specified row and column.
      *
-     * @param row
-     * @param column
+     * @param row which row of the grid
+     * @param column which column of the grid
      * @return pre-existing member (or null if invalid index)
      */
     public NavVertex getVertex(int row, int column) {
