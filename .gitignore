@@ -4,6 +4,7 @@
 /assets/Models/items/mummy/mummy.j3o
 /assets/Models/items/torch/torch.j3o
 /build/
+/bulletjme.dll
 /dist/
 /lwjgl.dll
 /lwjgl64.dll
