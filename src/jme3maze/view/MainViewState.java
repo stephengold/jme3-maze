@@ -67,7 +67,7 @@ import jme3utilities.navigation.NavVertex;
  * <p>
  * Enabled at creation.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class MainViewState
         extends GameAppState {
@@ -131,7 +131,7 @@ public class MainViewState
     /**
      * map free items to their spatials
      */
-    private Map<Item, Spatial> itemSpatial = new TreeMap<>();
+    final private Map<Item, Spatial> itemSpatial = new TreeMap<>();
     /**
      * shared material for ceiling geometries
      */
