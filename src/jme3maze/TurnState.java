@@ -30,7 +30,6 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.FastMath;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3utilities.Validate;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
@@ -41,7 +40,7 @@ import jme3utilities.navigation.NavVertex;
  * <p>
  * Disabled at creation.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class TurnState
         extends GameAppState {
