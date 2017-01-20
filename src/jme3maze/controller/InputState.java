@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2015, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -494,14 +494,15 @@ public class InputState
      * Activate the turn state for a specified direction.
      *
      * @param newDirection direction the player will turn relative to current
-     * direction (not null, length=1)
+     * direction (not null, length&gt;0)
      */
     private void goTurn(VectorXZ newDirection) {
         assert newDirection != null;
-        assert newDirection.isUnitVector() : newDirection;
+        assert !newDirection.isZeroLength();
 
         setEnabled(false);
-        turnState.activate(newDirection);
+        VectorXZ norm = newDirection.normalize();
+        turnState.activate(norm);
     }
 
     /**

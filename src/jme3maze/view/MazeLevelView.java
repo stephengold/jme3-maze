@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -395,27 +395,29 @@ class MazeLevelView {
      * @param parentNode where in the scene graph to attach geometries (not
      * null)
      * @param fromVertex (not null)
-     * @param direction (length=1)
+     * @param direction (not null, length&gt;0)
      */
     private void visualizeCorridor(Node parentNode, NavVertex fromVertex,
             VectorXZ direction) {
         assert parentNode != null;
         assert direction != null;
-        assert direction.isUnitVector() : direction;
+        assert !direction.isZeroLength();
 
-        NavArc arc = fromVertex.findLeastTurn(direction);
+        VectorXZ norm = direction.normalize();
+
+        NavArc arc = fromVertex.findLeastTurn(norm);
         if (arc == null) {
-            addClosure(parentNode, fromVertex, direction);
+            addClosure(parentNode, fromVertex, norm);
         } else {
             VectorXZ startDirection = arc.getHorizontalDirection();
-            float dot = startDirection.dot(direction);
+            float dot = startDirection.dot(norm);
             if (dot > 0.5f) {
                 /*
                  * found an arc whose start direction is within 60 degrees
                  */
                 addOpening(parentNode, arc);
             } else {
-                addClosure(parentNode, fromVertex, direction);
+                addClosure(parentNode, fromVertex, norm);
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -79,18 +79,15 @@ public class TurnState
      * Enable this state with the specified final direction.
      *
      * @param finalDirection player's direction when the turn is complete
-     * (length=1)
+     * (length&gt;0)
      */
     public void activate(VectorXZ finalDirection) {
-        Validate.nonNull(finalDirection, "direction");
-        if (!finalDirection.isUnitVector()) {
-            logger.log(Level.SEVERE, "direction={0}", finalDirection);
-            throw new IllegalArgumentException(
-                    "direction should have length=1");
-        }
+        VectorXZ.validateNonZero(finalDirection, "direction");
+
         logger.log(Level.INFO, "finalDirection={0}", finalDirection);
 
-        this.finalDirection = finalDirection;
+        VectorXZ norm = finalDirection.normalize();
+        this.finalDirection = norm;
         setEnabled(true);
     }
     // *************************************************************************

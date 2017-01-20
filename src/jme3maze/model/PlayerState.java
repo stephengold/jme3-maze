@@ -29,7 +29,6 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.items.Item;
@@ -154,8 +153,7 @@ public class PlayerState
     /**
      * Find a particular class of item in this player's inventory.
      *
-     * @param <T>
-     * @param itemClass item class to search for
+     * @param <T> class to find
      * @return item found, otherwise null
      */
     public <T extends Item> T findItem(Class<T> itemClass) {
@@ -190,8 +188,10 @@ public class PlayerState
      */
     public VectorXZ getDirection() {
         assert direction != null;
-        assert direction.isUnitVector() : direction;
-        return direction;
+        assert !direction.isZeroLength();
+
+        VectorXZ norm = direction.normalize();
+        return norm;
     }
 
     /**
@@ -331,17 +331,13 @@ public class PlayerState
     /**
      * Rotate this player around the +Y axis.
      *
-     * @param rotation new direction for the current X-axis (length=1)
+     * @param rotation new direction for the current X-axis (length&gt;0)
      */
     public void rotate(VectorXZ rotation) {
-        Validate.nonNull(rotation, "rotation");
-        if (!rotation.isUnitVector()) {
-            logger.log(Level.SEVERE, "rotation={0}", rotation);
-            throw new IllegalArgumentException(
-                    "rotation should have length=1");
-        }
+        VectorXZ.validateNonZero(rotation, "rotation");
 
         VectorXZ newDirection = direction.rotate(rotation);
+        newDirection = newDirection.normalize();
         setDirection(newDirection);
     }
 
