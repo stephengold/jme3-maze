@@ -45,7 +45,7 @@ import jme3utilities.navigation.NavVertex;
 /**
  * Immutable visualizer for maze levels in the main view.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 class MazeLevelView {
     // *************************************************************************

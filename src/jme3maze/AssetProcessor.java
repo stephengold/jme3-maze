@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ import jme3utilities.debug.Printer;
 /**
  * A headless simple application to convert Blender assets to J3O files.
  *
- * @author Stephen Gold <sgold@sonic.net>
+ * @author Stephen Gold sgold@sonic.net
  */
 public class AssetProcessor
         extends SimpleApplication {
