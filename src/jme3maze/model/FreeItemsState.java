@@ -41,7 +41,7 @@ import jme3maze.items.Item;
 import jme3maze.items.Mummy;
 import jme3maze.items.Torch;
 import jme3utilities.Validate;
-import jme3utilities.math.Noise;
+import jme3utilities.math.noise.Noise;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
