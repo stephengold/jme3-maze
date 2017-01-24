@@ -130,6 +130,9 @@ public class TurnState
         VectorXZ conjugate = direction.mirrorZ();
         VectorXZ rotation = finalDirection.rotate(conjugate);
         float maxTurnAngle = elapsedTime * playerState.getMaxTurnRate();
+        if (maxTurnAngle > FastMath.PI) {
+            maxTurnAngle = FastMath.PI;
+        }
         VectorXZ limitedRotation = rotation.clampDirection(maxTurnAngle);
         playerState.rotate(limitedRotation);
     }
