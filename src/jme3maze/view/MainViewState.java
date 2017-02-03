@@ -445,7 +445,7 @@ public class MainViewState
          * Add a control for the forward-looking main camera, five world units
          * behind the avatar.
          */
-        Vector3f localOffset = new Vector3f(0f, eyeHeight, -5f);
+        Vector3f localOffset = new Vector3f(-5f, eyeHeight, 0f);
         Camera slotCamera = slot.getCamera();
         forwardView = new CameraControl(slotCamera, localOffset,
                 forwardDirection, WorldState.upDirection);

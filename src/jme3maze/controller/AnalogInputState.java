@@ -300,7 +300,7 @@ public class AnalogInputState
      */
     private void updateMainCamera() {
         float altitude = tiltUp; // radians
-        float azimuth = FastMath.HALF_PI - panLeft; // radians
+        float azimuth = -panLeft; // radians
         Vector3f direction = MyVector3f.fromAltAz(altitude, azimuth);
         mainViewState.setLookDirection(direction);
 

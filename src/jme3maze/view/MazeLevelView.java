@@ -180,7 +180,8 @@ class MazeLevelView {
 
         Vector3f vertexLocation = vertex.copyLocation();
         float halfWidth = corridorWidth / 2f;
-        Quaternion orientation = direction.toQuaternion();
+        Quaternion orientation =
+                direction.rotate(-FastMath.HALF_PI).toQuaternion();
 
         Vector3f lowerLeftCorner = new Vector3f(halfWidth, 0f, halfWidth);
         lowerLeftCorner = orientation.mult(lowerLeftCorner);
@@ -235,7 +236,8 @@ class MazeLevelView {
         assert parentNode != null;
 
         VectorXZ horizontalDirection = arc.horizontalOffset().normalize();
-        Quaternion orientation = horizontalDirection.toQuaternion();
+        Quaternion orientation =
+                horizontalDirection.rotate(-FastMath.HALF_PI).toQuaternion();
         Vector3f vertexLocation = arc.getFromVertex().copyLocation();
         /*
          * Add horizontal tiles for ceilings and floors.

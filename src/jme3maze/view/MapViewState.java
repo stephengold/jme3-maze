@@ -113,7 +113,7 @@ public class MapViewState
     /**
      * local "forward" direction (length=1)
      */
-    final private static Vector3f forwardDirection = Vector3f.UNIT_Z;
+    final private static Vector3f forwardDirection = Vector3f.UNIT_X;
     // *************************************************************************
     // fields
     /**
@@ -334,12 +334,12 @@ public class MapViewState
         Geometry geometry = new Geometry("icon", unitSquare);
         node.attachChild(geometry);
         Quaternion rotation = new Quaternion();
-        rotation.lookAt(Vector3f.UNIT_Y, Vector3f.UNIT_Z);
+        rotation.lookAt(Vector3f.UNIT_Y, Vector3f.UNIT_X);
         geometry.setLocalRotation(rotation);
         geometry.setLocalScale(iconDiameter);
         float y = matchEye ? 5f : 6f;
         float iconRadius = iconDiameter / 2f;
-        geometry.setLocalTranslation(iconRadius, y, -iconRadius);
+        geometry.setLocalTranslation(-iconRadius, y, -iconRadius);
         geometry.setMaterial(material);
         geometry.setQueueBucket(Bucket.Transparent);
 
