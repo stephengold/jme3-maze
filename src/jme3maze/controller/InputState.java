@@ -418,7 +418,7 @@ public class InputState extends GameAppState {
                 } else if (nextArc == advanceArc) {
                     goMove(advanceArc);
                 } else {
-                    direction = nextArc.horizontalOffset().normalize();
+                    direction = nextArc.horizontalOffset();
                     goTurn(direction);
                 }
         }

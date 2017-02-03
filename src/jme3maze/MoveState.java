@@ -155,7 +155,6 @@ public class MoveState extends GameAppState {
             VectorXZ direction = playerState.getDirection();
             NavArc nextArc = destinationVertex.findOutgoing(direction, -2.0);
             VectorXZ horizontalDirection = nextArc.horizontalOffset();
-            horizontalDirection = horizontalDirection.normalize();
             turnState.activate(horizontalDirection);
 
         } else {

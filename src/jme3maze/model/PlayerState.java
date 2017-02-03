@@ -51,10 +51,6 @@ public class PlayerState extends GameAppState {
     // constants
 
     /**
-     * tolerance for comparing horizontal direction vectors
-     */
-    final private static float epsilon = 1e-4f;
-    /**
      * message logger for this class
      */
     final private static Logger logger = Logger.getLogger(
@@ -369,7 +365,7 @@ public class PlayerState extends GameAppState {
         NavVertex fromVertex = arc.getFromVertex();
         setVertex(fromVertex);
 
-        VectorXZ horizontalDirection = arc.horizontalOffset().normalize();
+        VectorXZ horizontalDirection = arc.horizontalOffset();
         setDirection(horizontalDirection);
         /*
          * Update the map (if enabled and readable).
