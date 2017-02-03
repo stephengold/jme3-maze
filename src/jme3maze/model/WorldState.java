@@ -27,8 +27,10 @@ package jme3maze.model;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +39,11 @@ import java.util.Random;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3utilities.Validate;
+import jme3utilities.math.Locus3f;
+import jme3utilities.math.VectorXZ;
 import jme3utilities.math.noise.Noise;
+import jme3utilities.math.polygon.SimplePolygon3f;
+import jme3utilities.math.spline.LinearSpline3f;
 import jme3utilities.math.spline.Spline3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
@@ -343,6 +349,56 @@ public class WorldState
     // private methods
 
     /**
+     * Add a short arc to the graph and create a travel path for it.
+     *
+     * @param from originating vertex (not null, unaffected)
+     * @param to terminating vertex (not null, unaffected)
+     * @param fromGrid true if the originating vertex is on the grid, false if
+     * the terminating vertex is on the grid
+     * @return
+     */
+    private NavArc addShortArc(NavVertex from, NavVertex to, boolean fromGrid) {
+        assert graph.contains(from) : from;
+        assert graph.contains(to) : to;
+
+        NavArc result = graph.addArc(from, to, 1f);
+
+        Vector3f offset = result.offset();
+        Vector3f[] joints;
+        if (FastMath.abs(offset.y) < 0.1f) {
+            /*
+             * horizontal corridor arc: no joint
+             */
+            joints = new Vector3f[2];
+            joints[0] = from.copyLocation();
+            joints[1] = to.copyLocation();
+        } else {
+            /*
+             * ramp arc: has a joint half a width from the grid vertex
+             */
+            joints = new Vector3f[3];
+            joints[0] = from.copyLocation();
+            joints[2] = to.copyLocation();
+
+            VectorXZ jointHorizontalOffset = new VectorXZ(offset);
+            VectorXZ direction = jointHorizontalOffset.cardinalize();
+            Vector3f jointOffset = direction.toVector3f();
+            if (fromGrid) {
+                jointOffset.multLocal(corridorWidth / 2f);
+                joints[1] = from.copyLocation();
+            } else {
+                jointOffset.multLocal(-corridorWidth / 2f);
+                joints[1] = to.copyLocation();
+            }
+            joints[1].addLocal(jointOffset);
+        }
+        Spline3f travelPath = new LinearSpline3f(joints);
+        travelPaths.put(result, travelPath);
+
+        return result;
+    }
+
+    /**
      * Initialize the pseudo-random maze.
      */
     private void initializeMaze() {
@@ -368,7 +424,7 @@ public class WorldState
                 startArc = (NavArc) Noise.pick(gridArcs, generator);
                 entryEndVertex = startArc.getFromVertex();
             } else {
-                entryEndVertex = level.findVertex(entryEndLocation);
+                entryEndVertex = level.findGridVertex(entryEndLocation);
             }
             /*
              * Put the level's exit as far as possible from its entrance.
@@ -385,6 +441,73 @@ public class WorldState
             Vector3f offset = arcDirection.mult(vertexSpacing);
             entryEndLocation = entryStartLocation.subtract(offset);
             entryEndLocation.y -= levelSpacing;
+        }
+        /*
+         * Split each pair of grid arcs by inserting a new (non-grid) vertex.
+         */
+        NavArc[] allArcs = graph.copyArcs();
+        BitSet doneFlags = new BitSet(allArcs.length);
+        for (int i = 0; i < allArcs.length; i++) {
+            if (doneFlags.get(i)) {
+                continue;
+            }
+            doneFlags.set(i);
+
+            NavArc arc = allArcs[i];
+            NavVertex v1 = arc.getFromVertex();
+            NavVertex v2 = arc.getToVertex();
+            assert v1 != v2;
+
+            NavArc reverse = null;
+            for (int j = 0; j < allArcs.length; j++) {
+                NavArc b = allArcs[j];
+                if (b.isReverse(arc)) {
+                    reverse = b;
+                    doneFlags.set(j);
+                    break;
+                }
+            }
+            assert reverse != null;
+
+            boolean success = graph.remove(v1, v2);
+            assert success;
+            success = graph.remove(v2, v1);
+            assert success;
+
+            String name1 = v1.getName();
+            String name2 = v2.getName();
+            String midName = String.format("mid.%s.%s", name1, name2);
+
+            SimplePolygon3f poly1 = (SimplePolygon3f) v1.getLocus();
+            Vector3f location1 = poly1.centroid();
+            SimplePolygon3f poly2 = (SimplePolygon3f) v2.getLocus();
+            Vector3f location2 = poly2.centroid();
+
+            int corner1 = poly1.findSide(location2, null);
+            int next1 = poly1.nextIndex(corner1);
+            int corner2 = poly2.findSide(location1, null);
+            int next2 = poly2.nextIndex(corner2);
+
+            Vector3f[] midCorners = new Vector3f[4];
+            midCorners[0] = poly1.copyCornerLocation(corner1);
+            midCorners[1] = poly1.copyCornerLocation(next1);
+            midCorners[2] = poly2.copyCornerLocation(corner2);
+            midCorners[3] = poly2.copyCornerLocation(next2);
+            Locus3f midLocus = new SimplePolygon3f(midCorners, 0.1f);
+
+            NavVertex mid = graph.addVertex(midName, midLocus);
+
+            NavArc newArc = addShortArc(v1, mid, true);
+            if (startArc == arc) {
+                startArc = newArc;
+            }
+            addShortArc(mid, v1, false);
+
+            newArc = addShortArc(v2, mid, true);
+            if (startArc == reverse) {
+                startArc = newArc;
+            }
+            addShortArc(mid, v2, false);
         }
     }
 }

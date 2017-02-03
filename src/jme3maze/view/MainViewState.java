@@ -44,6 +44,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.texture.Texture;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -386,22 +387,41 @@ public class MainViewState
                     MyAsset.createUnshadedMaterial(assetManager, wallTexture);
         }
         /*
-         * Generate a 3-D representation of each maze level.
+         * Visualize each level of the maze.
          */
         Node mazeNode = new Node("main maze");
         root.attachChild(mazeNode);
 
         float corridorWidth = WorldState.getCorridorWidth();
         MazeLevelView mazeLevelView = new MazeLevelView(corridorWidth,
-                wallHeight, ceilingMaterial, floorMaterial, wallMaterial);
+                wallHeight, ceilingMaterial, 30f,
+                floorMaterial, 5f, wallMaterial, 10f);
 
+        NavGraph graph = worldState.getGraph();
+        List<NavVertex> notDone = graph.listVertices();
         int numLevels = worldState.getNumLevels();
         for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
             MazeLevel level = worldState.getLevel(levelIndex);
-            addMazeLevel(level, mazeLevelView, mazeNode);
+            mazeLevelView.addLevel(level, mazeNode, graph, notDone);
         }
         /*
-         * Add free items.
+         * Visualize ramps between levels.
+         */
+        assert notDone.size() == numLevels - 1 : notDone;
+        for (NavVertex vertex : notDone) {
+            mazeLevelView.addNonGridVertex(mazeNode, vertex);
+        }
+
+        if (debugFlag) {
+            /*
+             * As a debugging aid, add navigation arcs using sticks.
+             */
+            Material debugMaterial = MyAsset.createUnshadedMaterial(
+                    assetManager, ColorRGBA.White);
+            NavDebug.addSticks(graph, mazeNode, 0.5f, debugMaterial);
+        }
+        /*
+         * Visualize free items.
          */
         for (Item item : freeItemsState.getAll()) {
             addFreeItem(item);
@@ -472,30 +492,6 @@ public class MainViewState
             plsr.setLight(torch);
             plsr.setShadowIntensity(1f);
             viewPort.addProcessor(plsr);
-        }
-    }
-
-    /**
-     * Add 3-D representation of a maze level to the scene.
-     *
-     * @param level level to represent (not null)
-     * @param mazeNode where in the scene graph to add (not null)
-     */
-    private void addMazeLevel(MazeLevel level, MazeLevelView mazeView,
-            Node mazeNode) {
-        assert level != null;
-        assert mazeNode != null;
-
-        mazeView.visualize(level, mazeNode);
-
-        if (debugFlag) {
-            /*
-             * As a debugging aid, visualize the navigation arcs using sticks.
-             */
-            NavGraph graph = worldState.getGraph();
-            Material debugMaterial = MyAsset.createUnshadedMaterial(
-                    assetManager, ColorRGBA.White);
-            NavDebug.addSticks(graph, mazeNode, 0.5f, debugMaterial);
         }
     }
 }

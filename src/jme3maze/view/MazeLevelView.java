@@ -26,20 +26,22 @@
 package jme3maze.view;
 
 import com.jme3.material.Material;
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Quad;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Logger;
 import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
+import jme3utilities.math.MyVector3f;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
+import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
@@ -67,7 +69,22 @@ class MazeLevelView {
      */
     final private float corridorWidth;
     /**
-     * height of walls (in world units, &gt;0): set by constructor
+     * ideal length and width for a ceiling quad (in world units, &gt;0, set by
+     * constructor)
+     */
+    final private float idealSizeCeiling;
+    /**
+     * ideal length and width for a floor quad (in world units, &gt;0, set by
+     * constructor)
+     */
+    final private float idealSizeFloor;
+    /**
+     * ideal length and width for a wall quad (in world units, &gt;0, set by
+     * constructor)
+     */
+    final private float idealSizeWall;
+    /**
+     * height of walls (in world units, &gt;0, set by constructor)
      */
     final private float wallHeight;
     /**
@@ -89,364 +106,483 @@ class MazeLevelView {
      * Instantiate a visualizer with the specified parameters.
      *
      * @param corridorWidth width of corridors (in world units, &gt;0)
+     * @param idealSize ideal width and height of a quad (in world units, &gt;0)
      * @param wallHeight height of walls (in world units, &gt;0)
      * @param ceilingMaterial material for ceiling (not null)
      * @param floorMaterial material for floor (not null)
      * @param wallMaterial material for walls (not null)
      */
     MazeLevelView(float corridorWidth, float wallHeight,
-            Material ceilingMaterial, Material floorMaterial,
-            Material wallMaterial) {
-        Validate.positive(corridorWidth, "width");
-        Validate.positive(wallHeight, "height");
-        Validate.nonNull(ceilingMaterial, "ceiling material");
-        Validate.nonNull(floorMaterial, "floor material");
-        Validate.nonNull(wallMaterial, "wall material");
+            Material ceilingMaterial, float idealSizeCeiling,
+            Material floorMaterial, float idealSizeFloor,
+            Material wallMaterial, float idealSizeWall) {
+        assert corridorWidth > 0f : corridorWidth;
+        assert corridorWidth < WorldState.getVertexSpacing();
+        assert wallHeight > 0f : wallHeight;
+        assert wallHeight < WorldState.getLevelSpacing();
+        assert ceilingMaterial != null;
+        assert idealSizeCeiling > 0f : idealSizeCeiling;
+        assert floorMaterial != null;
+        assert idealSizeFloor > 0f : idealSizeFloor;
+        assert wallMaterial != null;
+        assert idealSizeWall > 0f : idealSizeWall;
 
         this.corridorWidth = corridorWidth;
         this.wallHeight = wallHeight;
+
         this.ceilingMaterial = ceilingMaterial;
+        this.idealSizeCeiling = idealSizeCeiling;
+
         this.floorMaterial = floorMaterial;
+        this.idealSizeFloor = idealSizeFloor;
+
         this.wallMaterial = wallMaterial;
+        this.idealSizeWall = idealSizeWall;
     }
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Visualize the specified maze level under the specified scene node.
+     * Visualize the specified maze level under a specified scene node.
      *
      * @param level maze level to visualize (not null)
-     * @param parentNode where in the scene graph to attach geometries (not
-     * null)
+     * @param parent where in the scene to attach geometries (not null)
+     * @param notDone vertices not yet visualized (not null)
      */
-    public void visualize(MazeLevel level, Node parentNode) {
-        Validate.nonNull(parentNode, "node");
-
-        int gridRows = level.getRows();
-        int gridColumns = level.getColumns();
+    public void addLevel(MazeLevel level, Node parent, NavGraph graph,
+            Collection<NavVertex> notDone) {
+        Validate.nonNull(parent, "node");
+        Validate.nonNull(notDone, "not-done set");
+        /*
+         * grid vertices on this level
+         */
+        int gridRows = level.numGridRows();
+        int gridColumns = level.numGridColumns();
         for (int row = 0; row < gridRows; row++) {
             for (int column = 0; column < gridColumns; column++) {
-                visualizeVertex(level, parentNode, row, column);
+                NavVertex vertex = level.getGridVertex(row, column);
+                assert level.contains(vertex);
+                assert notDone.contains(vertex);
+                addGridVertex(parent, vertex);
+                notDone.remove(vertex);
             }
+        }
+        /*
+         * non-grid vertices on this level
+         */
+        Collection<NavVertex> mids = new ArrayList<>(notDone.size());
+        for (NavVertex vertex : notDone) {
+            if (level.contains(vertex)) {
+                mids.add(vertex);
+            }
+        }
+        for (NavVertex vertex : mids) {
+            addNonGridVertex(parent, vertex);
+            notDone.remove(vertex);
+        }
+    }
+
+    /**
+     * Visualize the specified non-grid vertex.
+     *
+     * @param parent where in the scene to attach geometries (not null)
+     * @param vertex non-grid vertex (not null, unaffected)
+     */
+    public void addNonGridVertex(Node parent, NavVertex vertex) {
+        assert parent != null;
+        assert vertex.numOutgoing() == 2;
+
+        Vector3f northeast = new Vector3f(1f, 0f, 1f);
+        NavArc neArc = vertex.findOutgoing(northeast, 0.01);
+        assert neArc != null;
+        Vector3f southwest = new Vector3f(-1f, 0f, -1f);
+        NavArc swArc = vertex.findOutgoing(southwest, 0.01);
+        assert swArc != null;
+        assert neArc != swArc;
+        NavVertex swVertex = swArc.getToVertex();
+        NavVertex neVertex = neArc.getToVertex();
+        assert neVertex != swVertex;
+
+        VectorXZ horizontalDirection = neArc.horizontalOffset().cardinalize();
+        float vertexSpacing = WorldState.getVertexSpacing();
+        assert vertexSpacing > corridorWidth : vertexSpacing;
+        Quaternion orientation = horizontalDirection.toQuaternion();
+
+        VectorXZ northExtent = new VectorXZ(
+                vertexSpacing - corridorWidth, corridorWidth);
+        VectorXZ extent = northExtent.rotate(horizontalDirection);
+        extent = extent.firstQuadrant();
+        /*
+         * Check for slope.
+         */
+        int neLevel = WorldState.levelIndex(neVertex);
+        assert neLevel >= 0 : neLevel;
+        int swLevel = WorldState.levelIndex(swVertex);
+        assert swLevel >= 0 : swLevel;
+        /* 
+         * The levelChange is +1 if north/east end is below south/west end.
+         * It is -1 if the north/east end is above the south/west end.
+         */
+        int levelChange = neLevel - swLevel;
+        float levelSpacing = WorldState.getLevelSpacing();
+        float yChange = levelChange * levelSpacing;
+        boolean nsFlag = horizontalDirection.getZ() == 0f;
+        /*
+         * Visualize ceiling and floor.
+         */
+        addCeilingQuad(parent, vertex, extent, nsFlag, yChange);
+        addFloorQuad(parent, vertex, extent, nsFlag, yChange);
+
+        if (neLevel == swLevel) {
+            /*
+             * Corridor uses one set of side walls.
+             */
+            addSideWalls(parent, vertex, orientation, 0f, wallHeight);
+
+        } else {
+            /*
+             * Ramp uses three sets of side walls: one for the lower level, 
+             * one for the upper level, and one for the gap between them.
+             */
+            float gapHeight = levelSpacing - wallHeight;
+            float halfSpacing = levelSpacing / 2;
+            addSideWalls(parent, vertex, orientation, halfSpacing, wallHeight);
+            addSideWalls(parent, vertex, orientation, 0f, gapHeight);
+            addSideWalls(parent, vertex, orientation, -halfSpacing, wallHeight);
         }
     }
     // *************************************************************************
     // private methods
 
     /**
-     * Add a horizontal square ceiling tile (quad).
+     * Add a ceiling for the specified vertex.
      *
-     * @param parentNode where in the scene graph to attach geometries (not
-     * null)
-     * @param location world coordinates of the floor below the tile's center
-     * (not null, unaffected)
-     * @param description name for the geometry (not null)
-     * @return new instance (parented)
+     * @param parent node in the scene graph to attach geometries (not null)
+     * @param vertex (not null, unaffected)
+     * @param extent dimensions of the tile (not null, both components &gt;0)
+     * @param nsFlag true if elongated north-south
+     * @param yChange depression of the north/east end relative to the
+     * south/west end (in world units)
      */
-    private Spatial addCeilingTile(Node parentNode, Vector3f location,
-            String description) {
-        assert description != null;
+    private void addCeilingQuad(Node parent, NavVertex vertex,
+            VectorXZ extent, boolean nsFlag, float yChange) {
+        assert parent != null;
+        assert vertex != null;
+        assert extent != null;
+        assert extent.getX() > 0f : extent;
+        assert extent.getZ() > 0f : extent;
 
-        Geometry geometry = new Geometry(description, unitSquare);
-        parentNode.attachChild(geometry);
-
-        geometry.setLocalScale(corridorWidth, corridorWidth, 1f);
-        geometry.setMaterial(ceilingMaterial);
-        float halfWidth = corridorWidth / 2f;
-        Vector3f cornerLocation =
-                location.add(-halfWidth, wallHeight, -halfWidth);
-        MySpatial.setWorldLocation(geometry, cornerLocation);
-
-        Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(FastMath.HALF_PI, Vector3f.UNIT_X);
-        MySpatial.setWorldOrientation(geometry, rotation);
-
-        return geometry;
+        Vector3f vertexLocation = vertex.copyLocation();
+        String vertexName = vertex.getName();
+        String description = "ceiling for " + vertexName;
+        /* 
+         * The quad's origin is in the southwest corner. 
+         * Its U-axis points north. Its V-axis points east.
+         */
+        Vector3f origin = vertexLocation.add(
+                -extent.getX() / 2, wallHeight, -extent.getZ() / 2);
+        Vector3f uOffset = new Vector3f(extent.getX(), 0f, 0f);
+        Vector3f vOffset = new Vector3f(0f, 0f, extent.getZ());
+        if (nsFlag) {
+            /* north-south */
+            origin.y += yChange / 2;
+            uOffset.y -= yChange;
+        } else {
+            /* east-west */
+            origin.y += yChange / 2;
+            vOffset.y -= yChange;
+        }
+        addRectangle(parent, description, ceilingMaterial, idealSizeCeiling,
+                origin, uOffset, vOffset);
     }
 
     /**
-     * Add a closure wall for the specified vertex and orientation.
+     * Add a closure wall for the specified grid vertex and direction.
      *
-     * @param parentNode where in the scene graph to attach geometries (not
-     * null)
-     * @param vertex (not null, unaffected)
-     * @param direction (positive length)
+     * @param parent node in the scene graph to attach geometries (not null)
+     * @param gridVertex (not null, unaffected)
+     * @param direction from the center of the vertex (not null, not zero,
+     * unaffected)
+     * @param dirDescription textual description of the direction (not null)
      */
-    private void addClosure(Node parentNode, NavVertex vertex,
-            VectorXZ direction) {
-        assert parentNode != null;
+    private void addClosure(Node parent, NavVertex gridVertex,
+            VectorXZ direction, String dirDescription) {
+        assert parent != null;
         assert direction != null;
         assert !direction.isZero() : direction;
 
-        Vector3f vertexLocation = vertex.copyLocation();
-        float halfWidth = corridorWidth / 2f;
-        Quaternion orientation =
-                direction.rotate(-FastMath.HALF_PI).toQuaternion();
+        Vector3f vertexLocation = gridVertex.copyLocation();
+        Quaternion orientation = direction.toQuaternion();
 
-        Vector3f lowerLeftCorner = new Vector3f(halfWidth, 0f, halfWidth);
+        float halfWidth = corridorWidth / 2;
+        Vector3f lowerLeftCorner = new Vector3f(halfWidth, 0f, -halfWidth);
         lowerLeftCorner = orientation.mult(lowerLeftCorner);
         lowerLeftCorner.addLocal(vertexLocation);
 
-        Vector3f lowerRightCorner = new Vector3f(-halfWidth, 0f, halfWidth);
+        Vector3f lowerRightCorner = new Vector3f(halfWidth, 0f, halfWidth);
         lowerRightCorner = orientation.mult(lowerRightCorner);
         lowerRightCorner.addLocal(vertexLocation);
 
-        String description = "closure wall";
-        addWallSegment(parentNode, lowerLeftCorner, lowerRightCorner,
-                description);
+        String description = String.format("%s closure wall for %s",
+                dirDescription, gridVertex.getName());
+        addWallSegment(parent, description, lowerLeftCorner, lowerRightCorner,
+                wallHeight);
     }
 
     /**
-     * Add a horizontal square floor tile (quad).
+     * Visualize the floor for the specified vertex.
      *
-     * @param parentNode where in the scene graph to attach geometries (not
-     * null)
-     * @param location world coordinates of tile's center (not null, unaffected)
-     * @param description name for the geometry (not null)
-     * @return new instance (parented)
+     * @param parent node in the scene graph to attach geometries (not null)
+     * @param vertex (not null, unaffected)
+     * @param extent dimensions of the tile (not null, both components &gt;0)
+     * @param nsFlag true if elongated north-south
+     * @param yChange depression of the north/east end relative to the
+     * south/west end (in world units)
      */
-    private Spatial addFloorTile(Node parentNode, Vector3f location,
-            String description) {
+    private void addFloorQuad(Node parent, NavVertex vertex,
+            VectorXZ extent, boolean nsFlag, float yChange) {
+        assert parent != null;
+        assert vertex != null;
+        assert extent != null;
+        assert extent.getX() > 0f : extent;
+        assert extent.getZ() > 0f : extent;
+
+        Vector3f vertexLocation = vertex.copyLocation();
+        String vertexName = vertex.getName();
+        String description = "floor for " + vertexName;
+        /* 
+         * The quad's origin is in the southeast corner. 
+         * Its U-axis points north. Its V-axis points west.
+         */
+        Vector3f origin = vertexLocation.add(
+                -extent.getX() / 2, 0f, extent.getZ() / 2);
+        Vector3f uOffset = new Vector3f(extent.getX(), 0f, 0f);
+        Vector3f vOffset = new Vector3f(0f, 0f, -extent.getZ());
+        if (nsFlag) {
+            /* north-south */
+            origin.y += yChange / 2;
+            uOffset.y -= yChange;
+        } else {
+            /* east-west */
+            origin.y -= yChange / 2;
+            vOffset.y += yChange;
+        }
+        addRectangle(parent, description, floorMaterial, idealSizeFloor,
+                origin, uOffset, vOffset);
+    }
+
+    /**
+     * Visualize ceiling, floor, and walls for the specified grid vertex.
+     *
+     * @param parent where in the scene graph to attach geometries (not null)
+     * @param gridVertex (not null, unaffected)
+     */
+    private void addGridVertex(Node parent, NavVertex gridVertex) {
+        assert parent != null;
+        /*
+         * Visualize the ceiling and floor.
+         */
+        VectorXZ extent = new VectorXZ(corridorWidth, corridorWidth);
+        boolean nsFlag = false;
+        float yChange = 0f;
+        addFloorQuad(parent, gridVertex, extent, nsFlag, yChange);
+        addCeilingQuad(parent, gridVertex, extent, nsFlag, yChange);
+        /*
+         * Visualize opening or closure in each of the four cardinal directions.
+         */
+        addGridWall(parent, gridVertex, VectorXZ.east, "east");
+        addGridWall(parent, gridVertex, VectorXZ.north, "north");
+        addGridWall(parent, gridVertex, VectorXZ.south, "south");
+        addGridWall(parent, gridVertex, VectorXZ.west, "west");
+    }
+
+    /**
+     * Visualize the closure walls for the specified grid vertex and direction.
+     *
+     * @param parent where in the scene graph to attach geometries (not null)
+     * @param gridVertex (not null, unaffected)
+     * @param direction (not null, not zero, unaffected)
+     * @param dirDescription (not null)
+     */
+    private void addGridWall(Node parent, NavVertex gridVertex,
+            VectorXZ direction, String dirDescription) {
+        assert parent != null;
+        assert direction != null;
+        assert !direction.isZero();
+        assert dirDescription != null;
+
+        double cosineTolerance = 0.75;
+        NavArc arc = gridVertex.findOutgoing(direction, cosineTolerance);
+        if (arc == null) {
+            addClosure(parent, gridVertex, direction, dirDescription);
+        }
+    }
+
+    /**
+     * Visualize a rectangle with the specified name and material.
+     *
+     * @param parent where in the scene graph to attach geometries (not null)
+     * @param description (not null)
+     * @param material (not null)
+     * @param idealSize (in world units, &gt;0)
+     * @param origin world location of the lower left corner (not null,
+     * unaffected)
+     * @param uOffset offset of lower right corner from origin (not null, not
+     * zero, unaffected)
+     * @param vOffset offset of upper left corner from origin (not null, not
+     * zero, unaffected, orthogonal to uOffset)
+     */
+    private void addRectangle(Node parent, String description,
+            Material material, float idealSize,
+            Vector3f origin, Vector3f uOffset, Vector3f vOffset) {
+        assert parent != null;
         assert description != null;
-
-        Geometry geometry = new Geometry(description, unitSquare);
-        parentNode.attachChild(geometry);
-
-        geometry.setLocalScale(corridorWidth, corridorWidth, 1f);
-        geometry.setMaterial(floorMaterial);
-        float halfSpacing = corridorWidth / 2f;
-        Vector3f cornerLocation = location.add(-halfSpacing, 0f, halfSpacing);
-        MySpatial.setWorldLocation(geometry, cornerLocation);
-
-        Quaternion rotation = new Quaternion();
-        rotation.fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_X);
-        MySpatial.setWorldOrientation(geometry, rotation);
-
-        return geometry;
-    }
-
-    /**
-     * Add corridor ceiling, floor, and walls for the specified arc.
-     *
-     * @param parentNode where in the scene graph to attach geometries (not
-     * null)
-     * @param arc (not null, unaffected)
-     */
-    private void addOpening(Node parentNode, NavArc arc) {
-        assert parentNode != null;
-
-        VectorXZ horizontalDirection = arc.horizontalOffset().normalize();
-        Quaternion orientation =
-                horizontalDirection.rotate(-FastMath.HALF_PI).toQuaternion();
-        Vector3f vertexLocation = arc.getFromVertex().copyLocation();
+        assert material != null;
+        assert idealSize > 0f : idealSize;
+        assert origin != null;
+        assert uOffset != null;
+        assert !MyVector3f.isZero(uOffset);
+        assert vOffset != null;
+        assert !MyVector3f.isZero(vOffset);
         /*
-         * Add horizontal tiles for ceilings and floors.
+         * Calculate the dimentions of the rectangle, in world units.
          */
-        float vertexSpacing = WorldState.getVertexSpacing();
-        assert corridorWidth * 3f == vertexSpacing : vertexSpacing;
-        VectorXZ horizontalOffset = horizontalDirection.mult(corridorWidth);
-        Vector3f location = vertexLocation.add(horizontalOffset.toVector3f());
-        Spatial ceilingTile =
-                addCeilingTile(parentNode, location, "corridor ceiling");
-        Spatial floorTile =
-                addFloorTile(parentNode, location, "corridor floor");
+        float uLength = uOffset.length();
+        float vLength = vOffset.length();
         /*
-         * Add basic side walls.
+         * Calculate the world direction of the axes and normal.
          */
-        addSideWalls(parentNode, vertexLocation, orientation);
+        Vector3f uDirection = uOffset.divide(uLength);
+        Vector3f vDirection = vOffset.divide(vLength);
+        Vector3f normal = uDirection.cross(vDirection);
+        float normalLength = normal.lengthSquared();
+        assert normalLength > 0.9998f && normalLength < 1.0002f : normal;
         /*
-         * Check for rampage.
+         * Calculate the world orientation of rectangle.
          */
-        int levelChange = WorldState.levelChange(arc);
-        if (levelChange != 0) {
-            assert levelChange == 1 || levelChange == -1 : levelChange;
-            /*
-             * Ramps require extra side walls.
-             */
-            float levelSpacing = WorldState.getLevelSpacing();
-            Vector3f verticalOffset =
-                    new Vector3f(0f, -levelChange * levelSpacing / 2f, 0f);
-            vertexLocation.addLocal(verticalOffset);
-            addSideWalls(parentNode, vertexLocation, orientation);
-            /*
-             * Ramps require skewing both the ceiling and the floor.
-             */
-            float tan = levelSpacing / (vertexSpacing - corridorWidth);
-            double tangent = (double) tan;
-            float sec = (float) Math.sqrt(1.0 + tangent * tangent);
-            float rotationAngle = FastMath.atan(tan) * levelChange;
-            Vector3f rotationAxis;
-            Quaternion rotation = new Quaternion();
-            float dx = horizontalDirection.getX();
-            float dz = horizontalDirection.getZ();
-            if (FastMath.abs(dx) > FastMath.abs(dz)) {
-                if (dx < 0f) {
-                    MySpatial.moveWorld(ceilingTile, verticalOffset);
-                    MySpatial.moveWorld(floorTile, verticalOffset);
+        Quaternion orientation = new Quaternion();
+        orientation.fromAxes(uDirection, vDirection, normal);
+        /*
+         * Split the rectangle into individual quads as close in size 
+         * to 10 wu by 10 wu as possible.
+         */
+        int numU = 1;
+        if (uLength > idealSize) {
+            numU = Math.round(uLength / idealSize);
+        }
+        int numV = 1;
+        if (vLength > idealSize) {
+            numV = Math.round(vLength / idealSize);
+        }
+        Vector3f location = new Vector3f(0f, 0f, 0f);
+        Vector3f scale = new Vector3f(uLength / numU, vLength / numV, 1f);
+
+        for (int uIndex = 0; uIndex < numU; uIndex++) {
+            float uFraction = ((float) uIndex) / numU;
+            Vector3f u = uOffset.mult(uFraction);
+            for (int vIndex = 0; vIndex < numV; vIndex++) {
+                float vFraction = ((float) vIndex) / numV;
+                Vector3f v = vOffset.mult(vFraction);
+
+                String name = description;
+                if (numU > 1 || numV > 1) {
+                    name = String.format("quad(%d,%d) of %s",
+                            uIndex, vIndex, description);
                 }
-                ceilingTile.scale(sec, 1f, 1f);
-                floorTile.scale(sec, 1f, 1f);
+                Geometry geometry = new Geometry(name, unitSquare);
+                parent.attachChild(geometry);
+                geometry.setMaterial(material);
 
-                float sign = Math.signum(dx);
-                rotationAxis = new Vector3f(0f, -sign, 0f);
-                rotation.fromAngleNormalAxis(rotationAngle, rotationAxis);
-                ceilingTile.rotate(rotation);
-                rotation.fromAngleNormalAxis(-rotationAngle, rotationAxis);
-                floorTile.rotate(rotation);
-
-            } else {
-                if (dz > 0f) {
-                    MySpatial.moveWorld(floorTile, verticalOffset);
-                } else {
-                    MySpatial.moveWorld(ceilingTile, verticalOffset);
-                }
-                ceilingTile.scale(1f, sec, 1f);
-                floorTile.scale(1f, sec, 1f);
-
-                float sign = Math.signum(dz);
-                rotationAxis = new Vector3f(sign, 0f, 0f);
-                rotation.fromAngleNormalAxis(rotationAngle, rotationAxis);
-                ceilingTile.rotate(rotation);
-                floorTile.rotate(rotation);
+                location.set(origin);
+                location.addLocal(u);
+                location.addLocal(v);
+                MySpatial.setWorldLocation(geometry, location);
+                MySpatial.setWorldOrientation(geometry, orientation);
+                geometry.setLocalScale(scale);
             }
         }
     }
 
     /**
-     * Add a wall segment on each side of a corridor.
+     * Visualize wall segments on both sides of a corridor.
      *
-     * @param parentNode where in the scene to attach geometries (not null)
-     * @param vertexLocation world location of start vertex of the corridor (not
-     * null, unaffected)
+     * @param parent where in the scene graph to attach geometries (not null)
+     * @param vertex (not null, unaffected)
      * @param orientation orientation of the corridor (not null, unaffected)
+     * @param yOffset vertical offset of bottom edges above the vertex location
+     * (in world units)
+     * @param height height of the walls (in world units, &gt;0)
      */
-    private void addSideWalls(Node parentNode, Vector3f vertexLocation,
-            Quaternion orientation) {
-        assert vertexLocation != null;
+    private void addSideWalls(Node parent, NavVertex vertex,
+            Quaternion orientation, float yOffset, float height) {
+        assert parent != null;
+        assert orientation != null;
+        assert height > 0f : height;
 
+        Vector3f location = vertex.copyLocation();
+        location.y += yOffset;
         float vertexSpacing = WorldState.getVertexSpacing();
-        float halfSpacing = vertexSpacing / 2f;
         float halfWidth = corridorWidth / 2f;
+        float halfLength = (vertexSpacing - corridorWidth) / 2f;
         /*
-         * near corner of left wall
+         * backward corner of left wall
          */
-        Vector3f nearLeftCorner = new Vector3f(halfWidth, 0f, halfWidth);
-        nearLeftCorner = orientation.mult(nearLeftCorner);
-        nearLeftCorner.addLocal(vertexLocation);
+        Vector3f backLeft = new Vector3f(-halfLength, 0f, -halfWidth);
+        backLeft = orientation.mult(backLeft);
+        backLeft.addLocal(location);
         /*
-         * far corner of left wall
+         * forward corner of left wall
          */
-        Vector3f farLeftCorner = new Vector3f(halfWidth, 0f, halfSpacing);
-        farLeftCorner = orientation.mult(farLeftCorner);
-        farLeftCorner.addLocal(vertexLocation);
-        /*
-         * far corner of right wall
-         */
-        Vector3f farRightCorner = new Vector3f(-halfWidth, 0f, halfSpacing);
-        farRightCorner = orientation.mult(farRightCorner);
-        farRightCorner.addLocal(vertexLocation);
-        /*
-         * near corner of right wall
-         */
-        Vector3f nearRightCorner = new Vector3f(-halfWidth, 0f, halfWidth);
-        nearRightCorner = orientation.mult(nearRightCorner);
-        nearRightCorner.addLocal(vertexLocation);
+        Vector3f forwardLeft = new Vector3f(halfLength, 0f, -halfWidth);
+        forwardLeft = orientation.mult(forwardLeft);
+        forwardLeft.addLocal(location);
 
-        String description = "left wall";
-        addWallSegment(parentNode, nearLeftCorner, farLeftCorner, description);
-        description = "right wall";
-        addWallSegment(parentNode, farRightCorner, nearRightCorner,
-                description);
+        String description = "left wall of " + vertex.getName();
+        addWallSegment(parent, description, backLeft, forwardLeft, height);
+        /*
+         * forward corner of right wall
+         */
+        Vector3f forwardRight = new Vector3f(halfLength, 0f, halfWidth);
+        forwardRight = orientation.mult(forwardRight);
+        forwardRight.addLocal(location);
+        /*
+         * backward corner of right wall
+         */
+        Vector3f backRight = new Vector3f(-halfLength, 0f, halfWidth);
+        backRight = orientation.mult(backRight);
+        backRight.addLocal(location);
+
+        description = "right wall of " + vertex.getName();
+        addWallSegment(parent, description, forwardRight, backRight, height);
     }
 
     /**
-     * Add a single wall segment (quad).
+     * Visualize a wall segment.
      *
-     * @param parentNode where in the scene to attach geometries (not null)
-     * @param lowerLeftCorner world coordinates of lower left corner (not null,
+     * @param parent where in the scene to attach geometries (not null)
+     * @param description textual description of the rectangle (not null)
+     * @param lowerLeft world coordinates of lower left corner (not null,
      * unaffected)
-     * @param lowerRightCorner world coordinates of lower right corner (not
-     * null, unaffected)
-     * @param description name for the geometry (not null)
+     * @param lowerRight world coordinates of lower right corner (not null,
+     * unaffected)
+     * @param height height of the wall (in world units, &gt;0)
      */
-    private void addWallSegment(Node parentNode, Vector3f lowerLeftCorner,
-            Vector3f lowerRightCorner, String description) {
-        assert lowerLeftCorner != null;
-        assert lowerRightCorner != null;
-        assert lowerLeftCorner.y == lowerRightCorner.y : lowerLeftCorner.y;
+    private void addWallSegment(Node parent, String description,
+            Vector3f lowerLeft, Vector3f lowerRight, float height) {
+        assert parent != null;
         assert description != null;
-
-        Geometry geometry = new Geometry(description, unitSquare);
-        parentNode.attachChild(geometry);
-        Vector3f baseOffset = lowerRightCorner.subtract(lowerLeftCorner);
-        float width = baseOffset.length();
-        Vector3f scale = new Vector3f(width, wallHeight, 1f);
-        geometry.setLocalScale(scale);
-        geometry.setMaterial(wallMaterial);
-        MySpatial.setWorldLocation(geometry, lowerLeftCorner);
-
-        Vector3f direction = baseOffset.cross(WorldState.upDirection);
-        Quaternion orientation = WorldState.toOrientation(direction);
-        MySpatial.setWorldOrientation(geometry, orientation);
-    }
-
-    /**
-     * Visualize ramp/corridor ceiling, floor, and walls for the specified
-     * vertex and direction.
-     *
-     * @param parentNode where in the scene graph to attach geometries (not
-     * null)
-     * @param fromVertex (not null)
-     * @param direction (not null, length&gt;0)
-     */
-    private void visualizeCorridor(Node parentNode, NavVertex fromVertex,
-            VectorXZ direction) {
-        assert parentNode != null;
-        assert direction != null;
-        assert !direction.isZero();
-
-        VectorXZ norm = direction.normalize();
-
-        double cosineTolerance = 0.75;
-        NavArc arc = fromVertex.findOutgoing(direction, cosineTolerance);
-        if (arc == null) {
-            addClosure(parentNode, fromVertex, norm);
-        } else {
-            /*
-             * found an arc whose start direction is within 60 degrees
-             */
-            addOpening(parentNode, arc);
-        }
-    }
-
-    /**
-     * Visualize ceiling, floor, and walls for the specified vertex.
-     *
-     * @param level maze level to visualize (not null, unaffected)
-     * @param parentNode where in the scene graph to attach geometries (not
-     * null)
-     * @param row grid row of the vertex (&ge;0)
-     * @param column grid column of the vertex (&ge;0)
-     */
-    private void visualizeVertex(MazeLevel level, Node parentNode, int row,
-            int column) {
-        assert parentNode != null;
-        assert row >= 0 : row;
-        assert column >= 0 : column;
-
-        NavVertex fromVertex = level.getVertex(row, column);
-        /*
-         * Add ceiling and floor for the vertex.
+        assert lowerLeft != null;
+        assert lowerRight != null;
+        assert lowerLeft.y == lowerRight.y : lowerLeft.y;
+        assert height > 0f : height;
+        /* 
+         * The quad's origin is in the lower left corner. 
+         * Its uOffset points right. Its vOffset points up.
          */
-        Vector3f location = fromVertex.copyLocation();
-        addFloorTile(parentNode, location, "floor tile");
-        addCeilingTile(parentNode, location, "ceiling tile");
-        /*
-         * Add possible ramps/corridors in the four cardinal directions.
-         */
-        visualizeCorridor(parentNode, fromVertex, VectorXZ.east);
-        visualizeCorridor(parentNode, fromVertex, VectorXZ.north);
-        visualizeCorridor(parentNode, fromVertex, VectorXZ.south);
-        visualizeCorridor(parentNode, fromVertex, VectorXZ.west);
+        Vector3f origin = lowerLeft;
+        Vector3f uOffset = lowerRight.subtract(origin);
+        Vector3f vOffset = new Vector3f(0f, height, 0f);
+        addRectangle(parent, description, wallMaterial, idealSizeWall,
+                origin, uOffset, vOffset);
     }
 }

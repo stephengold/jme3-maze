@@ -218,10 +218,10 @@ public class FreeItemsState
         Crown crown = new Crown(simpleApplication);
         add(crown, goalVertex);
         /*
-         * Place the torch at a random vertex one hop from the
-         * starting point.
+         * Place the torch at a random vertex exactly 2 hops
+         * from the starting point.
          */
-        List<NavVertex> options = graph.findByHops(1, startVertex);
+        List<NavVertex> options = graph.findByHops(2, startVertex);
         options.remove(goalVertex);
         NavVertex torchVertex = (NavVertex) Noise.pick(options, generator);
         if (torchVertex != null) {
@@ -229,10 +229,10 @@ public class FreeItemsState
             add(torch, torchVertex);
         }
         /*
-         * Place the ankh at a random vertex exactly five hops
+         * Place the ankh at a random vertex exactly 10 hops
          * from the starting point.
          */
-        options = graph.findByHops(5, startVertex);
+        options = graph.findByHops(10, startVertex);
         options.remove(goalVertex);
         NavVertex ankhVertex = (NavVertex) Noise.pick(options, generator);
         if (ankhVertex != null) {
@@ -240,10 +240,10 @@ public class FreeItemsState
             add(ankh, ankhVertex);
         }
         /*
-         * Place a mummy at a random vertex exactly six hops
+         * Place a mummy at a random vertex exactly 12 hops
          * from the starting point.
          */
-        options = graph.findByHops(6, startVertex);
+        options = graph.findByHops(12, startVertex);
         options.remove(goalVertex);
         NavVertex mummyVertex = (NavVertex) Noise.pick(options, generator);
         if (mummyVertex != null) {
