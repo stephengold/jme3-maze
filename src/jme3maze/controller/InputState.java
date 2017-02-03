@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.items.Item;
 import jme3utilities.Validate;
-import jme3utilities.math.VectorXZ;
+import jme3utilities.math.ReadXZ;
 import jme3utilities.navigation.NavArc;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -360,7 +360,7 @@ public class InputState extends GameAppState {
         super.update(elapsedTime);
 
         NavArc advanceArc = playerState.advanceArc();
-        VectorXZ direction = playerState.getDirection();
+        ReadXZ direction = playerState.getDirection();
         /*
          * Process the most recent action string.
          */
@@ -496,12 +496,12 @@ public class InputState extends GameAppState {
      * @param newDirection direction the player will turn relative to current
      * direction (not null, length&gt;0)
      */
-    private void goTurn(VectorXZ newDirection) {
+    private void goTurn(ReadXZ newDirection) {
         assert newDirection != null;
         assert !newDirection.isZero();
 
         setEnabled(false);
-        VectorXZ norm = newDirection.normalize();
+        ReadXZ norm = newDirection.normalize();
         turnState.activate(norm);
     }
 

@@ -30,6 +30,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.FastMath;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
@@ -61,7 +62,7 @@ public class TurnState extends GameAppState {
     /**
      * final direction of turn: set by activate()
      */
-    private VectorXZ finalDirection;
+    private ReadXZ finalDirection;
     // *************************************************************************
     // constructors
 
@@ -80,12 +81,12 @@ public class TurnState extends GameAppState {
      * @param finalDirection player's direction when the turn is complete
      * (length&gt;0)
      */
-    public void activate(VectorXZ finalDirection) {
+    public void activate(ReadXZ finalDirection) {
         VectorXZ.validateNonZero(finalDirection, "direction");
 
         logger.log(Level.INFO, "finalDirection={0}", finalDirection);
 
-        VectorXZ norm = finalDirection.normalize();
+        ReadXZ norm = finalDirection.normalize();
         this.finalDirection = norm;
         setEnabled(true);
     }
@@ -121,19 +122,19 @@ public class TurnState extends GameAppState {
     public void update(float elapsedTime) {
         super.update(elapsedTime);
 
-        VectorXZ direction = playerState.getDirection();
+        ReadXZ direction = playerState.getDirection();
         float directionError = direction.directionError(finalDirection);
         if (FastMath.abs(directionError) < epsilon) {
             turnComplete();
             return;
         }
-        VectorXZ conjugate = direction.mirrorZ();
-        VectorXZ rotation = finalDirection.rotate(conjugate);
+        ReadXZ conjugate = direction.mirrorZ();
+        ReadXZ rotation = finalDirection.mult(conjugate);
         float maxTurnAngle = elapsedTime * playerState.getMaxTurnRate();
         if (maxTurnAngle > FastMath.PI) {
             maxTurnAngle = FastMath.PI;
         }
-        VectorXZ limitedRotation = rotation.clampDirection(maxTurnAngle);
+        ReadXZ limitedRotation = rotation.clampDirection(maxTurnAngle);
         playerState.rotate(limitedRotation);
     }
     // *************************************************************************

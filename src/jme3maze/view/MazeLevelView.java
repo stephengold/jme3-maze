@@ -39,6 +39,7 @@ import jme3maze.model.WorldState;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
+import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
@@ -64,7 +65,7 @@ class MazeLevelView {
     final private static Quad unitSquare = new Quad(1f, 1f);
     // *************************************************************************
     // fields
-
+    
     /**
      * width of corridors (in world units, &gt;0, set by constructor)
      */
@@ -204,14 +205,14 @@ class MazeLevelView {
         NavVertex neVertex = neArc.getToVertex();
         assert neVertex != swVertex;
 
-        VectorXZ horizontalDirection = neArc.horizontalOffset().cardinalize();
+        ReadXZ horizontalDirection = neArc.horizontalOffset().cardinalize();
         float vertexSpacing = WorldState.getVertexSpacing();
         assert vertexSpacing > corridorWidth : vertexSpacing;
         Quaternion orientation = horizontalDirection.toQuaternion();
 
         VectorXZ northExtent = new VectorXZ(
                 vertexSpacing - corridorWidth, corridorWidth);
-        VectorXZ extent = northExtent.rotate(horizontalDirection);
+        ReadXZ extent = northExtent.mult(horizontalDirection);
         extent = extent.firstQuadrant();
         /*
          * Check for slope.
@@ -266,7 +267,7 @@ class MazeLevelView {
      * south/west end (in world units)
      */
     private void addCeilingQuad(Node parent, NavVertex vertex,
-            VectorXZ extent, boolean nsFlag, float yChange) {
+            ReadXZ extent, boolean nsFlag, float yChange) {
         assert parent != null;
         assert vertex != null;
         assert extent != null;
@@ -341,7 +342,7 @@ class MazeLevelView {
      * south/west end (in world units)
      */
     private void addFloorQuad(Node parent, NavVertex vertex,
-            VectorXZ extent, boolean nsFlag, float yChange) {
+            ReadXZ extent, boolean nsFlag, float yChange) {
         assert parent != null;
         assert vertex != null;
         assert extent != null;

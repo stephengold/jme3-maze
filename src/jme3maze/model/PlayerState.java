@@ -34,6 +34,7 @@ import jme3maze.GameAppState;
 import jme3maze.items.Item;
 import jme3maze.items.Torch;
 import jme3utilities.Validate;
+import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
@@ -101,7 +102,7 @@ public class PlayerState extends GameAppState {
     /**
      * direction this player facing (in world coordinates, length=1)
      */
-    private VectorXZ direction = VectorXZ.north;
+    private ReadXZ direction = VectorXZ.north;
     /**
      * location (world coordinates)
      */
@@ -179,11 +180,11 @@ public class PlayerState extends GameAppState {
      *
      * @return unit vector in world coordinates
      */
-    public VectorXZ getDirection() {
+    public ReadXZ getDirection() {
         assert direction != null;
         assert !direction.isZero();
 
-        VectorXZ norm = direction.normalize();
+        ReadXZ norm = direction.normalize();
         return norm;
     }
 
@@ -326,10 +327,10 @@ public class PlayerState extends GameAppState {
      *
      * @param rotation new direction for the current X-axis (length&gt;0)
      */
-    public void rotate(VectorXZ rotation) {
+    public void rotate(ReadXZ rotation) {
         VectorXZ.validateNonZero(rotation, "rotation");
 
-        VectorXZ newDirection = direction.rotate(rotation);
+        ReadXZ newDirection = direction.mult(rotation);
         newDirection = newDirection.normalize();
         setDirection(newDirection);
     }
@@ -378,7 +379,7 @@ public class PlayerState extends GameAppState {
      *
      * @param newDirection map coordinates (not zero)
      */
-    public void setDirection(VectorXZ newDirection) {
+    public void setDirection(ReadXZ newDirection) {
         VectorXZ.validateNonZero(newDirection, "new direction");
 
         direction = newDirection.normalize();

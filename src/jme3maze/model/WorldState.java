@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3utilities.Validate;
 import jme3utilities.math.Locus3f;
+import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.math.noise.Noise;
 import jme3utilities.math.polygon.SimplePolygon3f;
@@ -382,7 +383,7 @@ public class WorldState extends GameAppState {
             joints[2] = to.copyLocation();
 
             VectorXZ jointHorizontalOffset = new VectorXZ(offset);
-            VectorXZ direction = jointHorizontalOffset.cardinalize();
+            ReadXZ direction = jointHorizontalOffset.cardinalize();
             Vector3f jointOffset = direction.toVector3f();
             if (fromGrid) {
                 jointOffset.multLocal(corridorWidth / 2f);

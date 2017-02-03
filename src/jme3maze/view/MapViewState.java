@@ -57,6 +57,7 @@ import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
 import jme3utilities.debug.Printer;
+import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavDebug;
@@ -206,7 +207,7 @@ public class MapViewState
      * @param startVertex (not null)
      * @param direction (not null, not zero)
      */
-    public void addMazeLineOfSight(NavVertex startVertex, VectorXZ direction) {
+    public void addMazeLineOfSight(NavVertex startVertex, ReadXZ direction) {
         VectorXZ.validateNonZero(direction, "direction");
 
         if (!isEnabled() || !isReadable()) {
@@ -217,7 +218,7 @@ public class MapViewState
             return;
         }
 
-        VectorXZ cardinal = direction.cardinalize();
+        ReadXZ cardinal = direction.cardinalize();
         for (NavVertex vertex = startVertex; vertex != null;) {
             addMazeVertex(vertex);
             for (NavArc arc : vertex.copyOutgoing()) {
@@ -428,7 +429,7 @@ public class MapViewState
             Quaternion orientation = playerState.getOrientation();
             setPlayerOrientation(orientation);
             NavVertex vertex = playerState.getVertex();
-            VectorXZ direction = playerState.getDirection();
+            ReadXZ direction = playerState.getDirection();
             addMazeLineOfSight(vertex, direction);
         }
 

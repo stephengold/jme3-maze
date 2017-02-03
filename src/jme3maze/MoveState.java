@@ -28,6 +28,7 @@ package jme3maze;
 import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
+import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.math.spline.Spline3f;
 import jme3utilities.navigation.NavArc;
@@ -152,7 +153,7 @@ public class MoveState extends GameAppState {
             /*
              * Turn to the arc which requires the least rotation.
              */
-            VectorXZ direction = playerState.getDirection();
+            ReadXZ direction = playerState.getDirection();
             NavArc nextArc = destinationVertex.findOutgoing(direction, -2.0);
             VectorXZ horizontalDirection = nextArc.horizontalOffset();
             turnState.activate(horizontalDirection);
