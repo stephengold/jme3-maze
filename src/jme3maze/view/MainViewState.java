@@ -349,6 +349,7 @@ public class MainViewState extends GameAppState {
     @Override
     public void initialize(AppStateManager stateManager,
             Application application) {
+        logger.info("starting");
         super.initialize(stateManager, application);
 
         slot = bigSlotState;
@@ -448,6 +449,7 @@ public class MainViewState extends GameAppState {
             printer.setPrintTransform(true);
             printer.printSubtree(root);
         }
+        logger.info("complete");
     }
     // *************************************************************************
     // private methods
