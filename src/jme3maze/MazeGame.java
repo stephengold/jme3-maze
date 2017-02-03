@@ -64,8 +64,8 @@ public class MazeGame
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(MazeGame.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            MazeGame.class.getName());
     /**
      * application name for the window's title bar
      */

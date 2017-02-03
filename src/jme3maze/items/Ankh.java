@@ -38,16 +38,14 @@ import jme3utilities.MyAsset;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class Ankh
-        extends Item {
+public class Ankh extends Item {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(Ankh.class.getName());
+    final private static Logger logger = Logger.getLogger(Ankh.class.getName());
     /**
      * asset path to the "ankh" icon asset
      */

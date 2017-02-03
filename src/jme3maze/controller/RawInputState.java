@@ -57,10 +57,11 @@ public class RawInputState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(RawInputState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            RawInputState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * track status of middle mouse button
      */

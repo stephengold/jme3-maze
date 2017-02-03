@@ -79,8 +79,8 @@ public class AnalogInputState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(AnalogInputState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            AnalogInputState.class.getName());
     /**
      * analog event when the mouse pointer moves down
      */
@@ -107,6 +107,7 @@ public class AnalogInputState
     final private static String wheelTowardsEvent = "wheel towards";
     // *************************************************************************
     // fields
+    
     /**
      * accumulated amount of main camera zoom (outward from default)
      */
@@ -204,48 +205,48 @@ public class AnalogInputState
          * Moving the mouse pointer downward triggers an event.
          */
         boolean moveDown = true;
-        MouseAxisTrigger moveDownTrigger =
-                new MouseAxisTrigger(MouseInput.AXIS_Y, moveDown);
+        MouseAxisTrigger moveDownTrigger = new MouseAxisTrigger(
+                MouseInput.AXIS_Y, moveDown);
         inputManager.addMapping(moveDownEvent, moveDownTrigger);
         inputManager.addListener(this, moveDownEvent);
         /*
          * Moving the mouse pointer left triggers an event.
          */
         boolean moveLeft = true;
-        MouseAxisTrigger moveLeftTrigger =
-                new MouseAxisTrigger(MouseInput.AXIS_X, moveLeft);
+        MouseAxisTrigger moveLeftTrigger = new MouseAxisTrigger(
+                MouseInput.AXIS_X, moveLeft);
         inputManager.addMapping(moveLeftEvent, moveLeftTrigger);
         inputManager.addListener(this, moveLeftEvent);
         /*
          * Moving the mouse pointer right triggers an event.
          */
         boolean moveRight = false;
-        MouseAxisTrigger moveRightTrigger =
-                new MouseAxisTrigger(MouseInput.AXIS_X, moveRight);
+        MouseAxisTrigger moveRightTrigger = new MouseAxisTrigger(
+                MouseInput.AXIS_X, moveRight);
         inputManager.addMapping(moveRightEvent, moveRightTrigger);
         inputManager.addListener(this, moveRightEvent);
         /*
          * Moving the mouse pointer up triggers an event.
          */
         boolean moveUp = false;
-        MouseAxisTrigger moveUpTrigger =
-                new MouseAxisTrigger(MouseInput.AXIS_Y, moveUp);
+        MouseAxisTrigger moveUpTrigger = new MouseAxisTrigger(
+                MouseInput.AXIS_Y, moveUp);
         inputManager.addMapping(moveUpEvent, moveUpTrigger);
         inputManager.addListener(this, moveUpEvent);
         /*
          * Turning the mouse wheel away triggers an event.
          */
         boolean wheelAway = true;
-        MouseAxisTrigger wheelAwayTrigger =
-                new MouseAxisTrigger(MouseInput.AXIS_WHEEL, wheelAway);
+        MouseAxisTrigger wheelAwayTrigger = new MouseAxisTrigger(
+                MouseInput.AXIS_WHEEL, wheelAway);
         inputManager.addMapping(wheelAwayEvent, wheelAwayTrigger);
         inputManager.addListener(this, wheelAwayEvent);
         /*
          * Turning the mouse wheel toward you triggers an event.
          */
         boolean wheelTowards = false;
-        MouseAxisTrigger wheelTowardsTrigger =
-                new MouseAxisTrigger(MouseInput.AXIS_WHEEL, wheelTowards);
+        MouseAxisTrigger wheelTowardsTrigger = new MouseAxisTrigger(
+                MouseInput.AXIS_WHEEL, wheelTowards);
         inputManager.addMapping(wheelTowardsEvent, wheelTowardsTrigger);
         inputManager.addListener(this, wheelTowardsEvent);
 

@@ -40,8 +40,7 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class MoveState
-        extends GameAppState {
+public class MoveState extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -59,10 +58,11 @@ public class MoveState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(MoveState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            MoveState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * distance traveled from start of arc
      */

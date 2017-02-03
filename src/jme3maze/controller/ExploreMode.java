@@ -50,8 +50,8 @@ public class ExploreMode
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(ExploreMode.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            ExploreMode.class.getName());
     /**
      * asset path to the cursor for this mode
      */

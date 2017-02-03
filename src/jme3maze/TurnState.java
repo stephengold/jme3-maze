@@ -42,8 +42,7 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class TurnState
-        extends GameAppState {
+public class TurnState extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -54,10 +53,11 @@ public class TurnState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(TurnState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            TurnState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * final direction of turn: set by activate()
      */
@@ -140,7 +140,7 @@ public class TurnState
     // private methods
 
     /**
-     * The current rotation is complete.
+     * The current rotation is complete. Switch to the input appstate.
      */
     private void turnComplete() {
         setEnabled(false);

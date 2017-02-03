@@ -39,18 +39,18 @@ import jme3utilities.Validate;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class IconControl
-        extends SimpleControl {
+public class IconControl extends SimpleControl {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(IconControl.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            IconControl.class.getName());
     // *************************************************************************
     // fields
+
     /**
      * spatial to copy the orientation from (not null)
      */

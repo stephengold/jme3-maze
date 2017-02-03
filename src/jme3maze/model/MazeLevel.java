@@ -56,12 +56,13 @@ public class MazeLevel {
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(MazeLevel.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            MazeLevel.class.getName());
     // *************************************************************************
     // fields
+    
     /**
-     * navigation graph in which the vertices are embedded
+     * navigation graph in which the vertices are embedded (set by constructor)
      */
     final private NavGraph graph;
     /**
@@ -73,11 +74,11 @@ public class MazeLevel {
      */
     private int numGridVertices = 0;
     /**
-     * rectangular array of vertices: set by constructor
+     * rectangular array of vertices (set by constructor)
      */
     final private NavVertex[][] grid;
     /**
-     * generator for randomization (not null): set by constructor
+     * generator for randomization (not null, set by constructor)
      */
     final private Random generator;
     /**
@@ -94,7 +95,7 @@ public class MazeLevel {
     /**
      * Instantiate a level with the specified dimensions etcetera.
      *
-     * @param yValue y-coordinate of the floor (in world coordinates)
+     * @param yValue Y-coordinate of the floor (in world coordinates)
      * @param numRows number of rows of vertices on the X-axis (&gt;1)
      * @param numColumns number of columns of vertices on the Z-axis (&gt;1)
      * @param graph navigation graph to contain the vertices (not null)
@@ -138,8 +139,8 @@ public class MazeLevel {
             removeGridPair(arc);
         }
         /**
-         * Prune the remaining arcs until a minimum spanning tree is obtained.
-         * In this way, all vertices are connected without any loops.
+         * Prune the remaining arc-pairs until a minimum spanning tree is
+         * obtained. In this way, all vertices are connected without any loops.
          */
         int numPairs = numGridVertices - 1;
         pruneTo(numPairs);
@@ -217,9 +218,9 @@ public class MazeLevel {
     }
 
     /**
-     * Read the world Y-coordinate for this level's floor.
+     * Read the Y-coordinate of this level's floor.
      *
-     * @return Y-coordinate value
+     * @return Y-coordinate value (in world coordinates)
      */
     public float getFloorY() {
         float result = grid[0][0].copyLocation().getY();
@@ -237,7 +238,7 @@ public class MazeLevel {
     }
 
     /**
-     * Access the vertex in the specified row and column.
+     * Access the grid vertex in the specified row and column.
      *
      * @param row which row of the grid
      * @param column which column of the grid
@@ -329,7 +330,7 @@ public class MazeLevel {
     }
 
     /**
-     * Read the number of rows of vertices on the X-axis of this level.
+     * Calculate the number of rows of vertices on the X-axis of this level.
      *
      * @return count (&gt;1)
      */
@@ -393,7 +394,7 @@ public class MazeLevel {
     }
 
     /**
-     * Fill this level with vertices (but no arcs).
+     * Fill this level with grid vertices (but no arcs).
      *
      * @param yValue y-coordinate for this level (in world coordinates)
      * @param namePrefix (not null)
@@ -433,7 +434,8 @@ public class MazeLevel {
      * Find the column index of the specified vertex.
      *
      * @param vertex (member)
-     * @return value between 0 and numColumns-1, inclusive
+     * @return value between 0 and numGridColumns-1 inclusive or -1 if not on
+     * grid
      */
     private int findColumn(NavVertex vertex) {
         validateMember(vertex);

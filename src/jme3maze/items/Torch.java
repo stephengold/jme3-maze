@@ -44,16 +44,15 @@ import jme3utilities.MyAsset;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class Torch
-        extends Item {
+public class Torch extends Item {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(Torch.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            Torch.class.getName());
     /**
      * asset path to the "torch" icon asset
      */

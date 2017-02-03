@@ -41,16 +41,15 @@ import jme3utilities.controls.RotationControl;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class Crown
-        extends Item {
+public class Crown extends Item {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(Crown.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            Crown.class.getName());
     /**
      * asset path to the "crown" icon asset
      */

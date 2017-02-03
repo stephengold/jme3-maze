@@ -70,13 +70,12 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class MainViewState
-        extends GameAppState {
+public class MainViewState extends GameAppState {
     // *************************************************************************
     // constants
 
     /**
-     * flag to enable debug features
+     * flag to enable debugging aids
      */
     final private static boolean debugFlag = false;
     /**
@@ -102,8 +101,8 @@ public class MainViewState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(MainViewState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            MainViewState.class.getName());
     /**
      * asset path to the "pond" texture asset in jME3-testdata.jar
      */
@@ -120,6 +119,7 @@ public class MainViewState
     final private static Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
     // *************************************************************************
     // fields
+    
     /**
      * scene-graph control which links the camera's orientation to that of the
      * player's avatar
@@ -367,24 +367,24 @@ public class MainViewState
 
         Texture floorTexture = MyAsset.loadTexture(assetManager, pondAssetPath);
         if (shadedFlag) {
-            floorMaterial =
-                    MyAsset.createShadedMaterial(assetManager, floorTexture);
+            floorMaterial = MyAsset.createShadedMaterial(
+                    assetManager, floorTexture);
             floorMaterial.setBoolean("UseMaterialColors", true);
             floorMaterial.setColor("Diffuse", ColorRGBA.White.mult(2f));
         } else {
-            floorMaterial =
-                    MyAsset.createUnshadedMaterial(assetManager, floorTexture);
+            floorMaterial = MyAsset.createUnshadedMaterial(
+                    assetManager, floorTexture);
         }
 
         Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
         if (shadedFlag) {
-            wallMaterial =
-                    MyAsset.createShadedMaterial(assetManager, wallTexture);
+            wallMaterial = MyAsset.createShadedMaterial(
+                    assetManager, wallTexture);
             wallMaterial.setBoolean("UseMaterialColors", true);
             wallMaterial.setColor("Diffuse", ColorRGBA.White);
         } else {
-            wallMaterial =
-                    MyAsset.createUnshadedMaterial(assetManager, wallTexture);
+            wallMaterial = MyAsset.createUnshadedMaterial(
+                    assetManager, wallTexture);
         }
         /*
          * Visualize each level of the maze.
@@ -487,8 +487,8 @@ public class MainViewState
         torch.setRadius(attenuationRadius);
 
         if (shadowsFlag) {
-            PointLightShadowRenderer plsr =
-                    new PointLightShadowRenderer(assetManager, shadowMapSize);
+            PointLightShadowRenderer plsr = new PointLightShadowRenderer(
+                    assetManager, shadowMapSize);
             plsr.setLight(torch);
             plsr.setShadowIntensity(1f);
             viewPort.addProcessor(plsr);

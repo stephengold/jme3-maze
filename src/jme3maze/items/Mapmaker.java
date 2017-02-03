@@ -45,16 +45,15 @@ import jme3utilities.Validate;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class Mapmaker
-        extends Item {
+public class Mapmaker extends Item {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(Mapmaker.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            Mapmaker.class.getName());
     /**
      * asset path to the "mapmaker" icon asset
      */

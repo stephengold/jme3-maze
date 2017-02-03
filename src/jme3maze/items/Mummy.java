@@ -50,8 +50,8 @@ public class Mummy
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(Mummy.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            Mummy.class.getName());
     /**
      * asset path to the "mummy" icon asset
      */

@@ -52,18 +52,18 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class FreeItemsState
-        extends GameAppState {
+public class FreeItemsState extends GameAppState {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(FreeItemsState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            FreeItemsState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * look up the vertex where an item is located
      */

@@ -46,8 +46,7 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class PlayerState
-        extends GameAppState {
+public class PlayerState extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -58,10 +57,11 @@ public class PlayerState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(PlayerState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            PlayerState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * rate of movement in world units per second (&gt;0)
      */
@@ -380,7 +380,7 @@ public class PlayerState
     /**
      * Alter this player's direction.
      *
-     * @param newDirection world coordinates (not null, positive length)
+     * @param newDirection map coordinates (not zero)
      */
     public void setDirection(VectorXZ newDirection) {
         VectorXZ.validateNonZero(newDirection, "new direction");

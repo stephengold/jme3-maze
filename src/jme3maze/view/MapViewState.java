@@ -77,14 +77,14 @@ public class MapViewState
     /**
      * background color for the map when readable: light gray
      */
-    final private static ColorRGBA readableBackgroundColor =
-            new ColorRGBA(0.6f, 0.6f, 0.6f, 1f);
+    final private static ColorRGBA readableBackgroundColor = new ColorRGBA(
+            0.6f, 0.6f, 0.6f, 1f);
     /**
      *
      * background color for the map when unreadable: dark gray
      */
-    final private static ColorRGBA unreadableBackgroundColor =
-            new ColorRGBA(0.2f, 0.2f, 0.2f, 2f);
+    final private static ColorRGBA unreadableBackgroundColor = new ColorRGBA(
+            0.2f, 0.2f, 0.2f, 2f);
     /**
      * ball radius (world units)
      */
@@ -100,8 +100,8 @@ public class MapViewState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(MapViewState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            MapViewState.class.getName());
     /**
      * reusable unit-square mesh
      */
@@ -116,6 +116,7 @@ public class MapViewState
     final private static Vector3f forwardDirection = Vector3f.UNIT_X;
     // *************************************************************************
     // fields
+    
     /**
      * slot to display this view: set in setEnabled()
      */
@@ -203,7 +204,7 @@ public class MapViewState
      * those vertices.
      *
      * @param startVertex (not null)
-     * @param direction (unit vector, positive length)
+     * @param direction (not null, not zero)
      */
     public void addMazeLineOfSight(NavVertex startVertex, VectorXZ direction) {
         VectorXZ.validateNonZero(direction, "direction");
@@ -325,8 +326,8 @@ public class MapViewState
      */
     public Spatial loadIcon(String textureAssetPath, boolean matchEye) {
         Texture texture = assetManager.loadTexture(textureAssetPath);
-        Material material =
-                MyAsset.createUnshadedMaterial(assetManager, texture);
+        Material material = MyAsset.createUnshadedMaterial(
+                assetManager, texture);
         material.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 
         Node node = new Node("icon node");
@@ -481,8 +482,8 @@ public class MapViewState
         float cameraHeight = 0.7f * levelSpacing; // world units
         Vector3f offset = new Vector3f(0f, cameraHeight, 0f);
         Vector3f down = new Vector3f(0f, -1f, 0f);
-        CameraControl downView =
-                new CameraControl(mapCamera, offset, down, forwardDirection);
+        CameraControl downView = new CameraControl(
+                mapCamera, offset, down, forwardDirection);
         avatarNode.addControl(downView);
     }
 
@@ -523,16 +524,16 @@ public class MapViewState
         int numArcs = vertex.numOutgoing();
         switch (numArcs) {
             case 1:
-                spatial =
-                        NavDebug.makeBall(vertex, ballRadius, culDeSacMaterial);
+                spatial = NavDebug.makeBall(
+                        vertex, ballRadius, culDeSacMaterial);
                 break;
             case 2:
-                spatial =
-                        NavDebug.makeBall(vertex, ballRadius, passageMaterial);
+                spatial = NavDebug.makeBall(
+                        vertex, ballRadius, passageMaterial);
                 break;
             default:
-                spatial = NavDebug.makeBall(vertex, ballRadius,
-                        intersectionMaterial);
+                spatial = NavDebug.makeBall(
+                        vertex, ballRadius, intersectionMaterial);
         }
         spatial.setUserData("vertex", vertex.getName());
         vertexSpatial.put(vertex, spatial);
@@ -563,20 +564,20 @@ public class MapViewState
      */
     private void initializeMaze() {
         ColorRGBA intersectionColor = ColorRGBA.Yellow;
-        intersectionMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, intersectionColor);
+        intersectionMaterial = MyAsset.createUnshadedMaterial(
+                assetManager, intersectionColor);
 
         ColorRGBA culDeSacColor = ColorRGBA.Red;
-        culDeSacMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, culDeSacColor);
+        culDeSacMaterial = MyAsset.createUnshadedMaterial(
+                assetManager, culDeSacColor);
 
         ColorRGBA passageColor = ColorRGBA.Green;
-        passageMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, passageColor);
+        passageMaterial = MyAsset.createUnshadedMaterial(
+                assetManager, passageColor);
 
         ColorRGBA stickColor = ColorRGBA.Blue;
-        stickMaterial =
-                MyAsset.createUnshadedMaterial(assetManager, stickColor);
+        stickMaterial = MyAsset.createUnshadedMaterial(
+                assetManager, stickColor);
 
         mapRootNode.attachChild(mazeNode);
     }

@@ -56,8 +56,7 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class WorldState
-        extends GameAppState {
+public class WorldState extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -76,8 +75,8 @@ public class WorldState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(WorldState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            WorldState.class.getName());
     /**
      * default seed for pseudo-random number generator
      */
@@ -88,6 +87,7 @@ public class WorldState
     final public static Vector3f upDirection = Vector3f.UNIT_Y;
     // *************************************************************************
     // fields
+    
     /**
      * map arcs to travel paths
      */

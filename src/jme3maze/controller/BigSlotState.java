@@ -54,10 +54,11 @@ public class BigSlotState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(BigSlotState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+                    BigSlotState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * interval between updates (in seconds, &ge;0): set by update()
      */

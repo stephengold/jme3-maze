@@ -57,8 +57,7 @@ import tonegod.gui.core.utils.UIDUtil;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class InputState
-        extends GameAppState {
+public class InputState extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -69,8 +68,8 @@ public class InputState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(InputState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            InputState.class.getName());
     /**
      * action string for following the current arc
      */
@@ -99,6 +98,7 @@ public class InputState
             "use rightHandItem";
     // *************************************************************************
     // fields
+    
     /**
      * GUI element for alerts
      */

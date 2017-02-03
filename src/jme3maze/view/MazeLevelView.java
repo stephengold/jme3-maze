@@ -56,16 +56,17 @@ class MazeLevelView {
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(MazeLevelView.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            MazeLevelView.class.getName());
     /**
      * reusable unit-square mesh
      */
     final private static Quad unitSquare = new Quad(1f, 1f);
     // *************************************************************************
     // fields
+
     /**
-     * width of corridors (in world units, &gt;0): set by constructor
+     * width of corridors (in world units, &gt;0, set by constructor)
      */
     final private float corridorWidth;
     /**
@@ -88,15 +89,15 @@ class MazeLevelView {
      */
     final private float wallHeight;
     /**
-     * material for ceilings (not null): set by constructor
+     * material for ceilings (not null, set by constructor)
      */
     final private Material ceilingMaterial;
     /**
-     * material for floors (not null): set by constructor
+     * material for floors (not null, set by constructor)
      */
     final private Material floorMaterial;
     /**
-     * material for walls (not null): set by constructor
+     * material for walls (not null, set by constructor)
      */
     final private Material wallMaterial;
     // *************************************************************************

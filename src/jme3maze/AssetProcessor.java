@@ -57,8 +57,8 @@ public class AssetProcessor
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(AssetProcessor.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            AssetProcessor.class.getName());
     // *************************************************************************
     // new methods exposed
 

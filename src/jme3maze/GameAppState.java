@@ -57,10 +57,11 @@ public class GameAppState
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(SimpleAppState.class.getName());
+    final private static Logger logger = Logger.getLogger(
+            SimpleAppState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * app state to handle analog input: set by initialize()
      */

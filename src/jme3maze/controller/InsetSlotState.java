@@ -77,6 +77,7 @@ public class InsetSlotState
             Logger.getLogger(InsetSlotState.class.getName());
     // *************************************************************************
     // fields
+    
     /**
      * interval between updates (in seconds, &ge;0): set by update()
      */
