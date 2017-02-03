@@ -69,7 +69,7 @@ public class WorldState extends GameAppState {
      */
     final private static float levelSpacing = 20f;
     /**
-     * tolerance for comparing polygons (in world units)
+     * tolerance for comparing coordinates (in world units)
      */
     final private static float tolerance = 0.1f;
     /**
@@ -88,7 +88,7 @@ public class WorldState extends GameAppState {
     /**
      * "up" direction in world coordinates
      */
-    final public static Vector3f upDirection = Vector3f.UNIT_Y;
+    final public static Vector3f upDirection = new Vector3f(0f, 1f, 0f);
     // *************************************************************************
     // fields
     

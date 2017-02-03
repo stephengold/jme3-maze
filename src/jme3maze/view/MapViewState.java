@@ -113,7 +113,7 @@ public class MapViewState
     /**
      * local "forward" direction (length=1)
      */
-    final private static Vector3f forwardDirection = Vector3f.UNIT_X;
+    final private static Vector3f forwardDirection = new Vector3f(1f, 0f, 0f);
     // *************************************************************************
     // fields
     
