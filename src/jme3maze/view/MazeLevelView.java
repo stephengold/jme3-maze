@@ -176,9 +176,9 @@ class MazeLevelView {
             VectorXZ direction) {
         assert parentNode != null;
         assert direction != null;
-        assert !direction.isZeroLength() : direction;
+        assert !direction.isZero() : direction;
 
-        Vector3f vertexLocation = vertex.getLocation();
+        Vector3f vertexLocation = vertex.copyLocation();
         float halfWidth = corridorWidth / 2f;
         Quaternion orientation = direction.toQuaternion();
 
@@ -234,9 +234,9 @@ class MazeLevelView {
     private void addOpening(Node parentNode, NavArc arc) {
         assert parentNode != null;
 
-        VectorXZ horizontalDirection = arc.getHorizontalDirection();
+        VectorXZ horizontalDirection = arc.horizontalOffset().normalize();
         Quaternion orientation = horizontalDirection.toQuaternion();
-        Vector3f vertexLocation = arc.getFromVertex().getLocation();
+        Vector3f vertexLocation = arc.getFromVertex().copyLocation();
         /*
          * Add horizontal tiles for ceilings and floors.
          */
@@ -401,24 +401,19 @@ class MazeLevelView {
             VectorXZ direction) {
         assert parentNode != null;
         assert direction != null;
-        assert !direction.isZeroLength();
+        assert !direction.isZero();
 
         VectorXZ norm = direction.normalize();
 
-        NavArc arc = fromVertex.findLeastTurn(norm);
+        double cosineTolerance = 0.75;
+        NavArc arc = fromVertex.findOutgoing(direction, cosineTolerance);
         if (arc == null) {
             addClosure(parentNode, fromVertex, norm);
         } else {
-            VectorXZ startDirection = arc.getHorizontalDirection();
-            float dot = startDirection.dot(norm);
-            if (dot > 0.5f) {
-                /*
-                 * found an arc whose start direction is within 60 degrees
-                 */
-                addOpening(parentNode, arc);
-            } else {
-                addClosure(parentNode, fromVertex, norm);
-            }
+            /*
+             * found an arc whose start direction is within 60 degrees
+             */
+            addOpening(parentNode, arc);
         }
     }
 
@@ -441,7 +436,7 @@ class MazeLevelView {
         /*
          * Add ceiling and floor for the vertex.
          */
-        Vector3f location = fromVertex.getLocation();
+        Vector3f location = fromVertex.copyLocation();
         addFloorTile(parentNode, location, "floor tile");
         addCeilingTile(parentNode, location, "ceiling tile");
         /*

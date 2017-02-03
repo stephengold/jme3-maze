@@ -191,7 +191,7 @@ public class MapViewState
         spatial = item.visualizeMap();
 
         NavVertex vertex = freeItemsState.getVertex(item);
-        Vector3f location = vertex.getLocation();
+        Vector3f location = vertex.copyLocation();
         spatial.move(location);
         spatial.setUserData("item", item);
         itemSpatial.put(item, spatial);
@@ -206,11 +206,7 @@ public class MapViewState
      * @param direction (unit vector, positive length)
      */
     public void addMazeLineOfSight(NavVertex startVertex, VectorXZ direction) {
-        Validate.nonNull(direction, "direction");
-        if (direction.isZeroLength()) {
-            throw new IllegalArgumentException(
-                    "direction should have positive length");
-        }
+        VectorXZ.validateNonZero(direction, "direction");
 
         if (!isEnabled() || !isReadable()) {
             /*
@@ -221,18 +217,17 @@ public class MapViewState
         }
 
         VectorXZ cardinal = direction.cardinalize();
-        int rowIncrement = Math.round(cardinal.getX());
-        int columnIncrement = Math.round(cardinal.getZ());
-
-        MazeLevel level = playerState.getMazeLevel();
-
         for (NavVertex vertex = startVertex; vertex != null;) {
             addMazeVertex(vertex);
-            for (NavArc arc : vertex.getArcs()) {
+            for (NavArc arc : vertex.copyOutgoing()) {
                 addMazeArc(arc);
             }
-            vertex = level.findNextLineOfSight(vertex, rowIncrement,
-                    columnIncrement);
+            NavArc arc = vertex.findOutgoing(cardinal, 0.9);
+            if (arc == null) {
+                vertex = null;
+            } else {
+                vertex = arc.getToVertex();
+            }
         }
     }
 
@@ -270,7 +265,11 @@ public class MapViewState
          */
         Spatial spatial = geometry;
         while (spatial != null) {
-            NavVertex vertex = spatial.getUserData("vertex");
+            NavVertex vertex = null;
+            String vertexName = spatial.getUserData("vertex");
+            if (vertexName != null) {
+                vertex = worldState.getGraph().find(vertexName);
+            }
             if (vertex == null) {
                 Item item = spatial.getUserData("item");
                 if (item != null) {
@@ -521,7 +520,7 @@ public class MapViewState
         if (spatial != null) {
             return;
         }
-        int numArcs = vertex.getNumArcs();
+        int numArcs = vertex.numOutgoing();
         switch (numArcs) {
             case 1:
                 spatial =
@@ -535,7 +534,7 @@ public class MapViewState
                 spatial = NavDebug.makeBall(vertex, ballRadius,
                         intersectionMaterial);
         }
-        spatial.setUserData("vertex", vertex);
+        spatial.setUserData("vertex", vertex.getName());
         vertexSpatial.put(vertex, spatial);
         mazeNode.attachChild(spatial);
     }

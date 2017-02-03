@@ -418,7 +418,7 @@ public class InputState
                 } else if (nextArc == advanceArc) {
                     goMove(advanceArc);
                 } else {
-                    direction = nextArc.getHorizontalDirection();
+                    direction = nextArc.horizontalOffset().normalize();
                     goTurn(direction);
                 }
         }
@@ -498,7 +498,7 @@ public class InputState
      */
     private void goTurn(VectorXZ newDirection) {
         assert newDirection != null;
-        assert !newDirection.isZeroLength();
+        assert !newDirection.isZero();
 
         setEnabled(false);
         VectorXZ norm = newDirection.normalize();

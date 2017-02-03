@@ -106,7 +106,7 @@ public class TurnState
          * Activate the player's current arc.
          */
         NavArc arc = playerState.getArc();
-        VectorXZ horizontalDirection = arc.getHorizontalDirection();
+        VectorXZ horizontalDirection = arc.horizontalOffset();
         activate(horizontalDirection);
     }
     // *************************************************************************
@@ -146,10 +146,8 @@ public class TurnState
         setEnabled(false);
 
         NavVertex vertex = playerState.getVertex();
-        NavArc arc = vertex.findLeastTurn(finalDirection);
-        VectorXZ horizontalDirection = arc.getHorizontalDirection();
-        float dot = finalDirection.dot(horizontalDirection);
-        if (1f - dot < epsilon) {
+        NavArc arc = vertex.findOutgoing(finalDirection, 1.0 - epsilon);
+        if (arc != null) {
             playerState.setArc(arc);
         } else {
             playerState.setDirection(finalDirection);

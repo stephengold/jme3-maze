@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +38,9 @@ import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
 import jme3utilities.math.noise.Noise;
 import jme3utilities.math.VectorXZ;
+import jme3utilities.math.polygon.SimplePolygon3f;
+import jme3utilities.math.spline.LinearSpline3f;
+import jme3utilities.math.spline.Spline3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -79,6 +83,10 @@ public class MazeLevel {
      */
     final private Random generator;
     /**
+     * travel path for each arc (not null, set by constructor)
+     */
+    final private Map<NavArc, Spline3f> travelPaths;
+    /**
      * name for this level (not null): set by constructor
      */
     final private String name;
@@ -99,7 +107,8 @@ public class MazeLevel {
      * @param entryEndLocation location for the entry point (or null for none)
      */
     MazeLevel(float yValue, int numRows, int numColumns,
-            NavGraph graph, Random generator, String name,
+            NavGraph graph, Map<NavArc, Spline3f> travelPaths, 
+            Random generator, String name, 
             NavVertex entryStartVertex, Vector3f entryEndLocation) {
         assert numRows > 1 : numRows;
         assert numColumns > 1 : numColumns;
@@ -109,6 +118,7 @@ public class MazeLevel {
 
         this.generator = generator;
         this.graph = graph;
+        this.travelPaths = travelPaths;
         this.name = name;
         /**
          * Create a rectangular grid of vertices in which neighbors are
@@ -122,13 +132,14 @@ public class MazeLevel {
             /*
              * Remove the arc-pair which would interfere with entry from above.
              */
-            Vector3f entryStartLocation = entryStartVertex.getLocation();
+            Vector3f entryStartLocation = entryStartVertex.copyLocation();
             Vector3f entryOffset =
                     entryStartLocation.subtract(entryEndLocation);
-            VectorXZ horizontalOffset = new VectorXZ(entryOffset);
             NavVertex entryEndVertex = findVertex(entryEndLocation);
-            NavArc arc = entryEndVertex.findLeastTurn(horizontalOffset);
-            graph.removePair(arc);
+            NavArc arc = entryEndVertex.findOutgoing(entryOffset, 0.75);
+            NavArc reverse = arc.findReverse();
+            graph.remove(arc);
+            graph.remove(reverse);
             numArcs -= 2;
         }
         /**
@@ -142,7 +153,7 @@ public class MazeLevel {
             /*
              * Add an entry ramp down from (and up to) the previous level.
              */
-            Vector3f entryStartLocation = entryStartVertex.getLocation();
+            Vector3f entryStartLocation = entryStartVertex.copyLocation();
             Vector3f downOffset = entryEndLocation.subtract(entryStartLocation);
             VectorXZ horizontalDirection =
                     MyVector3f.horizontalDirection(downOffset);
@@ -156,7 +167,9 @@ public class MazeLevel {
             Vector3f[] downJoints = new Vector3f[2];
             downJoints[0] = entryStartLocation.add(step);
             downJoints[1] = entryEndLocation.subtract(step);
-            graph.addArc(entryStartVertex, entryEndVertex, downJoints);
+            NavArc newArc = graph.addArc(entryStartVertex, entryEndVertex, 1f);
+            Spline3f travelPath = new LinearSpline3f(downJoints);
+            travelPaths.put(newArc, travelPath);
             numArcs++;
             /*
              * upward arc
@@ -164,7 +177,9 @@ public class MazeLevel {
             Vector3f[] upJoints = new Vector3f[2];
             upJoints[0] = entryEndLocation.subtract(step);
             upJoints[1] = entryStartLocation.add(step);
-            graph.addArc(entryEndVertex, entryStartVertex, upJoints);
+            newArc = graph.addArc(entryEndVertex, entryStartVertex, 1f);
+            travelPath = new LinearSpline3f(upJoints);
+            travelPaths.put(newArc, travelPath);
             numArcs++;
         }
     }
@@ -189,28 +204,6 @@ public class MazeLevel {
     }
 
     /**
-     * Find the next vertex along the specified line of sight.
-     *
-     * @param fromVertex (member)
-     * @param rowIncrement (-1, 0, or +1)
-     * @param columnIncrement (-1, 0, or +1)
-     * @return pre-existing instance (or null if none)
-     */
-    public NavVertex findNextLineOfSight(NavVertex fromVertex,
-            int rowIncrement, int columnIncrement) {
-        validateMember(fromVertex);
-
-        int row = findRow(fromVertex) + rowIncrement;
-        int column = findColumn(fromVertex) + columnIncrement;
-        NavVertex toVertex = getVertex(row, column);
-        if (toVertex != null && fromVertex.hasArcTo(toVertex)) {
-            return toVertex;
-        }
-
-        return null;
-    }
-
-    /**
      * Find the vertex nearest to the specified location.
      *
      * @param location (world coordinates, not null)
@@ -222,6 +215,33 @@ public class MazeLevel {
         int row = findRow(location);
         int column = findColumn(location);
         NavVertex result = grid[row][column];
+
+        return result;
+    }
+
+    /**
+     * List all grid arcs on this level.
+     *
+     * @return new list of grid arcs
+     */
+    public List<NavArc> getArcs() {
+        int numRows = getRows();
+        int numColumns = getColumns();
+        List<NavArc> result = new ArrayList<>(4 * numRows * numColumns);
+
+        for (int row = 0; row < numRows; row++) {
+            for (int column = 0; column < numColumns; column++) {
+                NavVertex vertex = grid[row][column];
+                if (vertex != null) {
+                    NavArc[] out = vertex.copyOutgoing();
+                    for (NavArc arc : out) {
+                        assert !result.contains(arc);
+                        boolean success = result.add(arc);
+                        assert success : vertex;
+                    }
+                }
+            }
+        }
 
         return result;
     }
@@ -243,7 +263,7 @@ public class MazeLevel {
      * @return Y-coordinate value
      */
     public float getFloorY() {
-        float result = grid[0][0].getLocation().getY();
+        float result = grid[0][0].copyLocation().getY();
         return result;
     }
 
@@ -323,7 +343,7 @@ public class MazeLevel {
         for (int row = 0; row < numRows; row++) {
             for (int column = 0; column < numColumns; column++) {
                 NavVertex vertex = grid[row][column];
-                NavArc[] vertexArcs = vertex.getArcs();
+                NavArc[] vertexArcs = vertex.copyOutgoing();
                 List<NavArc> list = Arrays.asList(vertexArcs);
                 allArcs.addAll(list);
             }
@@ -345,7 +365,12 @@ public class MazeLevel {
         assert startVertex != null;
         assert endVertex != null;
 
-        graph.addArc(startVertex, endVertex);
+        NavArc newArc = graph.addArc(startVertex, endVertex, 1f);
+        Vector3f[] joints = new Vector3f[2];
+        joints[0] = startVertex.copyLocation();
+        joints[1] = endVertex.copyLocation();
+        Spline3f travelPath = new LinearSpline3f(joints);
+        travelPaths.put(newArc, travelPath);
         numArcs++;
     }
 
@@ -398,9 +423,18 @@ public class MazeLevel {
             for (int column = 0; column < numColumns; column++) {
                 float z = vertexSpacing * (column - numColumns / 2);
                 Vector3f position = new Vector3f(x, yValue, z);
-                String description =
-                        String.format("%s(%d,%d)", namePrefix, row, column);
-                NavVertex newVertex = graph.addVertex(description, position);
+                float halfWidth = WorldState.getCorridorWidth() / 2;
+                Vector3f[] corners = new Vector3f[4];
+                corners[0] = position.add(-halfWidth, 0f, -halfWidth);
+                corners[1] = position.add(-halfWidth, 0f, halfWidth);
+                corners[2] = position.add(halfWidth, 0f, halfWidth);
+                corners[3] = position.add(halfWidth, 0f, -halfWidth);
+                SimplePolygon3f locus = new SimplePolygon3f(corners, 0.1f);
+
+                String vertexName = String.format(
+                        "%s(%d,%d)", namePrefix, row, column);
+                NavVertex newVertex = graph.addVertex(vertexName, locus);
+
                 assert findRow(newVertex) == row : row;
                 assert findColumn(newVertex) == column : column;
                 grid[row][column] = newVertex;
@@ -416,9 +450,9 @@ public class MazeLevel {
      * @return value between 0 and numColumns-1, inclusive
      */
     private int findColumn(NavVertex vertex) {
-        graph.validateMember(vertex);
+        graph.validateMember(vertex, "vertex");
 
-        Vector3f location = vertex.getLocation();
+        Vector3f location = vertex.copyLocation();
         int column = findColumn(location);
 
         return column;
@@ -452,9 +486,9 @@ public class MazeLevel {
      * @return value between 0 and numRows-1, inclusive
      */
     private int findRow(NavVertex vertex) {
-        graph.validateMember(vertex);
+        graph.validateMember(vertex, "vertex");
 
-        Vector3f location = vertex.getLocation();
+        Vector3f location = vertex.copyLocation();
         int row = findRow(location);
 
         return row;
@@ -490,9 +524,12 @@ public class MazeLevel {
         assert numPairs >= 0 : numPairs;
 
         while (numArcs > 2 * numPairs) {
-            NavArc arc = graph.randomArc(generator);
+            NavArc allArcs[] = graph.copyArcs();
+            NavArc arc = (NavArc) Noise.pick(allArcs, generator);
             if (graph.isConnectedWithout(arc)) {
-                graph.removePair(arc);
+                NavArc reverse = arc.findReverse();
+                graph.remove(arc);
+                graph.remove(reverse);
                 numArcs -= 2;
             }
         }

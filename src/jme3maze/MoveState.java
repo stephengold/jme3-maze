@@ -29,6 +29,7 @@ import com.jme3.math.Vector3f;
 import java.util.logging.Logger;
 import jme3maze.items.Item;
 import jme3utilities.math.VectorXZ;
+import jme3utilities.math.spline.Spline3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavVertex;
 
@@ -106,7 +107,8 @@ public class MoveState
         super.update(elapsedTime);
 
         NavArc arc = playerState.getArc();
-        float arcLength = arc.getPathLength();
+        Spline3f path = worldState.getPath(arc);
+        float arcLength = path.totalLength();
         float distanceRemaining = arcLength - distanceTraveled;
         if (distanceRemaining <= epsilon) {
             movementComplete(arc);
@@ -120,7 +122,7 @@ public class MoveState
             step = distanceRemaining;
         }
         distanceTraveled += step;
-        Vector3f newLocation = arc.pathLocation(distanceTraveled);
+        Vector3f newLocation = path.interpolate(distanceTraveled);
         playerState.setLocation(newLocation);
         playerState.setVertex(null);
     }
@@ -144,15 +146,16 @@ public class MoveState
             item.encounter();
         }
 
-        int numArcs = destinationVertex.getNumArcs();
+        int numArcs = destinationVertex.numOutgoing();
         boolean autoTurn = numArcs <= maxArcsForAutoTurn;
         if (autoTurn) {
             /*
              * Turn to the arc which requires the least rotation.
              */
             VectorXZ direction = playerState.getDirection();
-            NavArc nextArc = destinationVertex.findLeastTurn(direction);
-            VectorXZ horizontalDirection = nextArc.getHorizontalDirection();
+            NavArc nextArc = destinationVertex.findOutgoing(direction, -2.0);
+            VectorXZ horizontalDirection = nextArc.horizontalOffset();
+            horizontalDirection = horizontalDirection.normalize();
             turnState.activate(horizontalDirection);
 
         } else {

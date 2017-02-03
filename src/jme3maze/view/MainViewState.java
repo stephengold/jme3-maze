@@ -163,7 +163,7 @@ public class MainViewState
     public void addFreeItem(Item item) {
         Spatial spatial = item.visualizeMain();
         NavVertex vertex = freeItemsState.getVertex(item);
-        Vector3f location = vertex.getLocation();
+        Vector3f location = vertex.copyLocation();
         spatial.move(location);
 
         spatial.setUserData("item", item);

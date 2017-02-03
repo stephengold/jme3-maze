@@ -119,13 +119,9 @@ public class PlayerState
      * @return pre-existing instance, or null of no match
      */
     public NavArc advanceArc() {
-        NavArc bestMatch = vertex.findLeastTurn(direction);
-        VectorXZ horizontalDirection = bestMatch.getHorizontalDirection();
-        float dot = direction.dot(horizontalDirection);
-        if (1f - dot < epsilon) {
-            return bestMatch;
-        }
-        return null;
+        NavArc bestMatch = vertex.findOutgoing(direction, 0.75);
+
+        return bestMatch;
     }
 
     /**
@@ -189,7 +185,7 @@ public class PlayerState
      */
     public VectorXZ getDirection() {
         assert direction != null;
-        assert !direction.isZeroLength();
+        assert !direction.isZero();
 
         VectorXZ norm = direction.normalize();
         return norm;
@@ -373,7 +369,7 @@ public class PlayerState
         NavVertex fromVertex = arc.getFromVertex();
         setVertex(fromVertex);
 
-        VectorXZ horizontalDirection = arc.getHorizontalDirection();
+        VectorXZ horizontalDirection = arc.horizontalOffset().normalize();
         setDirection(horizontalDirection);
         /*
          * Update the map (if enabled and readable).
@@ -387,11 +383,7 @@ public class PlayerState
      * @param newDirection world coordinates (not null, positive length)
      */
     public void setDirection(VectorXZ newDirection) {
-        Validate.nonNull(newDirection, "direction");
-        if (newDirection.isZeroLength()) {
-            throw new IllegalArgumentException(
-                    "direction should have positive length");
-        }
+        VectorXZ.validateNonZero(newDirection, "new direction");
 
         direction = newDirection.normalize();
         orientation.set(direction.toQuaternion());
@@ -497,7 +489,7 @@ public class PlayerState
     public void setVertex(NavVertex newVertex) {
         vertex = newVertex;
         if (vertex != null) {
-            Vector3f newLocation = vertex.getLocation();
+            Vector3f newLocation = vertex.copyLocation();
             setLocation(newLocation);
 
             mazeLevelIndex = WorldState.levelIndex(vertex);

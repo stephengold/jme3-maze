@@ -30,10 +30,15 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3utilities.Validate;
+import jme3utilities.math.noise.Noise;
+import jme3utilities.math.spline.Spline3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -77,6 +82,10 @@ public class WorldState
     final public static Vector3f upDirection = Vector3f.UNIT_Y;
     // *************************************************************************
     // fields
+    /**
+     * map arcs to travel paths
+     */
+    final private Map<NavArc, Spline3f> travelPaths = new HashMap<>();
     /**
      * levels of the maze: set by initialize()
      */
@@ -179,7 +188,21 @@ public class WorldState
     }
 
     /**
-     * Get the location of the torch.
+     * Look up the travel path for a specific arc.
+     *
+     * @param arc (member)
+     * @return travel path, or null for straight line
+     */
+    public Spline3f getPath(NavArc arc) {
+        graph.validateMember(arc, "arc");
+
+        Spline3f result = travelPaths.get(arc);
+
+        return result;
+    }
+
+    /**
+     * Copy the location of the torch.
      *
      * @return new vector in world coordinates
      */
@@ -256,7 +279,7 @@ public class WorldState
      * @return level index (&ge;0)
      */
     public static int levelIndex(NavVertex vertex) {
-        Vector3f location = vertex.getLocation();
+        Vector3f location = vertex.copyLocation();
         int levelIndex = levelIndex(location);
 
         return levelIndex;
@@ -332,7 +355,8 @@ public class WorldState
             int numColumns = numRows;
             String levelName = String.format("L%d", levelIndex);
             MazeLevel level = new MazeLevel(baseY, numRows, numColumns, graph,
-                    generator, levelName, entryStartVertex, entryEndLocation);
+                    travelPaths, generator, levelName, entryStartVertex,
+                    entryEndLocation);
             levels[levelIndex] = level;
 
             NavVertex entryEndVertex;
@@ -340,7 +364,8 @@ public class WorldState
                 /*
                  * top level (level 0)
                  */
-                startArc = level.randomArc(generator);
+                List<NavArc> gridArcs = level.getArcs();
+                startArc = (NavArc) Noise.pick(gridArcs, generator);
                 entryEndVertex = startArc.getFromVertex();
             } else {
                 entryEndVertex = level.findVertex(entryEndLocation);
@@ -349,12 +374,14 @@ public class WorldState
              * Put the level's exit as far as possible from its entrance.
              */
             Collection<NavVertex> vertices = level.getVertices();
-            entryStartVertex = graph.findFurthest(entryEndVertex, vertices);
-            NavArc[] arcs = entryStartVertex.getArcs();
+            List<NavVertex> farVertices = graph.findMostHops(
+                    entryEndVertex, vertices);
+            entryStartVertex = (NavVertex) Noise.pick(farVertices, generator);
+            NavArc[] arcs = entryStartVertex.copyOutgoing();
             assert arcs.length == 1 : arcs.length;
             NavArc arc = arcs[0];
-            Vector3f arcDirection = arc.getStartDirection();
-            Vector3f entryStartLocation = entryStartVertex.getLocation();
+            Vector3f arcDirection = arc.offset().normalize();
+            Vector3f entryStartLocation = entryStartVertex.copyLocation();
             Vector3f offset = arcDirection.mult(vertexSpacing);
             entryEndLocation = entryStartLocation.subtract(offset);
             entryEndLocation.y -= levelSpacing;

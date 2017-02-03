@@ -100,7 +100,7 @@ public class FreeItemsState
         if (item instanceof Torch) {
             Torch torch = (Torch) item;
             Vector3f offset = torch.getLightOffset();
-            Vector3f location = vertex.getLocation();
+            Vector3f location = vertex.copyLocation();
             location.addLocal(offset);
             worldState.setTorchLocation(location);
         }
@@ -212,7 +212,9 @@ public class FreeItemsState
          */
         NavVertex startVertex = playerState.getVertex();
         NavGraph graph = worldState.getGraph();
-        NavVertex goalVertex = graph.findFurthest(startVertex);
+        List<NavVertex> farVertices = graph.findMostHops(startVertex);
+        Random generator = worldState.getGenerator();
+        NavVertex goalVertex = (NavVertex) Noise.pick(farVertices, generator);
         Crown crown = new Crown(simpleApplication);
         add(crown, goalVertex);
         /*
@@ -221,7 +223,6 @@ public class FreeItemsState
          */
         List<NavVertex> options = graph.findByHops(1, startVertex);
         options.remove(goalVertex);
-        Random generator = worldState.getGenerator();
         NavVertex torchVertex = (NavVertex) Noise.pick(options, generator);
         if (torchVertex != null) {
             Torch torch = new Torch(simpleApplication);
