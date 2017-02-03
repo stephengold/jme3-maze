@@ -122,6 +122,15 @@ public class PlayerState extends GameAppState {
     }
 
     /**
+     * Copy this player's location.
+     *
+     * @return new vector in world coordinates
+     */
+    public Vector3f copyLocation() {
+        return location.clone();
+    }
+
+    /**
      * Copy this player's orientation in world coordinates.
      *
      * @return a new instance
@@ -214,15 +223,6 @@ public class PlayerState extends GameAppState {
      */
     public Item getRightHandItem() {
         return rightHandItem;
-    }
-
-    /**
-     * Copy this player's location.
-     *
-     * @return new vector in world coordinates
-     */
-    public Vector3f getLocation() {
-        return location.clone();
     }
 
     /**

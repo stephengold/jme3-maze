@@ -431,7 +431,7 @@ public class MainViewState extends GameAppState {
          * Add avatar to represent the player.
          */
         root.attachChild(avatarNode);
-        Vector3f location = playerState.getLocation();
+        Vector3f location = playerState.copyLocation();
         MySpatial.setWorldLocation(avatarNode, location);
         Quaternion orientation = playerState.copyOrientation();
         MySpatial.setWorldOrientation(avatarNode, orientation);

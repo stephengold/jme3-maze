@@ -424,7 +424,7 @@ public class MapViewState
             slot.setRootNode(null);
             addCamera();
 
-            Vector3f location = playerState.getLocation();
+            Vector3f location = playerState.copyLocation();
             setPlayerLocation(location);
             Quaternion orientation = playerState.copyOrientation();
             setPlayerOrientation(orientation);
@@ -549,7 +549,7 @@ public class MapViewState
          * Add avatar node.
          */
         mapRootNode.attachChild(avatarNode);
-        Vector3f location = playerState.getLocation();
+        Vector3f location = playerState.copyLocation();
         MySpatial.setWorldLocation(avatarNode, location);
         Quaternion orientation = playerState.copyOrientation();
         MySpatial.setWorldOrientation(avatarNode, orientation);
