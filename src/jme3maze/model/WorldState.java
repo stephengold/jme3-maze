@@ -69,6 +69,10 @@ public class WorldState extends GameAppState {
      */
     final private static float levelSpacing = 20f;
     /**
+     * tolerance for comparing polygons (in world units)
+     */
+    final private static float tolerance = 0.1f;
+    /**
      * spacing between adjacent vertices in a level (in world units)
      */
     final private static float vertexSpacing = 30f;
@@ -93,11 +97,11 @@ public class WorldState extends GameAppState {
      */
     final private Map<NavArc, Spline3f> travelPaths = new HashMap<>();
     /**
-     * levels of the maze: set by initialize()
+     * levels of the maze (set by #initialize())
      */
     private MazeLevel[] levels;
     /**
-     * starting point for player
+     * starting arc for player
      */
     private NavArc startArc;
     /**
@@ -109,7 +113,8 @@ public class WorldState extends GameAppState {
      */
     final private Random generator;
     /**
-     * location of "torch" item in world coordinates: set by setTorchLocation()
+     * location of "torch" item (in world coordinates, set by
+     * #setTorchLocation())
      */
     final private Vector3f torchLocation = new Vector3f();
     // *************************************************************************
@@ -197,13 +202,14 @@ public class WorldState extends GameAppState {
      * Look up the travel path for a specific arc.
      *
      * @param arc (member)
-     * @return travel path, or null for straight line
+     * @return travel path (not null)
      */
     public Spline3f getPath(NavArc arc) {
         graph.validateMember(arc, "arc");
 
         Spline3f result = travelPaths.get(arc);
 
+        assert result != null;
         return result;
     }
 
@@ -217,7 +223,7 @@ public class WorldState extends GameAppState {
     }
 
     /**
-     * Determine the number of levels in the maze.
+     * Read the number of levels in the maze.
      *
      * @return count (&ge;0)
      */
@@ -263,26 +269,10 @@ public class WorldState extends GameAppState {
     }
 
     /**
-     * Compute the level difference between the endpoints of the specified arc.
-     *
-     * @param arc (not null, unaffected)
-     * @return number of levels (in the downward direction)
-     */
-    public static int levelChange(NavArc arc) {
-        NavVertex fromVertex = arc.getFromVertex();
-        int fromIndex = levelIndex(fromVertex);
-        NavVertex toVertex = arc.getToVertex();
-        int toIndex = levelIndex(toVertex);
-        int result = toIndex - fromIndex;
-
-        return result;
-    }
-
-    /**
      * Compute the level index of the specified vertex.
      *
      * @param vertex (not null)
-     * @return level index (&ge;0)
+     * @return level index (&ge;0) or -1 if between levels
      */
     public static int levelIndex(NavVertex vertex) {
         Vector3f location = vertex.copyLocation();
@@ -295,13 +285,21 @@ public class WorldState extends GameAppState {
      * Compute the level index of the specified location.
      *
      * @param location (not null)
-     * @return level index (&ge;0)
+     * @return level index (&ge;0) or -1 if between levels or out of range
      */
     public static int levelIndex(Vector3f location) {
-        int levelIndex = Math.round(-location.y / levelSpacing);
-
-        assert levelIndex >= 0 : levelIndex;
-        return levelIndex;
+        float yValue = location.y;
+        int levelIndex = Math.round(-yValue / levelSpacing);
+        if (levelIndex < 0) {
+            return -1;
+        }
+        float baseY = -levelIndex * levelSpacing;
+        float diff = FastMath.abs(baseY - yValue);
+        if (diff > tolerance) {
+            return -1;
+        } else {
+            return levelIndex;
+        }
     }
 
     /**
@@ -310,6 +308,8 @@ public class WorldState extends GameAppState {
      * @param newLocation (in world coordinates, not null)
      */
     public void setTorchLocation(Vector3f newLocation) {
+        Validate.nonNull(newLocation, "new location");
+
         torchLocation.set(newLocation);
         /*
          * Update the main view.
@@ -320,7 +320,7 @@ public class WorldState extends GameAppState {
     /**
      * Convert the specified direction to a quaternion.
      *
-     * @param direction (positive length, unaffected)
+     * @param direction (not null, not zero, unaffected)
      * @return new instance
      */
     public static Quaternion toOrientation(Vector3f direction) {
@@ -328,6 +328,7 @@ public class WorldState extends GameAppState {
 
         Quaternion result = new Quaternion();
         result.lookAt(direction, upDirection);
+
         return result;
     }
     // *************************************************************************
@@ -365,7 +366,7 @@ public class WorldState extends GameAppState {
 
         Vector3f offset = result.offset();
         Vector3f[] joints;
-        if (FastMath.abs(offset.y) < 0.1f) {
+        if (FastMath.abs(offset.y) < tolerance) {
             /*
              * horizontal corridor arc: no joint
              */
@@ -411,8 +412,8 @@ public class WorldState extends GameAppState {
             int numColumns = numRows;
             String levelName = String.format("L%d", levelIndex);
             MazeLevel level = new MazeLevel(baseY, numRows, numColumns, graph,
-                    travelPaths, generator, levelName, entryStartVertex,
-                    entryEndLocation);
+                    generator, levelName, entryStartVertex, entryEndLocation,
+                    tolerance);
             levels[levelIndex] = level;
 
             NavVertex entryEndVertex;
@@ -420,24 +421,27 @@ public class WorldState extends GameAppState {
                 /*
                  * top level (level 0)
                  */
-                List<NavArc> gridArcs = level.getArcs();
+                assert levelIndex == 0 : levelIndex;
+                List<NavArc> gridArcs = level.listGridArcs();
                 startArc = (NavArc) Noise.pick(gridArcs, generator);
                 entryEndVertex = startArc.getFromVertex();
             } else {
+                assert levelIndex > 0 : levelIndex;
                 entryEndVertex = level.findGridVertex(entryEndLocation);
             }
             /*
              * Put the level's exit as far as possible from its entrance.
              */
-            Collection<NavVertex> vertices = level.getVertices();
+            Collection<NavVertex> gridVertices = level.listGridVertices();
             List<NavVertex> farVertices = graph.findMostHops(
-                    entryEndVertex, vertices);
+                    entryEndVertex, gridVertices);
             entryStartVertex = (NavVertex) Noise.pick(farVertices, generator);
+            Vector3f entryStartLocation = entryStartVertex.copyLocation();
+
             NavArc[] arcs = entryStartVertex.copyOutgoing();
             assert arcs.length == 1 : arcs.length;
             NavArc arc = arcs[0];
-            Vector3f arcDirection = arc.offset().normalize();
-            Vector3f entryStartLocation = entryStartVertex.copyLocation();
+            Vector3f arcDirection = arc.offset().normalizeLocal();
             Vector3f offset = arcDirection.mult(vertexSpacing);
             entryEndLocation = entryStartLocation.subtract(offset);
             entryEndLocation.y -= levelSpacing;
@@ -493,7 +497,7 @@ public class WorldState extends GameAppState {
             midCorners[1] = poly1.copyCornerLocation(next1);
             midCorners[2] = poly2.copyCornerLocation(corner2);
             midCorners[3] = poly2.copyCornerLocation(next2);
-            Locus3f midLocus = new SimplePolygon3f(midCorners, 0.1f);
+            Locus3f midLocus = new SimplePolygon3f(midCorners, tolerance);
 
             NavVertex mid = graph.addVertex(midName, midLocus);
 
