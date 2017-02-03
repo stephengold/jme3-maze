@@ -215,6 +215,8 @@ public class FreeItemsState extends GameAppState {
         List<NavVertex> farVertices = graph.findMostHops(startVertex);
         Random generator = worldState.getGenerator();
         NavVertex goalVertex = (NavVertex) Noise.pick(farVertices, generator);
+        MazeLevel bottom = worldState.getLevel(worldState.getNumLevels() - 1);
+        assert goalVertex.copyLocation().y == bottom.getFloorY();
         Crown crown = new Crown(simpleApplication);
         add(crown, goalVertex);
         /*
