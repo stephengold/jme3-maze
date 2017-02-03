@@ -122,6 +122,16 @@ public class PlayerState extends GameAppState {
     }
 
     /**
+     * Copy this player's orientation in world coordinates.
+     *
+     * @return a new instance
+     */
+    public Quaternion copyOrientation() {
+        assert orientation != null;
+        return orientation.clone();
+    }
+
+    /**
      * Remove the specified item from this player's inventory.
      *
      * @param item item to remove (not null)
@@ -253,16 +263,6 @@ public class PlayerState extends GameAppState {
     public int getMoveCount() {
         assert moveCount >= 0 : moveCount;
         return moveCount;
-    }
-
-    /**
-     * Read this player's orientation in world coordinates.
-     *
-     * @return new instance
-     */
-    public Quaternion getOrientation() {
-        assert orientation != null;
-        return orientation.clone();
     }
 
     /**

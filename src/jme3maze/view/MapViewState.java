@@ -426,7 +426,7 @@ public class MapViewState
 
             Vector3f location = playerState.getLocation();
             setPlayerLocation(location);
-            Quaternion orientation = playerState.getOrientation();
+            Quaternion orientation = playerState.copyOrientation();
             setPlayerOrientation(orientation);
             NavVertex vertex = playerState.getVertex();
             ReadXZ direction = playerState.getDirection();
@@ -551,7 +551,7 @@ public class MapViewState
         mapRootNode.attachChild(avatarNode);
         Vector3f location = playerState.getLocation();
         MySpatial.setWorldLocation(avatarNode, location);
-        Quaternion orientation = playerState.getOrientation();
+        Quaternion orientation = playerState.copyOrientation();
         MySpatial.setWorldOrientation(avatarNode, orientation);
         /*
          * Load the "eye" icon and attach it to the avatar.
