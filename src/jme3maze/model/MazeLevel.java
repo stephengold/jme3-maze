@@ -65,13 +65,13 @@ public class MazeLevel {
      */
     final private NavGraph graph;
     /**
-     * number of navigation arcs in this level
+     * number of grid arcs in this level (&ge;0)
      */
-    private int numArcs = 0;
+    private int numGridArcs = 0;
     /**
-     * number of navigation vertices in this level
+     * number of grid vertices in this level (&ge;0)
      */
-    private int numVertices = 0;
+    private int numGridVertices = 0;
     /**
      * rectangular array of vertices: set by constructor
      */
@@ -135,16 +135,13 @@ public class MazeLevel {
                     entryStartLocation.subtract(entryEndLocation);
             NavVertex entryEndVertex = findGridVertex(entryEndLocation);
             NavArc arc = entryEndVertex.findOutgoing(entryOffset, 0.75);
-            NavArc reverse = arc.findReverse();
-            graph.remove(arc);
-            graph.remove(reverse);
-            numArcs -= 2;
+            removeGridPair(arc);
         }
         /**
          * Prune the remaining arcs until a minimum spanning tree is obtained.
          * In this way, all vertices are connected without any loops.
          */
-        int numPairs = numVertices - 1;
+        int numPairs = numGridVertices - 1;
         pruneTo(numPairs);
 
         if (entryEndLocation != null) {
@@ -279,6 +276,48 @@ public class MazeLevel {
     }
 
     /**
+     * Test whether the specified arc is part of this level's grid.
+     *
+     * @param arc input (may be null)
+     * @return true if grid arc, otherwise false
+     */
+    public boolean gridContains(NavArc arc) {
+        if (arc == null) {
+            return false;
+        } else if (!MazeLevel.this.gridContains(arc.getFromVertex())) {
+            return false;
+        } else if (!MazeLevel.this.gridContains(arc.getToVertex())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Test whether the specified vertex is part of this level's grid.
+     *
+     * @param vertex input (may be null)
+     * @return true if grid vertex, otherwise false
+     */
+    public boolean gridContains(NavVertex vertex) {
+        if (vertex == null) {
+            return false;
+        }
+        int row = findRow(vertex);
+        if (row == -1) {
+            return false;
+        }
+        int column = findColumn(vertex);
+        if (column == -1) {
+            return false;
+        }
+        if (grid[row][column] == vertex) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Read the number of columns of vertices on the Z-axis of this level.
      *
      * @return count (&gt;1)
@@ -318,7 +357,7 @@ public class MazeLevel {
         joints[1] = endVertex.copyLocation();
         Spline3f travelPath = new LinearSpline3f(joints);
         travelPaths.put(newArc, travelPath);
-        numArcs++;
+        numGridArcs++;
     }
 
     /**
@@ -383,7 +422,7 @@ public class MazeLevel {
                 NavVertex newVertex = graph.addVertex(vertexName, locus);
 
                 grid[row][column] = newVertex;
-                numVertices++;
+                numGridVertices++;
                 assert findRow(newVertex) == row : row;
                 assert findColumn(newVertex) == column : column;
             }
@@ -463,23 +502,49 @@ public class MazeLevel {
     }
 
     /**
-     * Remove random arc-pairs until the specified number of pairs remain.
+     * Remove random arc-pairs from the grid until only the specified number of
+     * pairs remain.
      *
      * @param numPairs pair-count goal (&ge;0)
      */
     private void pruneTo(int numPairs) {
         assert numPairs >= 0 : numPairs;
 
-        while (numArcs > 2 * numPairs) {
-            NavArc allArcs[] = graph.copyArcs();
-            NavArc arc = (NavArc) Noise.pick(allArcs, generator);
+        List<NavArc> untried = getArcs();
+        assert numGridArcs == untried.size();
+
+        while (numGridArcs > 2 * numPairs) {
+            assert !untried.isEmpty();
+
+            NavArc arc = (NavArc) Noise.pick(untried, generator);
+            NavArc reverse = arc.findReverse();
+
             if (graph.isConnectedWithout(arc)) {
-                NavArc reverse = arc.findReverse();
-                graph.remove(arc);
-                graph.remove(reverse);
-                numArcs -= 2;
+                removeGridPair(arc);
             }
+
+            boolean success = untried.remove(arc);
+            assert success;
+            success = untried.remove(reverse);
+            assert success;
         }
+    }
+
+    /**
+     * Remove a specified arc-pair from the grid.
+     *
+     * @param arc one arc of the pair (not null, reversible)
+     */
+    private void removeGridPair(NavArc arc) {
+        assert arc != null;
+        assert gridContains(arc) : arc;
+
+        NavArc reverse = arc.findReverse();
+        assert reverse != null;
+
+        graph.remove(arc);
+        graph.remove(reverse);
+        numGridArcs -= 2;
     }
 
     /**
