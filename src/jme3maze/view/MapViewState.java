@@ -64,7 +64,7 @@ import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * Game app state to manage the map view.
+ * Game appstate to manage the map view.
  * <p>
  * Disabled at creation.
  *

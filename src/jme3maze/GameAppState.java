@@ -42,8 +42,7 @@ import jme3maze.view.MapViewState;
 import jme3utilities.SimpleAppState;
 
 /**
- * Simple app state with protected fields providing access to all app states of
- * the Maze Game.
+ * Simple appstate with access to all other appstates in the Maze Game.
  * <p>
  * Enabled at creation.
  *
@@ -63,62 +62,62 @@ public class GameAppState
     // fields
     
     /**
-     * app state to handle analog input: set by initialize()
+     * appstate to handle analog input: set by initialize()
      */
     protected AnalogInputState analogInputState;
     /**
-     * app state to manage the full-screen slot: set by initialize()
+     * appstate to manage the full-screen display slot: set by initialize()
      */
     protected BigSlotState bigSlotState;
     /**
-     * app state to manage free items: set by initialize()
+     * appstate to manage free items: set by initialize()
      */
     protected FreeItemsState freeItemsState;
     /**
-     * app state to process action strings: set by initialize()
+     * appstate to process action strings: set by initialize()
      */
     protected InputState inputState;
     /**
-     * app state to manage the inset slot: set by initialize()
+     * appstate to manage the inset display slot: set by initialize()
      */
     protected InsetSlotState insetSlotState;
     /**
-     * app state to manage localization: set by initialize()
+     * appstate to manage localization: set by initialize()
      */
     protected LocaleState localeState;
     /**
-     * app state to manage the main view: set by initialize()
+     * appstate to manage the main view: set by initialize()
      */
     protected MainViewState mainViewState;
     /**
-     * app state to manage the map view: set by initialize()
+     * appstate to manage the map view: set by initialize()
      */
     protected MapViewState mapViewState;
     /**
-     * app state to translate the player along an arc: set by initialize()
+     * appstate to translate the player along an arc: set by initialize()
      */
     protected MoveState moveState;
     /**
-     * app state to manage the player: set by initialize()
+     * appstate to manage the player: set by initialize()
      */
     protected PlayerState playerState;
     /**
-     * app state to handle raw input: set by initialize()
+     * appstate to handle raw input: set by initialize()
      */
     protected RawInputState rawInputState;
     /**
-     * app state to rotate the player: set by initialize()
+     * appstate to rotate the player: set by initialize()
      */
     protected TurnState turnState;
     /**
-     * app state to manage the maze: set by initialize()
+     * appstate to manage the maze: set by initialize()
      */
     protected WorldState worldState;
     // *************************************************************************
     // AbstractAppState methods
 
     /**
-     * Initialize this app state on the 1st update after it gets attached.
+     * Initialize this appstate on the 1st update after it gets attached.
      *
      * @param sm application's render manager (not null)
      * @param app application which owns this state (not null)

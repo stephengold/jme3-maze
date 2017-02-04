@@ -133,31 +133,31 @@ public class MazeGame
         ScreenshotAppState screenShotState = new ScreenshotAppState();
         stateManager.attach(screenShotState);
         /*
-         * Attach localization app state to the application.
+         * Attach localization appstate to the application.
          */
         LocaleState localeState = new LocaleState();
         stateManager.attach(localeState);
         /*
-         * Attach model app states to the application.
+         * Attach model appstates to the application.
          */
         WorldState worldState = new WorldState(numLevels);
         PlayerState playerState = new PlayerState();
         FreeItemsState freeItemsState = new FreeItemsState();
         stateManager.attachAll(worldState, playerState, freeItemsState);
         /*
-         * Attach display slot app states to the application.
+         * Attach display slot appstates to the application.
          */
         BigSlotState bigSlotState = new BigSlotState();
         InsetSlotState insetSlotState = new InsetSlotState();
         stateManager.attachAll(bigSlotState, insetSlotState);
         /*
-         * Attach view app states to the application.
+         * Attach view appstates to the application.
          */
         MainViewState mainViewState = new MainViewState();
         MapViewState mapViewState = new MapViewState();
         stateManager.attachAll(mainViewState, mapViewState);
         /*
-         * Attach input app states to the application.
+         * Attach input appstates to the application.
          */
         AnalogInputState analogInputState = new AnalogInputState();
         ExploreMode exploreMode = new ExploreMode();

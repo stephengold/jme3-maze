@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014, Stephen Gold
+ Copyright (c) 2014-2017, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,7 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * Controller classes for the Maze Game, including the app states which handle
+ * Controller classes for the Maze Game, including the appstates which handle
  * input events and manage the screen layout.
  */
 package jme3maze.controller;

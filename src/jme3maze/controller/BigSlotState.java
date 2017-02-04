@@ -41,7 +41,7 @@ import jme3maze.GameAppState;
 import jme3utilities.Validate;
 
 /**
- * Game app state to manage the default slot, which includes most of the screen.
+ * Game appstate to manage the default slot, which includes most of the screen.
  *
  * @author Stephen Gold sgold@sonic.net
  */

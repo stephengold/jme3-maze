@@ -40,7 +40,7 @@ import jme3maze.GameAppState;
 import jme3utilities.Validate;
 
 /**
- * Game app state to manage an inset slot.
+ * Game appstate to manage an inset display slot.
  *
  * @author Stephen Gold sgold@sonic.net
  */
@@ -99,7 +99,7 @@ public class InsetSlotState
     // AbstractAppState methods
 
     /**
-     * Enable or disable this app state.
+     * Enable or disable this appstate.
      *
      * @param newStatus true to enable, false to disable
      */

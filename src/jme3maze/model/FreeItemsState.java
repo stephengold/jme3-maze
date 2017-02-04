@@ -46,7 +46,7 @@ import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
- * App state to manage the items not owned by any character in the Maze Game.
+ * Appstate to manage the items not owned by any character in the Maze Game.
  * <p>
  * Enabled at creation.
  *

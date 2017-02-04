@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 import jme3maze.GameAppState;
 
 /**
- * App state for localization data.
+ * Game appstate to manage resource bundles for localization.
  * <p>
  * Enabled at creation.
  *

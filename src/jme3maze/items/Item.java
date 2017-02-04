@@ -88,7 +88,7 @@ public class Item
     // *************************************************************************
     // fields
     /**
-     * app state manager: set by constructor
+     * appstate manager: set by constructor
      */
     final protected AppStateManager stateManager;
     /**
