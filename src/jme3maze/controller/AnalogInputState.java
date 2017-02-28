@@ -125,6 +125,15 @@ public class AnalogInputState
      */
     private float tiltUp = 0f;
     // *************************************************************************
+    // constructors
+    
+    /**
+     * Instantiate an uninitialized, enabled AnalogInputState.
+     */
+    public AnalogInputState() {
+        super(true);
+    }
+    // *************************************************************************
     // new methods exposed
 
     /**

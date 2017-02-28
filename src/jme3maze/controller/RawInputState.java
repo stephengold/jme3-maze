@@ -67,6 +67,15 @@ public class RawInputState
      */
     private boolean middleMouseButtonPressed = false;
     // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate an uninitialized, enabled RawInputState.
+     */
+    public RawInputState() {
+        super(true);
+    }    
+    // *************************************************************************
     // new methods exposed
 
     /**

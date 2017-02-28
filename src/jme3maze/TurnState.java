@@ -67,10 +67,10 @@ public class TurnState extends GameAppState {
     // constructors
 
     /**
-     * Instantiate a disabled turn state.
+     * Instantiate an uninitialized, disabled turn state.
      */
     TurnState() {
-        setEnabled(false);
+        super(false);
     }
     // *************************************************************************
     // new methods exposed

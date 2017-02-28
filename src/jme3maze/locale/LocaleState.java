@@ -80,6 +80,15 @@ public class LocaleState
      */
     private ResourceBundle labels;
     // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate an uninitialized, enabled LocaleState.
+     */
+    public LocaleState() {
+        super(true);
+    }    
+    // *************************************************************************
     // new methods exposed
 
     /**

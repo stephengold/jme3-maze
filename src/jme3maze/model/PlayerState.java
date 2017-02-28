@@ -29,6 +29,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import java.util.List;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.items.Item;
@@ -37,6 +38,7 @@ import jme3utilities.Validate;
 import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
+import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
 /**
@@ -107,6 +109,15 @@ public class PlayerState extends GameAppState {
      * location (world coordinates)
      */
     final private Vector3f location = new Vector3f();
+    // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate an uninitialized, enabled PlayerState.
+     */
+    public PlayerState() {
+        super(true);
+    }
     // *************************************************************************
     // new methods exposed
 
@@ -349,7 +360,12 @@ public class PlayerState extends GameAppState {
             goal = null;
             return null;
         }
-        NavArc result = worldState.getGraph().seek(vertex, goal);
+        NavGraph graph = worldState.getGraph();
+        List<NavArc> path = graph.seek(vertex, goal);
+        if (path.isEmpty()) {
+            return null;
+        }
+        NavArc result = path.get(0);
 
         return result;
     }

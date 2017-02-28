@@ -76,7 +76,7 @@ public class MoveState extends GameAppState {
      * invoked should be initialize().
      */
     MoveState() {
-        setEnabled(false);
+        super(false);
     }
     // *************************************************************************
     // AbstractAppState methods

@@ -35,14 +35,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3utilities.Validate;
-import jme3utilities.math.Locus3f;
 import jme3utilities.math.ReadXZ;
+import jme3utilities.math.locus.Locus3f;
 import jme3utilities.math.VectorXZ;
-import jme3utilities.math.noise.Noise;
+import jme3utilities.math.noise.Generator;
 import jme3utilities.math.polygon.SimplePolygon3f;
 import jme3utilities.math.spline.LinearSpline3f;
 import jme3utilities.math.spline.Spline3f;
@@ -112,7 +111,7 @@ public class WorldState extends GameAppState {
     /**
      * pseudo-random number generator: set by constructor
      */
-    final private Random generator;
+    final private Generator generator;
     /**
      * location of "torch" item (in world coordinates, set by
      * #setTorchLocation())
@@ -131,16 +130,17 @@ public class WorldState extends GameAppState {
     }
 
     /**
-     * Instantiate a world using the specified seed.
+     * Instantiate an uninitialized, enabled world using the specified seed.
      *
      * @param numLevels number of maze levels (&ge;1)
      * @param seed seed for pseudo-random number generator
      */
     public WorldState(int numLevels, long seed) {
+        super(true);
         Validate.positive(numLevels, "number of levels");
 
         levels = new MazeLevel[numLevels];
-        generator = new Random(seed);
+        generator = new Generator(seed);
     }
     // *************************************************************************
     // new methods exposed
@@ -160,7 +160,7 @@ public class WorldState extends GameAppState {
      *
      * @return pre-existing instance
      */
-    public Random getGenerator() {
+    public Generator getGenerator() {
         assert generator != null;
         return generator;
     }
@@ -424,7 +424,7 @@ public class WorldState extends GameAppState {
                  */
                 assert levelIndex == 0 : levelIndex;
                 List<NavArc> gridArcs = level.listGridArcs();
-                startArc = (NavArc) Noise.pick(gridArcs, generator);
+                startArc = (NavArc) generator.pick(gridArcs);
                 entryEndVertex = startArc.getFromVertex();
             } else {
                 assert levelIndex > 0 : levelIndex;
@@ -436,7 +436,7 @@ public class WorldState extends GameAppState {
             Collection<NavVertex> gridVertices = level.listGridVertices();
             List<NavVertex> farVertices = graph.findMostHops(
                     entryEndVertex, gridVertices);
-            entryStartVertex = (NavVertex) Noise.pick(farVertices, generator);
+            entryStartVertex = (NavVertex) generator.pick(farVertices);
             Vector3f entryStartLocation = entryStartVertex.copyLocation();
 
             NavArc[] arcs = entryStartVertex.copyOutgoing();
@@ -500,7 +500,8 @@ public class WorldState extends GameAppState {
             midCorners[3] = poly2.copyCornerLocation(next2);
             Locus3f midLocus = new SimplePolygon3f(midCorners, tolerance);
 
-            NavVertex mid = graph.addVertex(midName, midLocus);
+            Vector3f loc = midLocus.centroid();
+            NavVertex mid = graph.addVertex(midName, midLocus, loc);
 
             NavArc newArc = addShortArc(v1, mid, true);
             if (startArc == arc) {

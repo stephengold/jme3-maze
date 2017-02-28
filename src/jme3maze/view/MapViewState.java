@@ -170,10 +170,10 @@ public class MapViewState
     // constructors
 
     /**
-     * Instantiate a disabled map view state.
+     * Instantiate an uninitialized, disabled map view state.
      */
     public MapViewState() {
-        setEnabled(false);
+        super(false);
     }
     // *************************************************************************
     // new methods exposed

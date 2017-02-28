@@ -118,6 +118,15 @@ public class MainViewState extends GameAppState {
      */
     final private static Vector3f forwardDirection = new Vector3f(0f, 0f, 1f);
     // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate an uninitialized, enabled MainViewState.
+     */
+    public MainViewState() {
+        super(true);
+    }   
+    // *************************************************************************
     // fields
     
     /**

@@ -127,10 +127,10 @@ public class InputState extends GameAppState {
     // constructors
 
     /**
-     * Instantiate a disabled input state.
+     * Instantiate an uninitialized, disabled input state.
      */
     public InputState() {
-        setEnabled(false);
+        super(false);
     }
     // *************************************************************************
     // new methods exposed

@@ -64,6 +64,15 @@ public class BigSlotState
      */
     private float updateInterval = 0f;
     // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate an uninitialized, enabled BigSlotState.
+     */
+    public BigSlotState() {
+        super(true);
+    }    
+    // *************************************************************************
     // GameAppState methods
 
     /**

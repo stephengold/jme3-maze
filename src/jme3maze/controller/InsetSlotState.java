@@ -93,7 +93,7 @@ public class InsetSlotState
      * Instantiate a disabled inset in the upper left corner of the screen.
      */
     public InsetSlotState() {
-        setEnabled(false);
+        super(false);
     }
     // *************************************************************************
     // AbstractAppState methods

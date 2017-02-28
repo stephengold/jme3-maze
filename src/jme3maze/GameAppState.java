@@ -114,6 +114,17 @@ public class GameAppState
      */
     protected WorldState worldState;
     // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate an uninitialized GameAppState.
+     *
+     * @param enable initial status: true &rarr; enabled, false &rarr; disabled
+     */
+    public GameAppState(boolean enable) {
+        super(enable);
+    }
+    // *************************************************************************
     // AbstractAppState methods
 
     /**

@@ -29,11 +29,10 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Validate;
-import jme3utilities.math.noise.Noise;
+import jme3utilities.math.noise.Generator;
 import jme3utilities.math.polygon.SimplePolygon3f;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
@@ -84,7 +83,7 @@ public class MazeLevel {
     /**
      * generator for randomization (not null, set by constructor)
      */
-    final private Random generator;
+    final private Generator generator;
     /**
      * name for this level (not null): set by constructor
      */
@@ -107,7 +106,7 @@ public class MazeLevel {
      * @param tolerance tolerance for polygons (in world units, &gt;0)
      */
     MazeLevel(float floorY, int numRows, int numColumns, NavGraph graph,
-            Random generator, String name, NavVertex entryStartVertex,
+            Generator generator, String name, NavVertex entryStartVertex,
             Vector3f entryEndLocation, float tolerance) {
         assert numRows > 1 : numRows;
         assert numColumns > 1 : numColumns;
@@ -421,7 +420,8 @@ public class MazeLevel {
 
                 String vertexName = String.format(
                         "%s(%d,%d)", namePrefix, row, column);
-                NavVertex newVertex = graph.addVertex(vertexName, locus);
+                NavVertex newVertex = graph.addVertex(vertexName, locus,
+                        position);
 
                 grid[row][column] = newVertex;
                 numGridVertices++;
@@ -519,7 +519,7 @@ public class MazeLevel {
         while (numGridArcs > 2 * numPairs) {
             assert !untried.isEmpty();
 
-            NavArc arc = (NavArc) Noise.pick(untried, generator);
+            NavArc arc = (NavArc) generator.pick(untried);
             NavArc reverse = arc.findReverse();
 
             if (graph.isConnectedWithout(arc)) {

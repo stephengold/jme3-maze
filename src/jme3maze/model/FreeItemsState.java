@@ -30,7 +30,6 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -41,7 +40,7 @@ import jme3maze.items.Item;
 import jme3maze.items.Mummy;
 import jme3maze.items.Torch;
 import jme3utilities.Validate;
-import jme3utilities.math.noise.Noise;
+import jme3utilities.math.noise.Generator;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
 
@@ -72,6 +71,15 @@ public class FreeItemsState extends GameAppState {
      * look up all items items at a location
      */
     final private TreeMap<NavVertex, TreeSet<Item>> itemsAt = new TreeMap<>();
+    // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate an uninitialized, enabled FreeItemsState.
+     */
+    public FreeItemsState() {
+        super(true);
+    }
     // *************************************************************************
     // new methods exposed
 
@@ -213,8 +221,8 @@ public class FreeItemsState extends GameAppState {
         NavVertex startVertex = playerState.getVertex();
         NavGraph graph = worldState.getGraph();
         List<NavVertex> farVertices = graph.findMostHops(startVertex);
-        Random generator = worldState.getGenerator();
-        NavVertex goalVertex = (NavVertex) Noise.pick(farVertices, generator);
+        Generator generator = worldState.getGenerator();
+        NavVertex goalVertex = (NavVertex) generator.pick(farVertices);
         MazeLevel bottom = worldState.getLevel(worldState.getNumLevels() - 1);
         assert goalVertex.copyLocation().y == bottom.getFloorY();
         Crown crown = new Crown(simpleApplication);
@@ -225,7 +233,7 @@ public class FreeItemsState extends GameAppState {
          */
         List<NavVertex> options = graph.findByHops(2, startVertex);
         options.remove(goalVertex);
-        NavVertex torchVertex = (NavVertex) Noise.pick(options, generator);
+        NavVertex torchVertex = (NavVertex) generator.pick(options);
         if (torchVertex != null) {
             Torch torch = new Torch(simpleApplication);
             add(torch, torchVertex);
@@ -236,7 +244,7 @@ public class FreeItemsState extends GameAppState {
          */
         options = graph.findByHops(10, startVertex);
         options.remove(goalVertex);
-        NavVertex ankhVertex = (NavVertex) Noise.pick(options, generator);
+        NavVertex ankhVertex = (NavVertex) generator.pick(options);
         if (ankhVertex != null) {
             Ankh ankh = new Ankh(simpleApplication);
             add(ankh, ankhVertex);
@@ -247,7 +255,7 @@ public class FreeItemsState extends GameAppState {
          */
         options = graph.findByHops(12, startVertex);
         options.remove(goalVertex);
-        NavVertex mummyVertex = (NavVertex) Noise.pick(options, generator);
+        NavVertex mummyVertex = (NavVertex) generator.pick(options);
         if (mummyVertex != null) {
             Mummy mummy = new Mummy(simpleApplication);
             add(mummy, mummyVertex);
