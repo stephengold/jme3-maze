@@ -27,7 +27,7 @@ package jme3maze;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetLoadException;
-import com.jme3.asset.BlenderKey;
+import com.jme3.asset.ModelKey;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.scene.Geometry;
@@ -125,12 +125,12 @@ public class AssetProcessor
         logger.log(Level.FINE, "path={0}", path);
 
         String sourceAssetPath = String.format("Models/%s.blend", path);
-        String targetFilePath = String.format("assets/Models/%s.j3o", path);
+        String targetFilePath = String.format("Written Assets/Models/%s.j3o", path);
         File targetFile = new File(targetFilePath);
         /*
          * Load the Blender model.
          */
-        BlenderKey key = new BlenderKey(sourceAssetPath);
+        ModelKey key = new ModelKey(sourceAssetPath);
         Spatial model = assetManager.loadModel(key);
         logger.log(Level.INFO, "read Blender asset {0}",
                 MyString.quote(sourceAssetPath));

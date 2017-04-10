@@ -1,15 +1,7 @@
-/assets/Models/items/ankh/ankh.j3o
-/assets/Models/items/crown/crown.j3o
-/assets/Models/items/mapmaker/mapmaker.j3o
-/assets/Models/items/mummy/mummy.j3o
-/assets/Models/items/torch/torch.j3o
+/.gradle/2.13/
+/.nb-gradle/
 /build/
-/bulletjme.dll
-/dist/
-/lwjgl.dll
-/lwjgl64.dll
-/master-application.jnlp
-/nbproject/genfiles.properties
-/nbproject/private/
-/OpenAL32.dll
-/OpenAL64.dll
+/*.dll
+/nbproject/
+/private/
+/Written Assets/

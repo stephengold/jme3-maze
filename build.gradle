@@ -1,0 +1,61 @@
+apply plugin: 'java'
+
+//sourceCompatibility = '1.7'
+sourceCompatibility = '1.8'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+    }
+}
+
+ext.jmonkeyengineVersion = '3.1.0-stable'
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'jme3maze.MazeGame'
+}
+
+repositories {
+    maven { url 'https://jcenter.bintray.com' }
+    maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
+    maven { url 'https://dl.bintray.com/stephengold/jme3utilities' }
+    maven { url 'https://dl.bintray.com/stephengold/tonegod' }
+}
+
+dependencies {
+    compile "org.jmonkeyengine:jme3-core:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-blender:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-bullet:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-bullet-native:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-desktop:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-effects:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-jogg:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-lwjgl:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-plugins:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-terrain:${jmonkeyengineVersion}"
+    compile 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
+    compile 'tonegod:tonegodgui:0.1.0'
+    compile 'jme3utilities:SkyControl:0.9.2'
+    compile 'jme3utilities:jme3-utilities-debug:0.5.0'
+    compile 'jme3utilities:jme3-utilities-ui:0.5.0'
+    compile 'jme3utilities:jme3-utilities-x:0.2.0'
+}
+
+// cleanup tasks
+clean { dependsOn 'cleanDLLs', 'cleanWrittenAssets' }
+task cleanDLLs(type: Delete) {
+    delete fileTree(dir: '.', include: '*.dll')
+}
+task cleanWrittenAssets(type: Delete) {
+    delete 'Written Assets'
+}
+
+tasks.withType(JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    enableAssertions true
+}
+task runAssetProcessor(type: JavaExec) {
+    main 'jme3maze.AssetProcessor'
+}
