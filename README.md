@@ -10,7 +10,7 @@ Uses jMonkeyEngine, tonegodGUI, and jme3-utilities.
 
 ### jMonkeyEngine3 (jME3) Software Development Kit (SDK)
 
-The "master" branch of the jme3-utilities repository targets
+The jme3-maze project currently targets
 Version 3.1 of jMonkeyEngine.  You are welcome to use the Engine
 without also using the SDK, but I use the SDK, and the following
 installation instructions assume you will too.
