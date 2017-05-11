@@ -28,6 +28,7 @@ package jme3maze;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetLoadException;
 import com.jme3.asset.ModelKey;
+import com.jme3.audio.openal.ALAudioRenderer;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.binary.BinaryExporter;
 import com.jme3.scene.Geometry;
@@ -49,8 +50,7 @@ import jme3utilities.debug.Printer;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class AssetProcessor
-        extends SimpleApplication {
+public class AssetProcessor extends SimpleApplication {
     // *************************************************************************
     // constants
 
@@ -72,6 +72,8 @@ public class AssetProcessor
          * Mute the chatty loggers found in some imported packages.
          */
         Misc.setLoggingLevels(Level.WARNING);
+        Logger.getLogger(ALAudioRenderer.class.getName())
+                .setLevel(Level.SEVERE);
         /*
          * Set the logging level for this class.
          */

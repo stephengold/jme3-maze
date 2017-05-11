@@ -26,6 +26,7 @@
 package jme3maze;
 
 import com.jme3.app.state.ScreenshotAppState;
+import com.jme3.audio.openal.ALAudioRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
@@ -52,8 +53,7 @@ import jme3utilities.ui.ActionApplication;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class MazeGame
-        extends ActionApplication {
+public class MazeGame extends ActionApplication {
     // *************************************************************************
     // constants
 
@@ -83,6 +83,8 @@ public class MazeGame
          * Mute the chatty loggers found in some imported packages.
          */
         Misc.setLoggingLevels(Level.WARNING);
+        Logger.getLogger(ALAudioRenderer.class.getName())
+                .setLevel(Level.SEVERE);
         /*
          * Lower the logging level for this class.
          */
