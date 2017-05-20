@@ -114,14 +114,14 @@ public class MazeGame extends ActionApplication {
     @Override
     public void actionInitializeApplication() {
         /*
-         * Log the jME3 version string.
+         * Log the jMonkeyEngine version string.
          */
         logger.log(Level.INFO, "jME3-core version is {0}",
                 MyString.quote(JmeVersion.FULL_NAME));
         /*
-         * Log the jME3-utilities version string.
+         * Log the jme3-utilities-heart version string.
          */
-        logger.log(Level.INFO, "jME3-utilities version is {0}",
+        logger.log(Level.INFO, "jME3-utilities-heart version is {0}",
                 MyString.quote(Misc.getVersionShort()));
         /*
          * Disable display of JME statistics.
