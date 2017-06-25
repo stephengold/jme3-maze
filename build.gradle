@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+    // from jcenter repositories:
     compile "org.jmonkeyengine:jme3-core:${jmonkeyengineVersion}"
     compile "org.jmonkeyengine:jme3-blender:${jmonkeyengineVersion}"
     compile "org.jmonkeyengine:jme3-bullet:${jmonkeyengineVersion}"
@@ -35,10 +36,11 @@ dependencies {
     compile "org.jmonkeyengine:jme3-lwjgl:${jmonkeyengineVersion}"
     compile "org.jmonkeyengine:jme3-plugins:${jmonkeyengineVersion}"
     compile "org.jmonkeyengine:jme3-terrain:${jmonkeyengineVersion}"
+    // from stephengold's repositories:
     compile 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     compile 'tonegod:tonegodgui:0.1.0'
-    compile 'jme3utilities:jme3-utilities-heart:0.9.5'
-    compile 'jme3utilities:jme3-utilities-debug:0.5.3'
+    compile 'jme3utilities:jme3-utilities-heart:0.9.8'
+    compile 'jme3utilities:jme3-utilities-debug:0.6.0'
     compile 'jme3utilities:jme3-utilities-ui:0.5.3'
     compile 'jme3utilities:jme3-utilities-x:0.2.1'
 }
