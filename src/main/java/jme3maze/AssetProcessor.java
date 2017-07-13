@@ -43,7 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Misc;
 import jme3utilities.MyString;
-import jme3utilities.debug.Printer;
+import jme3utilities.debug.Dumper;
 
 /**
  * A headless simple application to convert Blender assets to J3O files.
@@ -138,7 +138,7 @@ public class AssetProcessor extends SimpleApplication {
                 MyString.quote(sourceAssetPath));
         validateSpatial(model);
 
-        new Printer().printSubtree(model);
+        new Dumper().dump(model);
         /*
          * Save the model in J3O format.
          */

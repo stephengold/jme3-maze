@@ -58,7 +58,7 @@ import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
-import jme3utilities.debug.Printer;
+import jme3utilities.debug.Dumper;
 import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -125,10 +125,10 @@ public class MainViewState extends GameAppState {
      */
     public MainViewState() {
         super(true);
-    }   
+    }
     // *************************************************************************
     // fields
-    
+
     /**
      * scene-graph control which links the camera's orientation to that of the
      * player's avatar
@@ -454,9 +454,9 @@ public class MainViewState extends GameAppState {
             /*
              * As a debugging aid, dump the scene graph of this view.
              */
-            Printer printer = new Printer();
+            Dumper printer = new Dumper();
             printer.setPrintTransform(true);
-            printer.printSubtree(root);
+            printer.dump(root);
         }
         logger.info("complete");
     }

@@ -56,7 +56,7 @@ import jme3utilities.MyCamera;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
 import jme3utilities.controls.CameraControl;
-import jme3utilities.debug.Printer;
+import jme3utilities.debug.Dumper;
 import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
@@ -117,7 +117,7 @@ public class MapViewState
     final private static Vector3f forwardDirection = new Vector3f(1f, 0f, 0f);
     // *************************************************************************
     // fields
-    
+
     /**
      * slot to display this view: set in setEnabled()
      */
@@ -454,7 +454,7 @@ public class MapViewState
         /*
          * As a debugging aid, dump the scene graph of this view.
          */
-        Printer printer = new Printer();
+        Dumper printer = new Dumper();
         printer.setPrintTransform(true);
         //printer.printSubtree(mapRootNode);
     }
