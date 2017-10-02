@@ -12,16 +12,21 @@ gradle.projectsEvaluated {
 }
 
 ext.jmonkeyengineVersion = '3.1.0-stable'
+//ext.jmonkeyengineVersion = '[3.2,)'
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'jme3maze.MazeGame'
 }
+jar.manifest.attributes(
+    'Main-Class': "${mainClass}"
+)
 
 repositories {
-    maven { url 'https://jcenter.bintray.com' }
-    maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
     maven { url 'https://dl.bintray.com/stephengold/jme3utilities' }
+    maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
     maven { url 'https://dl.bintray.com/stephengold/tonegod' }
+    maven { url 'https://jcenter.bintray.com' }
+    //mavenLocal()
 }
 
 dependencies {
@@ -36,13 +41,14 @@ dependencies {
     compile "org.jmonkeyengine:jme3-lwjgl:${jmonkeyengineVersion}"
     compile "org.jmonkeyengine:jme3-plugins:${jmonkeyengineVersion}"
     compile "org.jmonkeyengine:jme3-terrain:${jmonkeyengineVersion}"
-    // from stephengold's repositories:
-    compile 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
+
+    // from stephengold's bintray repositories:
     compile 'tonegod:tonegodgui:0.1.0'
-    compile 'jme3utilities:jme3-utilities-heart:0.9.10'
-    compile 'jme3utilities:jme3-utilities-debug:0.7.1'
-    compile 'jme3utilities:jme3-utilities-ui:0.5.3'
+    compile 'jme3utilities:jme3-utilities-heart:0.9.26'
+    compile 'jme3utilities:jme3-utilities-debug:0.7.6'
+    compile 'jme3utilities:jme3-utilities-ui:0.5.9'
     compile 'jme3utilities:jme3-utilities-x:0.2.1'
+    runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
 }
 
 // cleanup tasks

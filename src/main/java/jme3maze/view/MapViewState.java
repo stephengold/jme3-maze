@@ -455,7 +455,7 @@ public class MapViewState
          * As a debugging aid, dump the scene graph of this view.
          */
         Dumper printer = new Dumper();
-        printer.setPrintTransform(true);
+        printer.setDumpTransform(true);
         //printer.printSubtree(mapRootNode);
     }
     // *************************************************************************
