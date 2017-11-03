@@ -30,7 +30,6 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.shape.Quad;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -41,6 +40,7 @@ import jme3utilities.Validate;
 import jme3utilities.math.MyVector3f;
 import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
+import jme3utilities.mesh.RectangleMesh;
 import jme3utilities.navigation.NavArc;
 import jme3utilities.navigation.NavGraph;
 import jme3utilities.navigation.NavVertex;
@@ -57,15 +57,11 @@ class MazeLevelView {
     /**
      * message logger for this class
      */
-    final private static Logger logger = Logger.getLogger(
-            MazeLevelView.class.getName());
-    /**
-     * reusable unit-square mesh
-     */
-    final private static Quad unitSquare = new Quad(1f, 1f);
+    final private static Logger logger
+            = Logger.getLogger(MazeLevelView.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * width of corridors (in world units, &gt;0, set by constructor)
      */
@@ -221,7 +217,7 @@ class MazeLevelView {
         assert neLevel >= 0 : neLevel;
         int swLevel = WorldState.levelIndex(swVertex);
         assert swLevel >= 0 : swLevel;
-        /* 
+        /*
          * The levelChange is +1 if north/east end is below south/west end.
          * It is -1 if the north/east end is above the south/west end.
          */
@@ -243,7 +239,7 @@ class MazeLevelView {
 
         } else {
             /*
-             * Ramp uses three sets of side walls: one for the lower level, 
+             * Ramp uses three sets of side walls: one for the lower level,
              * one for the upper level, and one for the gap between them.
              */
             float gapHeight = levelSpacing - wallHeight;
@@ -277,8 +273,8 @@ class MazeLevelView {
         Vector3f vertexLocation = vertex.copyLocation();
         String vertexName = vertex.getName();
         String description = "ceiling for " + vertexName;
-        /* 
-         * The quad's origin is in the southwest corner. 
+        /*
+         * The quad's origin is in the southwest corner.
          * Its U-axis points north. Its V-axis points east.
          */
         Vector3f origin = vertexLocation.add(
@@ -352,12 +348,12 @@ class MazeLevelView {
         Vector3f vertexLocation = vertex.copyLocation();
         String vertexName = vertex.getName();
         String description = "floor for " + vertexName;
-        /* 
-         * The quad's origin is in the southeast corner. 
+        /*
+         * The quad's origin is in the southeast corner.
          * Its U-axis points north. Its V-axis points west.
          */
-        Vector3f origin = vertexLocation.add(
-                -extent.getX() / 2, 0f, extent.getZ() / 2);
+        Vector3f origin
+                = vertexLocation.add(-extent.getX() / 2, 0f, extent.getZ() / 2);
         Vector3f uOffset = new Vector3f(extent.getX(), 0f, 0f);
         Vector3f vOffset = new Vector3f(0f, 0f, -extent.getZ());
         if (nsFlag) {
@@ -464,10 +460,7 @@ class MazeLevelView {
          */
         Quaternion orientation = new Quaternion();
         orientation.fromAxes(uDirection, vDirection, normal);
-        /*
-         * Split the rectangle into individual quads as close in size 
-         * to 10 wu by 10 wu as possible.
-         */
+
         int numU = 1;
         if (uLength > idealSize) {
             numU = Math.round(uLength / idealSize);
@@ -476,33 +469,14 @@ class MazeLevelView {
         if (vLength > idealSize) {
             numV = Math.round(vLength / idealSize);
         }
-        Vector3f location = new Vector3f(0f, 0f, 0f);
-        Vector3f scale = new Vector3f(uLength / numU, vLength / numV, 1f);
 
-        for (int uIndex = 0; uIndex < numU; uIndex++) {
-            float uFraction = ((float) uIndex) / numU;
-            Vector3f u = uOffset.mult(uFraction);
-            for (int vIndex = 0; vIndex < numV; vIndex++) {
-                float vFraction = ((float) vIndex) / numV;
-                Vector3f v = vOffset.mult(vFraction);
-
-                String name = description;
-                if (numU > 1 || numV > 1) {
-                    name = String.format("quad(%d,%d) of %s",
-                            uIndex, vIndex, description);
-                }
-                Geometry geometry = new Geometry(name, unitSquare);
-                parent.attachChild(geometry);
-                geometry.setMaterial(material);
-
-                location.set(origin);
-                location.addLocal(u);
-                location.addLocal(v);
-                MySpatial.setWorldLocation(geometry, location);
-                MySpatial.setWorldOrientation(geometry, orientation);
-                geometry.setLocalScale(scale);
-            }
-        }
+        RectangleMesh mesh = new RectangleMesh(0f, numU, 0f, numV,
+                0f, uLength, 0f, vLength, 1f);
+        Geometry geometry = new Geometry(description, mesh);
+        parent.attachChild(geometry);
+        geometry.setMaterial(material);
+        MySpatial.setWorldLocation(geometry, origin);
+        MySpatial.setWorldOrientation(geometry, orientation);
     }
 
     /**
@@ -577,8 +551,8 @@ class MazeLevelView {
         assert lowerRight != null;
         assert lowerLeft.y == lowerRight.y : lowerLeft.y;
         assert height > 0f : height;
-        /* 
-         * The quad's origin is in the lower left corner. 
+        /*
+         * The quad's origin is in the lower left corner.
          * Its uOffset points right. Its vOffset points up.
          */
         Vector3f origin = lowerLeft;

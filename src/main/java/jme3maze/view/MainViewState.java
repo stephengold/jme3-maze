@@ -101,18 +101,18 @@ public class MainViewState extends GameAppState {
     /**
      * message logger for this class
      */
-    final private static Logger logger = Logger.getLogger(
-            MainViewState.class.getName());
+    final private static Logger logger
+            = Logger.getLogger(MainViewState.class.getName());
     /**
      * asset path to the "pond" texture asset in jME3-testdata.jar
      */
-    final private static String pondAssetPath =
-            "Textures/Terrain/Pond/Pond.jpg";
+    final private static String pondAssetPath
+            = "Textures/Terrain/Pond/Pond.jpg";
     /**
      * asset path to the "wall" texture asset in jME3-testdata.jar
      */
-    final private static String wallAssetPath =
-            "Textures/Terrain/BrickWall/BrickWall.jpg";
+    final private static String wallAssetPath
+            = "Textures/Terrain/BrickWall/BrickWall.jpg";
     /**
      * local "forward" direction (length=1)
      */
@@ -232,8 +232,8 @@ public class MainViewState extends GameAppState {
      * Replace CameraControl with FlyByCamera for debugging.
      */
     public void fly() {
-        CameraControl cameraControl =
-                avatarNode.getControl(CameraControl.class);
+        CameraControl cameraControl
+                = avatarNode.getControl(CameraControl.class);
         cameraControl.setEnabled(false);
 
         flyCam.setEnabled(true);
@@ -376,25 +376,27 @@ public class MainViewState extends GameAppState {
         }
 
         Texture floorTexture = MyAsset.loadTexture(assetManager, pondAssetPath);
+        floorTexture.setWrap(Texture.WrapMode.Repeat);
         if (shadedFlag) {
-            floorMaterial = MyAsset.createShadedMaterial(
-                    assetManager, floorTexture);
+            floorMaterial
+                    = MyAsset.createShadedMaterial(assetManager, floorTexture);
             floorMaterial.setBoolean("UseMaterialColors", true);
             floorMaterial.setColor("Diffuse", ColorRGBA.White.mult(2f));
         } else {
-            floorMaterial = MyAsset.createUnshadedMaterial(
-                    assetManager, floorTexture);
+            floorMaterial = MyAsset.createUnshadedMaterial(assetManager,
+                    floorTexture);
         }
 
         Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
+        wallTexture.setWrap(Texture.WrapMode.Repeat);
         if (shadedFlag) {
-            wallMaterial = MyAsset.createShadedMaterial(
-                    assetManager, wallTexture);
+            wallMaterial
+                    = MyAsset.createShadedMaterial(assetManager, wallTexture);
             wallMaterial.setBoolean("UseMaterialColors", true);
             wallMaterial.setColor("Diffuse", ColorRGBA.White);
         } else {
-            wallMaterial = MyAsset.createUnshadedMaterial(
-                    assetManager, wallTexture);
+            wallMaterial
+                    = MyAsset.createUnshadedMaterial(assetManager, wallTexture);
         }
         /*
          * Visualize each level of the maze.
@@ -498,8 +500,8 @@ public class MainViewState extends GameAppState {
         torch.setRadius(attenuationRadius);
 
         if (shadowsFlag) {
-            PointLightShadowRenderer plsr = new PointLightShadowRenderer(
-                    assetManager, shadowMapSize);
+            PointLightShadowRenderer plsr;
+            plsr = new PointLightShadowRenderer(assetManager, shadowMapSize);
             plsr.setLight(torch);
             plsr.setShadowIntensity(1f);
             viewPort.addProcessor(plsr);
