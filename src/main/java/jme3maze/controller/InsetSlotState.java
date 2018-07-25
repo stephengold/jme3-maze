@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2018, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -77,7 +77,7 @@ public class InsetSlotState
             Logger.getLogger(InsetSlotState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * interval between updates (in seconds, &ge;0): set by update()
      */
@@ -181,6 +181,9 @@ public class InsetSlotState
      */
     @Override
     public Node getRootNode() {
+        if (insetViewPort == null) {
+            return null;
+        }
         List<Spatial> scenes = insetViewPort.getScenes();
         if (scenes.isEmpty()) {
             return null;
