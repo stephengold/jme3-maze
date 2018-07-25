@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2018, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
 import jme3utilities.Misc;
 import jme3utilities.MyString;
+import jme3utilities.debug.Dumper;
 import jme3utilities.ui.ActionApplication;
 
 /**
@@ -71,7 +72,26 @@ public class MazeGame extends ActionApplication {
      */
     final private static String windowTitle = "Maze Game";
     // *************************************************************************
+    // fields
+
+    /**
+     * dumper for scene dumps
+     */
+    final private static Dumper dumper = new Dumper();
+    // *************************************************************************
     // new methods exposed
+
+    /**
+     * Process a "dump" action.
+     */
+    public void dump() {
+        dumper.setDumpBucket(true);
+        dumper.setDumpCull(true);
+        dumper.setDumpShadow(true);
+        dumper.setDumpTransform(true);
+
+        dumper.dump(renderManager);
+    }
 
     /**
      * Main entry point for the maze game.

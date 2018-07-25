@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2018, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.input.KeyInput;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3maze.MazeGame;
 import jme3utilities.MyString;
 import jme3utilities.ui.InputMode;
 
@@ -89,6 +90,9 @@ public class ExploreMode
         if (actionString.equals("close")) {
             simpleApplication.stop();
             return;
+        } else if (actionString.equals("dump")) {
+            ((MazeGame) simpleApplication).dump();
+            return;
         }
 
         InputState inputState = stateManager.getState(InputState.class);
@@ -117,6 +121,7 @@ public class ExploreMode
          * For now, avoid re-assigning those hotkeys.
          */
         bind("close", KeyInput.KEY_ESCAPE);
+        bind("dump", KeyInput.KEY_P);
         bind(InputState.leftActionString, KeyInput.KEY_A);
         bind(InputState.rightActionString, KeyInput.KEY_D);
         bind(InputState.leftActionString, KeyInput.KEY_LEFT);
