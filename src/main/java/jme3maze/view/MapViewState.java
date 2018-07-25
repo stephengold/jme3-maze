@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2018, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -472,11 +472,11 @@ public class MapViewState
         float levelSpacing = WorldState.getLevelSpacing();
         mapCamera.setFrustumFar(levelSpacing);
 
-        mapCamera.setParallelProjection(true);
-
         float vertexSpacing = WorldState.getVertexSpacing();
         float yViewRadius = 3f * vertexSpacing; // world units
         MyCamera.setYTangent(mapCamera, yViewRadius);
+
+        mapCamera.setParallelProjection(true);
         /*
          * Add a control for the downward-looking map camera.
          */
