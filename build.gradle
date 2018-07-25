@@ -1,54 +1,52 @@
 apply plugin: 'java'
 
+// select a source-code option
 //sourceCompatibility = '1.7'
 sourceCompatibility = '1.8'
 
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
-        options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+        options.compilerArgs << '-Xdiags:verbose'
+        options.compilerArgs << '-Xlint:unchecked'
+        options.deprecation = true
+        options.encoding = 'UTF-8'
     }
 }
 
-ext.jmonkeyengineVersion = '3.2.0-alpha2'
-//ext.jmonkeyengineVersion = '[3.2,)'
+// select a version of the Engine
+ext.jmonkeyengineVersion = '3.2.0-alpha2' // from jcenter
+//ext.jmonkeyengineVersion = '[3.2,)' // from mavenLocal
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'jme3maze.MazeGame'
 }
 jar.manifest.attributes(
-    'Main-Class': "${mainClass}"
+    'Main-Class': ext.mainClass
 )
 
 repositories {
     maven { url 'https://dl.bintray.com/stephengold/jme3utilities' }
     maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
     maven { url 'https://dl.bintray.com/stephengold/tonegod' }
-    maven { url 'https://jcenter.bintray.com' }
+    jcenter()
     //mavenLocal()
 }
 
 dependencies {
-    // from jcenter repositories:
-    compile "org.jmonkeyengine:jme3-core:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-blender:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-bullet:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-bullet-native:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-desktop:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-effects:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-jogg:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-lwjgl:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-plugins:${jmonkeyengineVersion}"
-    compile "org.jmonkeyengine:jme3-terrain:${jmonkeyengineVersion}"
-
     // from stephengold's bintray repositories:
     compile 'tonegod:tonegodgui:0.1.0'
-    compile 'jme3utilities:jme3-utilities-heart:1.0.0for32'
     compile 'jme3utilities:jme3-utilities-debug:0.8.2for32'
     compile 'jme3utilities:jme3-utilities-ui:0.6.0for32'
     compile 'jme3utilities:jme3-utilities-x:0.2.2for32'
     runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
+
+    // from jcenter (or mavenLocal) repositories:
+    compile "org.jmonkeyengine:jme3-blender:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-bullet:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-bullet-native:${jmonkeyengineVersion}"
+    runtime "org.jmonkeyengine:jme3-lwjgl:${jmonkeyengineVersion}"
+    runtime "org.jmonkeyengine:jme3-plugins:${jmonkeyengineVersion}"
+    compile "org.jmonkeyengine:jme3-terrain:${jmonkeyengineVersion}"
 }
 
 // cleanup tasks
