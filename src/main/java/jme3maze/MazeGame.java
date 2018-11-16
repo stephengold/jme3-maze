@@ -142,7 +142,7 @@ public class MazeGame extends ActionApplication {
          * Log the jme3-utilities-heart version string.
          */
         logger.log(Level.INFO, "jME3-utilities-heart version is {0}",
-                MyString.quote(Misc.getVersionShort()));
+                MyString.quote(Misc.versionShort()));
         /*
          * Disable display of JME statistics.
          * These displays can be re-enabled by pressing the F5 hotkey.

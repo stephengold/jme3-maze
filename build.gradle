@@ -43,10 +43,10 @@ repositories {
 dependencies {
     // from stephengold's bintray repositories:
     compile 'tonegod:tonegodgui:0.1.0'
-    compile 'jme3utilities:jme3-utilities-debug:0.9.1'
-    compile 'jme3utilities:jme3-utilities-heart:2.8.0'
-    compile 'jme3utilities:jme3-utilities-ui:0.6.4'
-    compile 'jme3utilities:jme3-utilities-x:0.2.4'
+    compile 'jme3utilities:jme3-utilities-debug:0.9.5'
+    compile 'jme3utilities:jme3-utilities-heart:2.12.0'
+    compile 'jme3utilities:jme3-utilities-ui:0.6.5'
+    compile 'jme3utilities:jme3-utilities-x:0.2.6'
     runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
 
     // from jcenter (or mavenLocal) repositories:
