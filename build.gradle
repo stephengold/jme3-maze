@@ -1,29 +1,29 @@
 apply plugin: 'java'
 
-// select one source-code option
+// select one source-code (JDK) option
 //sourceCompatibility = '1.7'
 sourceCompatibility = '1.8'
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
+        // compile-time options:
         options.compilerArgs << '-Xdiags:verbose'
         options.compilerArgs << '-Xlint:unchecked'
         options.deprecation = true
         options.encoding = 'UTF-8'
     }
     tasks.withType(JavaExec) {
+        // runtime options:
         classpath sourceSets.main.runtimeClasspath
         //debug true
+        //doFirst { println commandLine }
         enableAssertions true
         jvmArgs '-XX:+UseConcMarkSweepGC'
         //jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
     }
 }
 
-// select one version of the Engine
-//ext.jmonkeyengineVersion = '3.2.1-stable' // from jcenter
-ext.jmonkeyengineVersion = '3.2.2-beta1' // from jcenter
-//ext.jmonkeyengineVersion = '3.3.0-SNAPSHOT' // from mavenLocal
+ext.jmonkeyengineVersion = '3.2.2-stable' // from jcenter
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'jme3maze.MazeGame'
@@ -50,9 +50,9 @@ dependencies {
     compile 'jme3utilities:jme3-utilities-x:0.2.7'
     runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
 
-    // from jcenter (or mavenLocal) repositories:
+    // from jcenter repositories:
     compile "org.jmonkeyengine:jme3-blender:$jmonkeyengineVersion"
-    runtime "org.jmonkeyengine:jme3-lwjgl3:$jmonkeyengineVersion"
+    runtime "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengineVersion"
     runtime "org.jmonkeyengine:jme3-plugins:$jmonkeyengineVersion"
 }
 
