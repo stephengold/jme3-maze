@@ -1,39 +1,44 @@
-# jme3-maze project
+# Jme3-maze Project
 
-The jme3-maze project is a first-person, single-player game with a mouse-oriented GUI.
+The Jme3-maze Project is a first-person, single-player game with a mouse-oriented GUI.
 
 Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme.
 
 Uses jMonkeyEngine, tonegodGUI, and jme3-utilities.
 
-## How to install the SDK and the jme3-maze project
+## How to install the SDK and the Jme3-maze Project
 
 ### jMonkeyEngine3 (jME3) Software Development Kit (SDK)
 
-The jme3-maze project currently targets
-Version 3.1 of jMonkeyEngine.  You are welcome to use the Engine
+The Jme3-maze Project currently targets
+Version 3.2.2 of jMonkeyEngine.  You are welcome to use the Engine
 without also using the SDK, but I use the SDK, and the following
 installation instructions assume you will too.
 
 The hardware and software requirements of the SDK are documented at
 https://jmonkeyengine.github.io/wiki/jme3/requirements.html
 
- 1. Download a jMonkeyEngine 3.1 SDK from https://github.com/jMonkeyEngine/sdk/releases
+ 1. Download a jMonkeyEngine 3.2 SDK from
+    https://github.com/jMonkeyEngine/sdk/releases
  2. Install the SDK, which includes:
    + the engine itself,
    + an integrated development environment (IDE) based on NetBeans,
    + various plugins, and
    + the Blender 3D application.
- 3. To open the project in the SDK (or NetBeans), you will need the "Gradle
-    Support" plugin.  Download and install it before proceeding.
+ 3. To open the Minie project in the IDE (or NetBeans), you will need the
+    `Gradle Support` plugin.  Download and install it before proceeding.
+    If this plugin isn't shown in the IDE's "Plugins" tool,
+    you can download it from
+    [GitHub](https://github.com/kelemen/netbeans-gradle-project/releases).
 
 ### Source files
 
 Clone the jme3-maze repository using Git:
+
  1. Open the Clone wizard in the IDE:
    + Menu bar -> "Team" -> "Remote" -> "Clone..."
  2. For "Repository URL:" specify
-    "https://github.com/stephengold/jme3-maze.git" (without the quotes).
+    `https://github.com/stephengold/jme3-maze.git`
  3. Clear the "User:" and "Password:" text boxes.
  4. For "Clone into:" specify a writable folder (on a local filesystem)
     which doesn't already contain "jme3-maze".
@@ -65,10 +70,10 @@ To run the game:
 
 ## Acknowledgments
 
-Like most projects, the jme3-maze project builds upon the work of many who
-have gone before.
+Like most projects, the Minie Project builds on the work of many who
+have gone before.  I therefore acknowledge the following
+artists and software developers:
 
-I therefore acknowledge the following software developers:
 + Cris (aka "t0neg0d") for creating tonegodGUI and adapting it to my needs
 + the creators of (and contributors to) the following software:
   + Adobe Photoshop Elements
@@ -86,7 +91,7 @@ I therefore acknowledge the following software developers:
   + the WinMerge differencing and merging tool
 
 I am grateful to JFrog, Google, and Github for providing free hosting for the
-jme3-maze project and many other open-source projects.
+Jme3-maze Project and many other open-source projects.
 
 I'm also grateful to my dear Holly, for keeping me sane.
 
