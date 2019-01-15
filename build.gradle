@@ -43,10 +43,9 @@ repositories {
 
 dependencies {
     // from stephengold's bintray repositories:
-    compile 'tonegod:tonegodgui:0.1.1'
+    compile 'tonegod:tonegodgui:0.1.2'
     compile 'jme3utilities:jme3-utilities-debug:0.9.9'
-    compile 'jme3utilities:jme3-utilities-heart:2.18.0'
-    compile 'jme3utilities:jme3-utilities-ui:0.6.7'
+    compile 'jme3utilities:jme3-utilities-ui:0.7.0'
     compile 'jme3utilities:jme3-utilities-x:0.2.8'
     runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
 
