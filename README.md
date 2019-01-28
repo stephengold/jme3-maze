@@ -6,6 +6,13 @@ Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme
 
 Uses jMonkeyEngine, tonegodGUI, and jme3-utilities.
 
+## Contents of this document
+
+ + [How to install the SDK and the Jme3-maze Project](#install)
+ + [Acknowledgments](#acks)
+
+<a name="install"/>
+
 ## How to install the SDK and the Jme3-maze Project
 
 ### jMonkeyEngine3 (jME3) Software Development Kit (SDK)
@@ -67,6 +74,8 @@ To run the game:
  1. Right-click on the "jme3-maze" project in the "Projects" window.
  2. Select "Run"
 
+
+<a name="acks"/>
 
 ## Acknowledgments
 
