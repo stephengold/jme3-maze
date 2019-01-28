@@ -1,4 +1,4 @@
-# Jme3-maze Project
+<img height="150" src="https://i.imgur.com/MzrLrNm.png">
 
 The Jme3-maze Project is a first-person, single-player game
 with a mouse-oriented GUI.
