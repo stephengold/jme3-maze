@@ -25,7 +25,7 @@ https://jmonkeyengine.github.io/wiki/jme3/requirements.html
    + an integrated development environment (IDE) based on NetBeans,
    + various plugins, and
    + the Blender 3D application.
- 3. To open the Minie project in the IDE (or NetBeans), you will need the
+ 3. To open the Jme3-maze Project in the IDE (or NetBeans), you will need the
     `Gradle Support` plugin.  Download and install it before proceeding.
     If this plugin isn't shown in the IDE's "Plugins" tool,
     you can download it from
@@ -70,7 +70,7 @@ To run the game:
 
 ## Acknowledgments
 
-Like most projects, the Minie Project builds on the work of many who
+Like most projects, the Jme3-maze Project builds on the work of many who
 have gone before.  I therefore acknowledge the following
 artists and software developers:
 
