@@ -1,11 +1,11 @@
 <img height="150" src="https://i.imgur.com/MzrLrNm.png">
 
-The Jme3-maze Project is a first-person, single-player game
+The [Jme3-maze Project][jme3maze] is a first-person, single-player game
 with a mouse-oriented GUI.
 
 Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme.
 
-Uses jMonkeyEngine, tonegodGUI, and jme3-utilities.
+Uses [jMonkeyEngine][jme], [tonegodGUI][], and [jme3-utilities][utilities].
 
 ## Contents of this document
 
@@ -75,6 +75,22 @@ To run the game:
  1. Right-click on the "jme3-maze" project in the "Projects" window.
  2. Select "Run"
 
+[blender]: https://docs.blender.org "Blender Project"
+[chrome]: https://www.google.com/chrome "Chrome"
+[elements]: http://www.adobe.com/products/photoshop-elements.html "Photoshop Elements"
+[findbugs]: http://findbugs.sourceforge.net "FindBugs Project"
+[git]: https://git-scm.com "Git"
+[github]: https://github.com "GitHub"
+[gradle]: https://gradle.org "Gradle Project"
+[jfrog]: https://www.jfrog.com "JFrog"
+[jme]: http://jmonkeyengine.org  "jMonkeyEngine Project"
+[jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
+[makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
+[markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
+[netbeans]: https://netbeans.org "NetBeans Project"
+[tonegodgui]: https://github.com/stephengold/tonegodgui "TonegodGUI Project"
+[utilities]: https://github.com/stephengold/jme3-utilities "Jme3-Utilities Project"
+[winmerge]: http://winmerge.org "WinMerge Project"
 
 <a name="acks"/>
 
@@ -86,24 +102,24 @@ artists and software developers:
 
 + Cris (aka "t0neg0d") for creating tonegodGUI and adapting it to my needs
 + the creators of (and contributors to) the following software:
-    + Adobe Photoshop Elements
-    + the Blender 3-D animation suite
-    + the FindBugs source-code analyzer
-    + the Git revision-control system and GitK commit viewer
-    + the Google Chrome web browser
-    + the Gradle build tool
+    + [Adobe Photoshop Elements][elements]
+    + the [Blender][] 3-D animation suite
+    + the [FindBugs][] source-code analyzer
+    + the [Git][] revision-control system and GitK commit viewer
+    + the [Google Chrome web browser][chrome]
+    + the [Gradle][] build tool
     + the Java compiler, standard doclet, and runtime environment
-    + jMonkeyEngine and the jME3 Software Development Kit
+    + [jMonkeyEngine][jme] and the jME3 Software Development Kit
     + LWJGL, the Lightweight Java Game Library
-    + the MakeHuman 3-D character creation tool
-    + the Markdown document conversion tool
+    + the [MakeHuman][] 3-D character creation tool
+    + the [Markdown][] document conversion tool
     + Microsoft Windows 7 Professional
-    + the NetBeans integrated development environment
+    + the [NetBeans][] integrated development environment
     + the PMD source-code analyzer
     + the Subversion revision-control system
-    + the WinMerge differencing and merging tool
+    + the [WinMerge][] differencing and merging tool
 
-I am grateful to JFrog, Google, and Github for providing free hosting for the
+I am grateful to [JFrog][], Google, and [Github][] for providing free hosting for the
 Jme3-maze Project and many other open-source projects.
 
 I'm also grateful to my dear Holly, for keeping me sane.
