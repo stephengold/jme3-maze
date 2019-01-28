@@ -1,6 +1,7 @@
 # Jme3-maze Project
 
-The Jme3-maze Project is a first-person, single-player game with a mouse-oriented GUI.
+The Jme3-maze Project is a first-person, single-player game
+with a mouse-oriented GUI.
 
 Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme.
 
@@ -85,19 +86,19 @@ artists and software developers:
 
 + Cris (aka "t0neg0d") for creating tonegodGUI and adapting it to my needs
 + the creators of (and contributors to) the following software:
-  + Adobe Photoshop Elements
-  + the Blender 3D animation suite
-  + the FindBugs source code analyzer
-  + the Git and Subversion revision control systems
-  + the Google Chrome web browser
-  + the Java compiler, standard doclet, and runtime environment
-  + jMonkeyEngine and the jME3 Software Development Kit
-  + LWJGL, the Lightweight Java Game Library
-  + the MakeHuman 3D character creation tool
-  + Microsoft Windows
-  + the NetBeans integrated development environment
-  + the PMD source code analyzer
-  + the WinMerge differencing and merging tool
+    + Adobe Photoshop Elements
+    + the Blender 3D animation suite
+    + the FindBugs source code analyzer
+    + the Git and Subversion revision control systems
+    + the Google Chrome web browser
+    + the Java compiler, standard doclet, and runtime environment
+    + jMonkeyEngine and the jME3 Software Development Kit
+    + LWJGL, the Lightweight Java Game Library
+    + the MakeHuman 3D character creation tool
+    + Microsoft Windows
+    + the NetBeans integrated development environment
+    + the PMD source code analyzer
+    + the WinMerge differencing and merging tool
 
 I am grateful to JFrog, Google, and Github for providing free hosting for the
 Jme3-maze Project and many other open-source projects.
