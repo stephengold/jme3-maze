@@ -1,9 +1,10 @@
 <img height="150" src="https://i.imgur.com/MzrLrNm.png">
 
-The [Jme3-maze Project][jme3maze] is a first-person, single-player game
-with a mouse-oriented GUI.
-
+The [Jme3-maze Project][jme3maze] is creating a first-person, single-player game
+with a mouse-oriented GUI.  Its logline is:
+<blockquote>
 Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme.
+</blockquote>
 
 Uses [jMonkeyEngine][jme], [tonegodGUI][], and [jme3-utilities][utilities].
 
