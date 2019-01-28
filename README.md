@@ -87,17 +87,20 @@ artists and software developers:
 + Cris (aka "t0neg0d") for creating tonegodGUI and adapting it to my needs
 + the creators of (and contributors to) the following software:
     + Adobe Photoshop Elements
-    + the Blender 3D animation suite
-    + the FindBugs source code analyzer
-    + the Git and Subversion revision control systems
+    + the Blender 3-D animation suite
+    + the FindBugs source-code analyzer
+    + the Git revision-control system and GitK commit viewer
     + the Google Chrome web browser
+    + the Gradle build tool
     + the Java compiler, standard doclet, and runtime environment
     + jMonkeyEngine and the jME3 Software Development Kit
     + LWJGL, the Lightweight Java Game Library
-    + the MakeHuman 3D character creation tool
-    + Microsoft Windows
+    + the MakeHuman 3-D character creation tool
+    + the Markdown document conversion tool
+    + Microsoft Windows 7 Professional
     + the NetBeans integrated development environment
-    + the PMD source code analyzer
+    + the PMD source-code analyzer
+    + the Subversion revision-control system
     + the WinMerge differencing and merging tool
 
 I am grateful to JFrog, Google, and Github for providing free hosting for the
@@ -106,4 +109,4 @@ Jme3-maze Project and many other open-source projects.
 I'm also grateful to my dear Holly, for keeping me sane.
 
 If I've misattributed anything or left anyone out, please let me know so I can
-correct the situation.
+correct the situation: sgold@sonic.net
