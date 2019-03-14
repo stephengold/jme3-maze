@@ -37,16 +37,20 @@ repositories {
 
 dependencies {
     // from stephengold's bintray repositories:
-    compile 'tonegod:tonegodgui:0.1.2'
-    compile 'jme3utilities:jme3-utilities-debug:0.9.11'
-    compile 'jme3utilities:jme3-utilities-ui:0.7.0'
-    compile 'jme3utilities:jme3-utilities-x:0.2.8'
+    compile 'jme3utilities:jme3-utilities-heart:2.22.0'
+    compile 'jme3utilities:jme3-utilities-ui:0.7.1'
+    compile 'jme3utilities:jme3-utilities-x:0.2.9'
     runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
+    compile 'tonegod:tonegodgui:0.1.2'
 
     // from jcenter repositories:
     runtime "org.jmonkeyengine:jme3-blender:$jmonkeyengineVersion"
     runtime "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengineVersion"
     runtime "org.jmonkeyengine:jme3-plugins:$jmonkeyengineVersion"
+}
+
+task runAssetProcessor(type: JavaExec) {
+    main 'jme3maze.AssetProcessor'
 }
 
 // cleanup tasks
@@ -59,8 +63,4 @@ task cleanSOs(type: Delete) {
 }
 task cleanWrittenAssets(type: Delete) {
     delete 'Written Assets'
-}
-
-task runAssetProcessor(type: JavaExec) {
-    main 'jme3maze.AssetProcessor'
 }
