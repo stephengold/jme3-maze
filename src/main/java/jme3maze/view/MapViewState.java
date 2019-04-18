@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2018, Stephen Gold
+ Copyright (c) 2014-2019, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -406,7 +406,8 @@ public class MapViewState
         float vertexSpacing = WorldState.getVertexSpacing(); // world units
         float yViewRadius = vertexSpacing * yViewDiameter / 2f; // world units
         Camera mapCamera = slot.getCamera();
-        MyCamera.setYTangent(mapCamera, yViewRadius);
+        float oldYvr = mapCamera.getFrustumTop() - mapCamera.getFrustumBottom();
+        MyCamera.zoom(mapCamera, yViewRadius / oldYvr);
     }
     // *************************************************************************
     // AbstractAppState methods
