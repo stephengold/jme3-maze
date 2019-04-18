@@ -16,12 +16,14 @@ gradle.projectsEvaluated {
         //debug true
         //doFirst { println commandLine }
         enableAssertions true
+        //jvmArgs '-verbosegc'
+        //jvmArgs '-Xms512m', '-Xmx512m'
         jvmArgs '-XX:+UseConcMarkSweepGC'
         //jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
     }
 }
 
-ext.jmonkeyengineVersion = '3.2.2-stable' // from jcenter
+ext.jmonkeyengineVersion = '3.2.3-stable' // from jcenter
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = 'jme3maze.MazeGame'
@@ -37,9 +39,9 @@ repositories {
 
 dependencies {
     // from stephengold's bintray repositories:
-    compile 'jme3utilities:jme3-utilities-heart:2.22.0'
-    compile 'jme3utilities:jme3-utilities-ui:0.7.1'
-    compile 'jme3utilities:jme3-utilities-x:0.2.9'
+    compile 'jme3utilities:jme3-utilities-heart:2.25.0'
+    compile 'jme3utilities:jme3-utilities-ui:0.7.2'
+    compile 'jme3utilities:jme3-utilities-x:0.2.10'
     runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     compile 'tonegod:tonegodgui:0.1.2'
 
@@ -54,9 +56,12 @@ task runAssetProcessor(type: JavaExec) {
 }
 
 // cleanup tasks
-clean { dependsOn 'cleanDLLs', 'cleanSOs', 'cleanWrittenAssets' }
+clean { dependsOn 'cleanDLLs', 'cleanLogs', 'cleanSOs', 'cleanWrittenAssets' }
 task cleanDLLs(type: Delete) {
     delete fileTree(dir: '.', include: '*.dll')
+}
+task cleanLogs(type: Delete) {
+    delete fileTree(dir: '.', include: 'hs_err_pid*.log')
 }
 task cleanSOs(type: Delete) {
     delete fileTree(dir: '.', include: '*.so')
