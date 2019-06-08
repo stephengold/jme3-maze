@@ -40,14 +40,15 @@ repositories {
 
 dependencies {
     // from stephengold's bintray repositories:
-    compile 'jme3utilities:jme3-utilities-heart:2.26.0'
-    compile 'jme3utilities:jme3-utilities-ui:0.7.2'
-    compile 'jme3utilities:jme3-utilities-x:0.2.10'
+    compile 'jme3utilities:jme3-utilities-heart:2.28.1'
+    compile 'jme3utilities:jme3-utilities-ui:0.7.3'
+    compile 'jme3utilities:jme3-utilities-x:0.2.11'
     runtime 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     compile 'tonegod:tonegodgui:0.1.2'
 
     // from jcenter repositories:
     runtime "org.jmonkeyengine:jme3-blender:$jmonkeyengineVersion"
+    runtime "org.jmonkeyengine:jme3-jogg:$jmonkeyengineVersion"
     runtime "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengineVersion"
     runtime "org.jmonkeyengine:jme3-plugins:$jmonkeyengineVersion"
 }

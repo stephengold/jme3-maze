@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2019, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -187,7 +187,7 @@ public class Torch extends Item {
          * Create material for particles.
          */
         String texturePath = "Effects/Explosion/flame.png";
-        Texture texture = MyAsset.loadTexture(assetManager, texturePath);
+        Texture texture = MyAsset.loadTexture(assetManager, texturePath, false);
         Material material =
                 MyAsset.createParticleMaterial(assetManager, texture);
         /*

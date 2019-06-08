@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2019, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -375,7 +375,8 @@ public class MainViewState extends GameAppState {
                     ColorRGBA.White);
         }
 
-        Texture floorTexture = MyAsset.loadTexture(assetManager, pondAssetPath);
+        Texture floorTexture
+                = MyAsset.loadTexture(assetManager, pondAssetPath, true);
         floorTexture.setWrap(Texture.WrapMode.Repeat);
         if (shadedFlag) {
             floorMaterial
@@ -387,7 +388,8 @@ public class MainViewState extends GameAppState {
                     floorTexture);
         }
 
-        Texture wallTexture = MyAsset.loadTexture(assetManager, wallAssetPath);
+        Texture wallTexture
+                = MyAsset.loadTexture(assetManager, wallAssetPath, true);
         wallTexture.setWrap(Texture.WrapMode.Repeat);
         if (shadedFlag) {
             wallMaterial

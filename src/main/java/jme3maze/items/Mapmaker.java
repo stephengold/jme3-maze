@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2019, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -152,7 +152,7 @@ public class Mapmaker extends Item {
         brush.setMaterial(brushMaterial);
 
         Texture eyeTexture = MyAsset.loadTexture(assetManager,
-                "Textures/items/brown_eye.png");
+                "Textures/items/brown_eye.png", false);
         Material eyesMaterial =
                 MyAsset.createShinyMaterial(assetManager, ColorRGBA.White);
         eyesMaterial.setTexture("DiffuseMap", eyeTexture);
