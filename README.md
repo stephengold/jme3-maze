@@ -20,7 +20,7 @@ Uses [jMonkeyEngine][jme], [tonegodGUI][], and [jme3-utilities][utilities].
 ### jMonkeyEngine3 (jME3) Software Development Kit (SDK)
 
 The Jme3-maze Project currently targets
-Version 3.2.2 of jMonkeyEngine.  You are welcome to use the Engine
+Version 3.2.4 of jMonkeyEngine.  You are welcome to use the Engine
 without also using the SDK, but I use the SDK, and the following
 installation instructions assume you will too.
 
