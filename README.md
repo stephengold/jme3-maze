@@ -13,6 +13,7 @@ It uses [jMonkeyEngine][jme], [tonegodGUI][], and [jme3-utilities][utilities].
 ## Contents of this document
 
  + [How to install the SDK and the Jme3-maze Project](#install)
+ + [How to install the Jme3-maze Project without an SDK](#nosdk)
  + [Acknowledgments](#acks)
 
 <a name="install"/>
@@ -106,6 +107,17 @@ To run the game:
 
  1. Right-click on the "jme3-maze" project in the "Projects" window.
  2. Select "Run"
+
+[Jump to table of contents](#toc)
+
+<a name="nosdk"/>
+
+## How to install the Jme3-maze Project without an SDK
+
+    git clone https://github.com/stephengold/jme3-maze.git
+    cd jme3-maze
+    ./gradlew runAssetProcessor
+    ./gradlew run
 
 [blender]: https://docs.blender.org "Blender Project"
 [bsd3]: https://opensource.org/licenses/BSD-3-Clause "3-Clause BSD License"
