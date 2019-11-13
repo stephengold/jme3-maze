@@ -3,7 +3,6 @@ plugins {
     id 'java'
 }
 
-// select one source-code (JDK) option
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -18,7 +17,6 @@ gradle.projectsEvaluated {
         args = []
         classpath sourceSets.main.runtimeClasspath
         //debug true
-        //doFirst { println commandLine }
         enableAssertions true
         //jvmArgs '-verbose:gc'
         //jvmArgs '-Xms512m', '-Xmx512m'
@@ -49,7 +47,7 @@ dependencies {
     implementation 'jme3utilities:jme3-utilities-ui:0.7.8for32'
     implementation 'jme3utilities:jme3-utilities-x:0.2.15for32'
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
-    implementation 'tonegod:tonegodgui:0.1.2'
+    implementation 'tonegod:tonegodgui:0.1.3'
 
     // from jcenter repositories:
     runtimeOnly "org.jmonkeyengine:jme3-blender:$jmonkeyengineVersion"
@@ -63,7 +61,7 @@ task runAssetProcessor(type: JavaExec) {
 }
 
 // cleanup tasks
-clean { dependsOn 'cleanDLLs', 'cleanLogs', 'cleanSOs', 'cleanWrittenAssets' }
+clean.dependsOn('cleanDLLs', 'cleanLogs', 'cleanSOs', 'cleanWrittenAssets')
 task cleanDLLs(type: Delete) {
     delete fileTree(dir: '.', include: '*.dll')
 }
