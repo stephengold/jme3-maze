@@ -5,4 +5,5 @@
 /private/
 /Written Assets/
 /*.dll
+/*.dylib
 /*.so
