@@ -44,8 +44,8 @@ repositories {
 
 dependencies {
     // from stephengold's bintray repositories:
-    implementation 'jme3utilities:jme3-utilities-heart:4.3.0for32'
-    implementation 'jme3utilities:jme3-utilities-ui:0.7.10for32'
+    implementation 'jme3utilities:jme3-utilities-heart:4.5.0for32'
+    implementation 'jme3utilities:jme3-utilities-ui:0.8.0for32'
     implementation 'jme3utilities:jme3-utilities-x:0.2.17for32'
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     implementation 'tonegod:tonegodgui:0.1.3'

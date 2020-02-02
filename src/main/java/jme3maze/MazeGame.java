@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2018, Stephen Gold
+ Copyright (c) 2014-2020, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
 import jme3maze.view.MapViewState;
-import jme3utilities.Misc;
+import jme3utilities.Heart;
 import jme3utilities.MyString;
 import jme3utilities.debug.Dumper;
 import jme3utilities.ui.ActionApplication;
@@ -102,7 +102,7 @@ public class MazeGame extends ActionApplication {
         /*
          * Mute the chatty loggers found in some imported packages.
          */
-        Misc.setLoggingLevels(Level.WARNING);
+        Heart.setLoggingLevels(Level.WARNING);
         Logger.getLogger(ALAudioRenderer.class.getName())
                 .setLevel(Level.SEVERE);
         /*
@@ -141,8 +141,8 @@ public class MazeGame extends ActionApplication {
         /*
          * Log the jme3-utilities-heart version string.
          */
-        logger.log(Level.INFO, "jME3-utilities-heart version is {0}",
-                MyString.quote(Misc.versionShort()));
+        logger.log(Level.INFO, "Heart version is {0}",
+                MyString.quote(Heart.versionShort()));
         /*
          * Disable display of JME statistics.
          * These displays can be re-enabled by pressing the F5 hotkey.
