@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     // from stephengold's bintray repositories:
-    implementation 'com.github.stephengold:Heart:5.0.0for32'
+    implementation 'com.github.stephengold:Heart:5.2.0for32'
     implementation 'com.github.stephengold:jme3-utilities-ui:0.8.1for32'
     implementation 'com.github.stephengold:jme3-utilities-x:0.2.18for32'
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
