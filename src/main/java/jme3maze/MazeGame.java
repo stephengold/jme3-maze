@@ -143,6 +143,8 @@ public class MazeGame extends ActionApplication {
          */
         logger.log(Level.INFO, "Heart version is {0}",
                 MyString.quote(Heart.versionShort()));
+
+        renderer.setDefaultAnisotropicFilter(8);
         /*
          * Disable display of JME statistics.
          * These displays can be re-enabled by pressing the F5 hotkey.
