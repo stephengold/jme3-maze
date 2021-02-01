@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2020, Stephen Gold
+ Copyright (c) 2014-2021, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,6 @@
  */
 package jme3maze;
 
-import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.audio.openal.ALAudioRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeVersion;
@@ -151,11 +150,6 @@ public class MazeGame extends ActionApplication {
          */
         setDisplayFps(false);
         setDisplayStatView(false);
-        /*
-         * Capture a screenshot each time the SYSRQ hotkey is pressed.
-         */
-        ScreenshotAppState screenShotState = new ScreenshotAppState();
-        stateManager.attach(screenShotState);
         /*
          * Attach localization appstate to the application.
          */

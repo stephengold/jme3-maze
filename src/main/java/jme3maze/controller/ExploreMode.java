@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2018, Stephen Gold
+ Copyright (c) 2014-2021, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,10 @@
 package jme3maze.controller;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
+import com.jme3.app.StatsAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.asset.AssetManager;
 import com.jme3.cursors.plugins.JmeCursor;
 import com.jme3.input.KeyInput;
@@ -74,10 +77,10 @@ public class ExploreMode
      *
      * @param actionString textual description of the action (not null)
      * @param ongoing true if the action is ongoing, otherwise false
-     * @param ignored time per frame (in seconds)
+     * @param tpf time per frame (in seconds)
      */
     @Override
-    public void onAction(String actionString, boolean ongoing, float ignored) {
+    public void onAction(String actionString, boolean ongoing, float tpf) {
         /*
          * Ignore actions which are not ongoing.
          */
@@ -93,6 +96,15 @@ public class ExploreMode
         } else if (actionString.equals("dump")) {
             ((MazeGame) simpleApplication).dump();
             return;
+        } else if (actionString.equals("ScreenShot")) {
+            ScreenshotAppState screenshotAppState
+                    = stateManager.getState(ScreenshotAppState.class);
+            screenshotAppState.onAction(actionString, ongoing, tpf);
+        } else if (actionString.equals(
+                SimpleApplication.INPUT_MAPPING_HIDE_STATS)) {
+            StatsAppState statsAppState
+                    = stateManager.getState(StatsAppState.class);
+            statsAppState.toggleStats();
         }
 
         InputState inputState = stateManager.getState(InputState.class);
@@ -111,12 +123,6 @@ public class ExploreMode
          * Windows uses:
          *  KEY_LMETA to open the Windows menu
          *  KEY_NUMLOCK to toggle keypad key definitions
-         * SimpleApplication pre-assigns:
-         *  KEY_F5 to toggle the stats display
-         *  KEY_C to print camera coordinates
-         *  KEY_M to print memory statistics
-         * And com.jme3.app.state.ScreenshotAppState uses:
-         *  KEY_SYSRQ to save a screenshot
          *
          * For now, avoid re-assigning those hotkeys.
          */
@@ -132,6 +138,15 @@ public class ExploreMode
         bind(InputState.advanceActionString, KeyInput.KEY_W);
         bind(InputState.useRightHandItemActionString, KeyInput.KEY_X);
         bind(InputState.useLeftHandItemActionString, KeyInput.KEY_Z);
+
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("linux")) {
+            bind("ScreenShot", KeyInput.KEY_SCROLL); // window mgr blocks SYSRQ
+        } else {
+            bind("ScreenShot", KeyInput.KEY_SYSRQ);
+        }
+
+        bind(SimpleApplication.INPUT_MAPPING_HIDE_STATS, KeyInput.KEY_F5);
     }
 
     /**
