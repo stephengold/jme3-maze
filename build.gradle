@@ -25,7 +25,7 @@ tasks.withType(JavaExec) { // Java runtime options:
     jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
 }
 
-ext.jmonkeyengineVersion = '3.3.2-stable' // from jcenter
+ext.jmonkeyengineVersion = '3.3.2-stable' // from mavenCentral
 
 mainClassName = 'jme3maze.MazeGame'
 if (!hasProperty('mainClass')) {
@@ -48,7 +48,7 @@ dependencies {
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     implementation 'tonegod:tonegodgui:0.1.4'
 
-    // from jcenter repositories:
+    // from mavenCentral repositories:
     runtimeOnly 'org.jmonkeyengine:jme3-blender:' + jmonkeyengineVersion
     runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmonkeyengineVersion
     runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmonkeyengineVersion
