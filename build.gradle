@@ -36,7 +36,6 @@ jar.manifest.attributes('Main-Class': mainClassName)
 repositories {
     //mavenLocal()
     maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
-    maven { url 'https://dl.bintray.com/stephengold/tonegod' }
     mavenCentral()
 }
 
@@ -45,8 +44,8 @@ dependencies {
     implementation 'com.github.stephengold:Heart:6.4.2'
     implementation 'com.github.stephengold:jme3-utilities-ui:0.9.2'
     implementation 'com.github.stephengold:jme3-utilities-x:0.2.20'
+    implementation 'com.github.stephengold:tonegodgui:0.1.5'
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
-    implementation 'tonegod:tonegodgui:0.1.4'
 
     // from mavenCentral repositories:
     runtimeOnly 'org.jmonkeyengine:jme3-blender:' + jmonkeyengineVersion
