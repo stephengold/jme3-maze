@@ -52,7 +52,7 @@ dependencies {
 }
 
 task runAssetProcessor(type: JavaExec) {
-    main 'jme3maze.AssetProcessor'
+    mainClass = 'jme3maze.AssetProcessor'
 }
 
 // cleanup tasks
