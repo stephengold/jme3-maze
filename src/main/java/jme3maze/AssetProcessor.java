@@ -36,6 +36,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.plugins.blender.BlenderLoader;
 import com.jme3.system.JmeContext;
 import java.io.File;
 import java.io.IOException;
@@ -95,6 +96,8 @@ public class AssetProcessor extends SimpleApplication {
      */
     @Override
     public void simpleInitApp() {
+        assetManager.registerLoader(BlenderLoader.class, "blend");
+
         String userDir = System.getProperty("user.dir");
         logger.log(Level.INFO, "working directory is {0}",
                 MyString.quote(userDir));
