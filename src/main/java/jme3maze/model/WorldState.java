@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2021, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -39,8 +39,8 @@ import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3utilities.Validate;
 import jme3utilities.math.ReadXZ;
-import jme3utilities.math.locus.Locus3f;
 import jme3utilities.math.VectorXZ;
+import jme3utilities.math.locus.Locus3f;
 import jme3utilities.math.noise.Generator;
 import jme3utilities.math.polygon.SimplePolygon3f;
 import jme3utilities.math.spline.LinearSpline3f;
@@ -91,7 +91,7 @@ public class WorldState extends GameAppState {
     final public static Vector3f upDirection = new Vector3f(0f, 1f, 0f);
     // *************************************************************************
     // fields
-    
+
     /**
      * map arcs to travel paths
      */
