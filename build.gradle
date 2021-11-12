@@ -1,6 +1,5 @@
 plugins {
     id 'application'
-    id 'java'
 }
 
 sourceCompatibility = 1.8
@@ -17,7 +16,6 @@ tasks.withType(JavaExec) { // Java runtime options:
     args = []
     classpath sourceSets.main.runtimeClasspath
     //debug true
-    //doFirst { println commandLine }
     enableAssertions true
     //jvmArgs '-verbose:gc'
     //jvmArgs '-Xms512m', '-Xmx512m'
