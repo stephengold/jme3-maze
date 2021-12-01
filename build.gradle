@@ -37,9 +37,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.stephengold:Heart:6.4.4'
-    implementation 'com.github.stephengold:jme3-utilities-ui:0.9.4'
-    implementation 'com.github.stephengold:jme3-utilities-x:0.2.21'
+    implementation 'com.github.stephengold:Heart:7.1.0'
+    implementation 'com.github.stephengold:jme3-utilities-ui:0.9.5'
+    implementation 'com.github.stephengold:jme3-utilities-x:0.2.22'
     implementation 'com.github.stephengold:tonegodgui:0.1.6'
 
     implementation 'org.jmonkeyengine:jme3-blender:3.3.2-stable'
