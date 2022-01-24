@@ -8,116 +8,30 @@ Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme
 
 It uses [jMonkeyEngine][jme], [tonegodGUI][], and [jme3-utilities][utilities].
 
-<a name="toc"/>
 
-## Contents of this document
+## How to build and run Jme3-maze from source
 
- + [How to install the SDK and the Jme3-maze Project](#install)
- + [How to install the Jme3-maze Project without an SDK](#nosdk)
- + [Acknowledgments](#acks)
+1. Install Git and a Java Development Kit (JDK),
+   if you don't already have one.
+2. Point the `JAVA_HOME` environment variable to your JDK installation.
+  + using Bash:  `export JAVA_HOME="` *path to installation* `"`
+  + using Windows Command Prompt:  `set JAVA_HOME="` *path to installation* `"`
+  + using PowerShell: `$env:JAVA_HOME = '` *path to installation* `'`
+3. Download and extract the Jme3-maze source code using Git:
+  + `git clone https://github.com/stephengold/jme3-maze.git
+  + `cd jme3-maze`
+4. Build the project from source:
+  + using Bash or PowerShell: `./gradlew build runAssetProcessor`
+  + using Windows Command Prompt: `.\gradlew build runAssetProcessor`
 
-<a name="install"/>
+You can run the local build using the Gradle wrapper:
+  + using Bash or PowerShell: `./gradlew run`
+  + using Windows Command Prompt: `.\gradlew run`
 
-## How to install the SDK and the Jme3-maze Project
+You can restore the project to a pristine state:
+ + using Bash or PowerShell: `./gradlew clean`
+ + using Windows Command Prompt: `.\gradlew clean`
 
-### jMonkeyEngine3 (jME3) Software Development Kit (SDK)
-
-The Jme3-maze Project currently targets
-Version 3.2.4 of jMonkeyEngine.  You are welcome to use the Engine
-without installing its Integrated Development Environment (IDE),
-but I use the IDE, so I tend to assume you will too.
-
-### IDE setup
-
-If you already have the IDE installed, skip to step 6.
-
-The hardware and software requirements of the IDE are documented at
-https://jmonkeyengine.github.io/wiki/jme3/requirements.html
-
- 1. Download a jMonkeyEngine 3.2 Software Development Kit (SDK) from
-    [GitHub](https://github.com/jMonkeyEngine/sdk/releases).
- 2. Install the SDK, which includes:
-    + the engine itself,
-    + an IDE based on [NetBeans][],
-    + various IDE plugins, and
-    + the [Blender 3D][blender] application.
- 3. Open the IDE.
- 4. The first time you open the IDE, it prompts you to
-    specify a folder for storing projects:
-    + Fill in the "Folder name" text box.
-    + Click on the "Set Project Folder" button.
- 5. The first time you open the IDE, you should update
-    all the pre-installed plugins:
-    + Menu bar -> "Tools" -> "Plugins" to open the "Plugins" dialog.
-    + Click on the "Update" button to open the "Plugin Installer" wizard.
-    + Click on the "Next >" button.
-    + After the plugins have downloaded, click "Finish".
-    + The IDE will restart.
- 6. In order to open the Jme3-maze Project in the IDE (or NetBeans),
-    you will need to install the `Gradle Support` plugin:
-    + Menu bar -> "Tools" -> "Plugins" to open the "Plugins" dialog.
-    + Click on the "Available Plugins" tab.
-    + Check the box next to "Gradle Support" in the "Gradle" category.
-     If this plugin isn't shown in the IDE's "Plugins" tool,
-     you can download it from
-     [GitHub](https://github.com/kelemen/netbeans-gradle-project/releases).
-    + Click on the "Install" button to open the "Plugin Installer" wizard.
-    + Click on the "Next >" button.
-    + Check the box next to
-     "I accept the terms in all the license agreements."
-    + Click on the "Install" button.
-    + When the "Verify Certificate" dialog appears,
-     click on the "Continue" button.
-    + Click on the "Finish" button.
-    + The IDE will restart.
-
-### Source files
-
-Clone the jme3-maze repository using Git:
-
- 1. Open the "Clone Repository" wizard in the IDE, either:
-     + Menu bar -> "Team" -> "Git" -> "Clone..." or
-     + Menu bar -> "Team" -> "Remote" -> "Clone..."
- 2. For "Repository URL:" specify
-    `https://github.com/stephengold/jme3-maze.git`
- 3. Clear the "User:" and "Password:" text boxes.
- 4. For "Clone into:" specify a writable folder (on a local filesystem)
-    that doesn't already contain "jme3-maze".
- 5. Click on the "Next >" button.
- 6. Make sure the "master" remote branch is checked.
- 7. Click on the "Next >" button again.
- 8. Make sure the Checkout Branch is set to "master".
- 9. Make sure the "Scan for NetBeans Projects after Clone" box is checked.
-10. Click on the "Finish" button.
-11. When the "Clone Completed" dialog appears, click on the "Open Project..."
-    button.
-
-### Asset conversion
-
-Before you run the game itself, you'll need to convert the Blender assets to
-native J3O format. To do this, run the AssetProcessor.java file in the jme3maze
-package:
-
- 1. Right-click on the "jme3-maze" project in the "Projects" window.
- 2. Select "Tasks" -> "runAssetProcessor"
-
-### Next steps
-
-To run the game:
-
- 1. Right-click on the "jme3-maze" project in the "Projects" window.
- 2. Select "Run"
-
-[Jump to table of contents](#toc)
-
-<a name="nosdk"/>
-
-## How to install the Jme3-maze Project without an SDK
-
-    git clone https://github.com/stephengold/jme3-maze.git
-    cd jme3-maze
-    ./gradlew runAssetProcessor
-    ./gradlew run
 
 [blender]: https://docs.blender.org "Blender Project"
 [bsd3]: https://opensource.org/licenses/BSD-3-Clause "3-Clause BSD License"
