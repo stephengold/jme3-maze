@@ -32,26 +32,8 @@ You can restore the project to a pristine state:
  + using Bash or PowerShell: `./gradlew clean`
  + using Windows Command Prompt: `.\gradlew clean`
 
-
-[blender]: https://docs.blender.org "Blender Project"
-[bsd3]: https://opensource.org/licenses/BSD-3-Clause "3-Clause BSD License"
-[chrome]: https://www.google.com/chrome "Chrome"
-[elements]: http://www.adobe.com/products/photoshop-elements.html "Photoshop Elements"
-[findbugs]: http://findbugs.sourceforge.net "FindBugs Project"
-[git]: https://git-scm.com "Git"
-[github]: https://github.com "GitHub"
-[gradle]: https://gradle.org "Gradle Project"
-[jfrog]: https://www.jfrog.com "JFrog"
-[jme]: http://jmonkeyengine.org  "jMonkeyEngine Project"
-[jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
-[makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
-[markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
-[netbeans]: https://netbeans.org "NetBeans Project"
-[tonegodgui]: https://github.com/stephengold/tonegodgui "TonegodGUI Project"
-[utilities]: https://github.com/stephengold/jme3-utilities "jME3 Utilities Project"
-[winmerge]: http://winmerge.org "WinMerge Project"
-
 [Jump to table of contents](#toc)
+
 
 <a name="acks"/>
 
@@ -89,3 +71,22 @@ If I've misattributed anything or left anyone out, please let me know so I can
 correct the situation: sgold@sonic.net
 
 [Jump to table of contents](#toc)
+
+
+[blender]: https://docs.blender.org "Blender Project"
+[bsd3]: https://opensource.org/licenses/BSD-3-Clause "3-Clause BSD License"
+[chrome]: https://www.google.com/chrome "Chrome"
+[elements]: http://www.adobe.com/products/photoshop-elements.html "Photoshop Elements"
+[findbugs]: http://findbugs.sourceforge.net "FindBugs Project"
+[git]: https://git-scm.com "Git"
+[github]: https://github.com "GitHub"
+[gradle]: https://gradle.org "Gradle Project"
+[jfrog]: https://www.jfrog.com "JFrog"
+[jme]: http://jmonkeyengine.org  "jMonkeyEngine Project"
+[jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
+[makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
+[markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
+[netbeans]: https://netbeans.org "NetBeans Project"
+[tonegodgui]: https://github.com/stephengold/tonegodgui "TonegodGUI Project"
+[utilities]: https://github.com/stephengold/jme3-utilities "jME3 Utilities Project"
+[winmerge]: http://winmerge.org "WinMerge Project"
