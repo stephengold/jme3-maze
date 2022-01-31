@@ -35,8 +35,6 @@ You can restore the project to a pristine state:
 [Jump to table of contents](#toc)
 
 
-<a name="acks"/>
-
 ## Acknowledgments
 
 Like most projects, the Jme3-maze Project builds on the work of many who
