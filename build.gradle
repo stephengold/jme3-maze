@@ -1,3 +1,5 @@
+// Gradle build script for the jme3-maze project
+
 plugins {
     id 'application'
 }
@@ -37,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.stephengold:Heart:7.2.0'
+    implementation 'com.github.stephengold:Heart:7.3.0'
     implementation 'com.github.stephengold:Acorus:0.9.8'
     implementation 'com.github.stephengold:jme3-utilities-x:0.3.0'
     implementation 'com.github.stephengold:tonegodgui:0.1.6'
@@ -54,6 +56,7 @@ task runAssetProcessor(type: JavaExec) {
 }
 
 // cleanup tasks
+
 clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSOs', 'cleanWrittenAssets')
 task cleanDLLs(type: Delete) {
     delete fileTree(dir: '.', include: '*.dll')
