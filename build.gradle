@@ -7,6 +7,7 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
+// current version of JMonkeyEngine:
 ext.jme3Version = '3.5.0-stable'
 
 tasks.withType(JavaCompile) { // Java compile-time options:
@@ -17,7 +18,6 @@ tasks.withType(JavaCompile) { // Java compile-time options:
 }
 
 tasks.withType(JavaExec) { // Java runtime options:
-    args = []
     classpath sourceSets.main.runtimeClasspath
     enableAssertions true
     //jvmArgs '-verbose:gc'
@@ -32,13 +32,13 @@ if (!hasProperty('mainClass')) {
 jar.manifest.attributes('Main-Class': mainClassName)
 
 repositories {
-    //mavenLocal() // to use local SNAPSHOTs of libraries
+    //mavenLocal() // to find local SNAPSHOTs of libraries
     mavenCentral()
 }
 
 dependencies {
     implementation 'com.github.stephengold:Heart:7.4.1'
-    implementation 'com.github.stephengold:Acorus:0.9.9'
+    implementation 'com.github.stephengold:Acorus:0.9.10'
     implementation 'com.github.stephengold:jme3-utilities-x:0.3.0'
     implementation 'com.github.stephengold:tonegodgui:0.1.6'
 
@@ -53,21 +53,22 @@ task runAssetProcessor(type: JavaExec) {
     mainClass = 'jme3maze.AssetProcessor'
 }
 
-// cleanup tasks
+// cleanup tasks:
 
 clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSOs', 'cleanWrittenAssets')
-task cleanDLLs(type: Delete) {
+
+task cleanDLLs(type: Delete) { // extracted Windows native libraries
     delete fileTree(dir: '.', include: '*.dll')
 }
-task cleanDyLibs(type: Delete) {
+task cleanDyLibs(type: Delete) { // extracted macOSX native libraries
     delete fileTree(dir: '.', include: '*.dylib')
 }
 task cleanLogs(type: Delete) {
     delete fileTree(dir: '.', include: 'hs_err_pid*.log')
 }
-task cleanSOs(type: Delete) {
+task cleanSOs(type: Delete) { // extracted Linux and Android native libraries
     delete fileTree(dir: '.', include: '*.so')
 }
-task cleanWrittenAssets(type: Delete) {
+task cleanWrittenAssets(type: Delete) { // Acorus output directory
     delete 'Written Assets'
 }
