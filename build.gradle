@@ -43,10 +43,13 @@ dependencies {
     implementation 'com.github.stephengold:tonegodgui:0.1.6'
 
     implementation 'org.jmonkeyengine:jme3-blender:3.3.2-stable'
-    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jme3Version
     runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jme3Version
-    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jme3Version
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:' + jme3Version
+
+    // jme3-maze doesn't use jme3-jogg nor jme3-plugins
+    //  -- they are included solely to avoid warnings from AssetConfig.
+    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jme3Version
+    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jme3Version
 }
 
 task runAssetProcessor(type: JavaExec) {
@@ -63,7 +66,7 @@ task cleanDLLs(type: Delete) { // extracted Windows native libraries
 task cleanDyLibs(type: Delete) { // extracted macOSX native libraries
     delete fileTree(dir: '.', include: '*.dylib')
 }
-task cleanLogs(type: Delete) {
+task cleanLogs(type: Delete) { // JVM crash logs
     delete fileTree(dir: '.', include: 'hs_err_pid*.log')
 }
 task cleanSOs(type: Delete) { // extracted Linux and Android native libraries
