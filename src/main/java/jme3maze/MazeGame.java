@@ -107,6 +107,7 @@ public class MazeGame extends ActionApplication {
          * Customize the window's title bar.
          */
         AppSettings settings = new AppSettings(true);
+        settings.setRenderer(AppSettings.LWJGL_OPENGL32);
         settings.setTitle(windowTitle);
         application.setSettings(settings);
 
