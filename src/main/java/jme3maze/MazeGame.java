@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2021, Stephen Gold
+ Copyright (c) 2014-2022, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,6 @@
  */
 package jme3maze;
 
-import com.jme3.audio.openal.ALAudioRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
@@ -98,20 +97,12 @@ public class MazeGame extends ActionApplication {
      * @param arguments array of command-line arguments (not null)
      */
     public static void main(String[] arguments) {
-        /*
-         * Mute the chatty loggers found in some imported packages.
-         */
-        Heart.setLoggingLevels(Level.WARNING);
-        Logger.getLogger(ALAudioRenderer.class.getName())
-                .setLevel(Level.SEVERE);
+        MazeGame application = new MazeGame();
+        Heart.parseAppArgs(application, arguments);
         /*
          * Lower the logging level for this class.
          */
         logger.setLevel(Level.INFO);
-        /*
-         * Instantiate the application.
-         */
-        MazeGame application = new MazeGame();
         /*
          * Customize the window's title bar.
          */
