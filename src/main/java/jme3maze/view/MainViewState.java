@@ -31,7 +31,6 @@ import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -47,9 +46,7 @@ import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
 import jme3utilities.MyCamera;
-import jme3utilities.MySpatial;
 import jme3utilities.Validate;
-import jme3utilities.controls.CameraControl;
 import jme3utilities.debug.Dumper;
 import jme3utilities.navigation.NavDebug;
 import jme3utilities.navigation.NavGraph;
@@ -78,10 +75,6 @@ public class MainViewState extends GameAppState {
      * flag to enable shadows
      */
     final private static boolean shadowsFlag = true;
-    /**
-     * height of camera above player's base location (in world units)
-     */
-    final private static float eyeHeight = 5f;
     /**
      * height of maze walls (in world units)
      */
@@ -122,11 +115,6 @@ public class MainViewState extends GameAppState {
     // fields
 
     /**
-     * scene-graph control which links the camera's orientation to that of the
-     * player's avatar
-     */
-    private CameraControl forwardView;
-    /**
      * slot to display this view: set in initialize()
      */
     private DisplaySlot slot;
@@ -143,27 +131,11 @@ public class MainViewState extends GameAppState {
      */
     private Material wallMaterial;
     /**
-     * node which represents the player in this view
-     */
-    final private Node avatarNode = new Node("main avatar node");
-    /**
      * point light source for this view
      */
     final private PointLight torch = new PointLight();
     // *************************************************************************
     // new methods exposed
-
-    /**
-     * Replace CameraControl with FlyByCamera for debugging.
-     */
-    public void fly() {
-        CameraControl cameraControl
-                = avatarNode.getControl(CameraControl.class);
-        cameraControl.setEnabled(false);
-
-        flyCam.setEnabled(true);
-        flyCam.setMoveSpeed(10f);
-    }
 
     /**
      * Access the scene's light source.
@@ -209,38 +181,6 @@ public class MainViewState extends GameAppState {
 
         Camera slotCamera = slot.getCamera();
         MyCamera.setYTangent(slotCamera, newTangent);
-    }
-
-    /**
-     * Alter the direction the player is looking relative to their direction of
-     * motion.
-     *
-     * @param newDirection direction in local coordinates (not null, positive
-     * length, unaffected)
-     */
-    public void setLookDirection(Vector3f newDirection) {
-        Validate.nonZero(newDirection, "direction");
-        forwardView.setLookDirection(newDirection);
-    }
-
-    /**
-     * Alter the location of the player's avatar.
-     *
-     * @param location world coordinates (not null)
-     */
-    public void setPlayerLocation(Vector3f location) {
-        Validate.nonNull(location, "location");
-        MySpatial.setWorldLocation(avatarNode, location);
-    }
-
-    /**
-     * Alter the orientation of the player's avatar.
-     *
-     * @param orientation orientation in world coordinate system (not null)
-     */
-    public void setPlayerOrientation(Quaternion orientation) {
-        Validate.nonNull(orientation, "orientation");
-        MySpatial.setWorldOrientation(avatarNode, orientation);
     }
 
     /**
@@ -340,14 +280,6 @@ public class MainViewState extends GameAppState {
                     assetManager, ColorRGBA.White);
             NavDebug.addSticks(graph, mazeNode, 0.5f, debugMaterial);
         }
-        /*
-         * Add avatar to represent the player.
-         */
-        root.attachChild(avatarNode);
-        Vector3f location = playerState.copyLocation();
-        MySpatial.setWorldLocation(avatarNode, location);
-        Quaternion orientation = playerState.copyOrientation();
-        MySpatial.setWorldOrientation(avatarNode, orientation);
         /*
          * Add lights and camera.
          */

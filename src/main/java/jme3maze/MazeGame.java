@@ -31,7 +31,6 @@ import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.BigSlotState;
-import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
 import jme3utilities.Heart;
@@ -137,8 +136,7 @@ public class MazeGame extends ActionApplication {
          * Attach model appstates to the application.
          */
         WorldState worldState = new WorldState(1);
-        PlayerState playerState = new PlayerState();
-        stateManager.attachAll(worldState, playerState);
+        stateManager.attachAll(worldState);
         /*
          * Attach display slot appstates to the application.
          */
@@ -149,7 +147,7 @@ public class MazeGame extends ActionApplication {
          */
         MainViewState mainViewState = new MainViewState();
         stateManager.attachAll(mainViewState);
-        
+
         mainViewState.setTorchLocation(new Vector3f(3f, 4.65f, 33f));
     }
 
@@ -158,7 +156,7 @@ public class MazeGame extends ActionApplication {
     public void simpleUpdate(float tpf) {
         ++frameCount;
         if (frameCount == 2) {
-           // dump();
+            // dump();
         }
     }
 }

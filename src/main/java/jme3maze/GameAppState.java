@@ -29,7 +29,6 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import java.util.logging.Logger;
 import jme3maze.controller.BigSlotState;
-import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
 import jme3utilities.SimpleAppState;
@@ -63,10 +62,6 @@ public class GameAppState
      */
     protected MainViewState mainViewState;
     /**
-     * appstate to manage the player: set by initialize()
-     */
-    protected PlayerState playerState;
-    /**
      * appstate to manage the maze: set by initialize()
      */
     protected WorldState worldState;
@@ -99,9 +94,6 @@ public class GameAppState
 
         mainViewState = stateManager.getState(MainViewState.class);
         assert mainViewState != null;
-
-        playerState = stateManager.getState(PlayerState.class);
-        assert playerState != null;
 
         worldState = stateManager.getState(WorldState.class);
         assert worldState != null;
