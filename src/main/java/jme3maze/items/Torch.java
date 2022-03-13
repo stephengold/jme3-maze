@@ -142,14 +142,6 @@ public class Torch extends Item {
     public Spatial visualizeMain() {
         Node node = new Node("torch node");
         node.setLocalTranslation(modelOffset);
-        /*
-         * Attach the torch model to the node.
-         */
-        Spatial spatial = assetManager.loadModel(modelAssetPath);
-        node.attachChild(spatial);
-        ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
-        Material material = MyAsset.createShinyMaterial(assetManager, color);
-        spatial.setMaterial(material);
 
         return node;
     }
