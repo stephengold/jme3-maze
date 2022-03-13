@@ -89,14 +89,6 @@ class MazeLevelView {
      * material for ceilings (not null, set by constructor)
      */
     final private Material ceilingMaterial;
-    /**
-     * material for floors (not null, set by constructor)
-     */
-    final private Material floorMaterial;
-    /**
-     * material for walls (not null, set by constructor)
-     */
-    final private Material wallMaterial;
     // *************************************************************************
     // constructors
 
@@ -131,10 +123,7 @@ class MazeLevelView {
         this.ceilingMaterial = ceilingMaterial;
         this.idealSizeCeiling = idealSizeCeiling;
 
-        this.floorMaterial = floorMaterial;
         this.idealSizeFloor = idealSizeFloor;
-
-        this.wallMaterial = wallMaterial;
         this.idealSizeWall = idealSizeWall;
     }
     // *************************************************************************
@@ -229,25 +218,6 @@ class MazeLevelView {
          * Visualize ceiling and floor.
          */
         addCeilingQuad(parent, vertex, extent, nsFlag, yChange);
-        addFloorQuad(parent, vertex, extent, nsFlag, yChange);
-
-        if (neLevel == swLevel) {
-            /*
-             * Corridor uses one set of side walls.
-             */
-            addSideWalls(parent, vertex, orientation, 0f, wallHeight);
-
-        } else {
-            /*
-             * Ramp uses three sets of side walls: one for the lower level,
-             * one for the upper level, and one for the gap between them.
-             */
-            float gapHeight = levelSpacing - wallHeight;
-            float halfSpacing = levelSpacing / 2;
-            addSideWalls(parent, vertex, orientation, halfSpacing, wallHeight);
-            addSideWalls(parent, vertex, orientation, 0f, gapHeight);
-            addSideWalls(parent, vertex, orientation, -halfSpacing, wallHeight);
-        }
     }
     // *************************************************************************
     // private methods
@@ -295,81 +265,6 @@ class MazeLevelView {
     }
 
     /**
-     * Add a closure wall for the specified grid vertex and direction.
-     *
-     * @param parent node in the scene graph to attach geometries (not null)
-     * @param gridVertex (not null, unaffected)
-     * @param direction from the center of the vertex (not null, not zero,
-     * unaffected)
-     * @param dirDescription textual description of the direction (not null)
-     */
-    private void addClosure(Node parent, NavVertex gridVertex,
-            VectorXZ direction, String dirDescription) {
-        assert parent != null;
-        assert direction != null;
-        assert !direction.isZero() : direction;
-
-        Vector3f vertexLocation = gridVertex.copyLocation();
-        Quaternion orientation = direction.toQuaternion();
-
-        float halfWidth = corridorWidth / 2;
-        Vector3f lowerLeftCorner = new Vector3f(halfWidth, 0f, -halfWidth);
-        lowerLeftCorner = orientation.mult(lowerLeftCorner);
-        lowerLeftCorner.addLocal(vertexLocation);
-
-        Vector3f lowerRightCorner = new Vector3f(halfWidth, 0f, halfWidth);
-        lowerRightCorner = orientation.mult(lowerRightCorner);
-        lowerRightCorner.addLocal(vertexLocation);
-
-        String description = String.format("%s closure wall for %s",
-                dirDescription, gridVertex.getName());
-        addWallSegment(parent, description, lowerLeftCorner, lowerRightCorner,
-                wallHeight);
-    }
-
-    /**
-     * Visualize the floor for the specified vertex.
-     *
-     * @param parent node in the scene graph to attach geometries (not null)
-     * @param vertex (not null, unaffected)
-     * @param extent dimensions of the tile (not null, both components &gt;0)
-     * @param nsFlag true if elongated north-south
-     * @param yChange depression of the north/east end relative to the
-     * south/west end (in world units)
-     */
-    private void addFloorQuad(Node parent, NavVertex vertex,
-            ReadXZ extent, boolean nsFlag, float yChange) {
-        assert parent != null;
-        assert vertex != null;
-        assert extent != null;
-        assert extent.getX() > 0f : extent;
-        assert extent.getZ() > 0f : extent;
-
-        Vector3f vertexLocation = vertex.copyLocation();
-        String vertexName = vertex.getName();
-        String description = "floor for " + vertexName;
-        /*
-         * The quad's origin is in the southeast corner.
-         * Its U-axis points north. Its V-axis points west.
-         */
-        Vector3f origin
-                = vertexLocation.add(-extent.getX() / 2, 0f, extent.getZ() / 2);
-        Vector3f uOffset = new Vector3f(extent.getX(), 0f, 0f);
-        Vector3f vOffset = new Vector3f(0f, 0f, -extent.getZ());
-        if (nsFlag) {
-            /* north-south */
-            origin.y += yChange / 2;
-            uOffset.y -= yChange;
-        } else {
-            /* east-west */
-            origin.y -= yChange / 2;
-            vOffset.y += yChange;
-        }
-        addRectangle(parent, description, floorMaterial, idealSizeFloor,
-                origin, uOffset, vOffset);
-    }
-
-    /**
      * Visualize ceiling, floor, and walls for the specified grid vertex.
      *
      * @param parent where in the scene graph to attach geometries (not null)
@@ -383,37 +278,7 @@ class MazeLevelView {
         VectorXZ extent = new VectorXZ(corridorWidth, corridorWidth);
         boolean nsFlag = false;
         float yChange = 0f;
-        addFloorQuad(parent, gridVertex, extent, nsFlag, yChange);
         addCeilingQuad(parent, gridVertex, extent, nsFlag, yChange);
-        /*
-         * Visualize opening or closure in each of the four cardinal directions.
-         */
-        addGridWall(parent, gridVertex, VectorXZ.east, "east");
-        addGridWall(parent, gridVertex, VectorXZ.north, "north");
-        addGridWall(parent, gridVertex, VectorXZ.south, "south");
-        addGridWall(parent, gridVertex, VectorXZ.west, "west");
-    }
-
-    /**
-     * Visualize the closure walls for the specified grid vertex and direction.
-     *
-     * @param parent where in the scene graph to attach geometries (not null)
-     * @param gridVertex (not null, unaffected)
-     * @param direction (not null, not zero, unaffected)
-     * @param dirDescription (not null)
-     */
-    private void addGridWall(Node parent, NavVertex gridVertex,
-            VectorXZ direction, String dirDescription) {
-        assert parent != null;
-        assert direction != null;
-        assert !direction.isZero();
-        assert dirDescription != null;
-
-        double cosineTolerance = 0.75;
-        NavArc arc = gridVertex.findOutgoing(direction, cosineTolerance);
-        if (arc == null) {
-            addClosure(parent, gridVertex, direction, dirDescription);
-        }
     }
 
     /**
@@ -477,88 +342,5 @@ class MazeLevelView {
         geometry.setMaterial(material);
         MySpatial.setWorldLocation(geometry, origin);
         MySpatial.setWorldOrientation(geometry, orientation);
-    }
-
-    /**
-     * Visualize wall segments on both sides of a corridor.
-     *
-     * @param parent where in the scene graph to attach geometries (not null)
-     * @param vertex (not null, unaffected)
-     * @param orientation orientation of the corridor (not null, unaffected)
-     * @param yOffset vertical offset of bottom edges above the vertex location
-     * (in world units)
-     * @param height height of the walls (in world units, &gt;0)
-     */
-    private void addSideWalls(Node parent, NavVertex vertex,
-            Quaternion orientation, float yOffset, float height) {
-        assert parent != null;
-        assert orientation != null;
-        assert height > 0f : height;
-
-        Vector3f location = vertex.copyLocation();
-        location.y += yOffset;
-        float vertexSpacing = WorldState.getVertexSpacing();
-        float halfWidth = corridorWidth / 2f;
-        float halfLength = (vertexSpacing - corridorWidth) / 2f;
-        /*
-         * backward corner of left wall
-         */
-        Vector3f backLeft = new Vector3f(-halfLength, 0f, -halfWidth);
-        backLeft = orientation.mult(backLeft);
-        backLeft.addLocal(location);
-        /*
-         * forward corner of left wall
-         */
-        Vector3f forwardLeft = new Vector3f(halfLength, 0f, -halfWidth);
-        forwardLeft = orientation.mult(forwardLeft);
-        forwardLeft.addLocal(location);
-
-        String description = "left wall of " + vertex.getName();
-        addWallSegment(parent, description, backLeft, forwardLeft, height);
-        /*
-         * forward corner of right wall
-         */
-        Vector3f forwardRight = new Vector3f(halfLength, 0f, halfWidth);
-        forwardRight = orientation.mult(forwardRight);
-        forwardRight.addLocal(location);
-        /*
-         * backward corner of right wall
-         */
-        Vector3f backRight = new Vector3f(-halfLength, 0f, halfWidth);
-        backRight = orientation.mult(backRight);
-        backRight.addLocal(location);
-
-        description = "right wall of " + vertex.getName();
-        addWallSegment(parent, description, forwardRight, backRight, height);
-    }
-
-    /**
-     * Visualize a wall segment.
-     *
-     * @param parent where in the scene to attach geometries (not null)
-     * @param description textual description of the rectangle (not null)
-     * @param lowerLeft world coordinates of lower left corner (not null,
-     * unaffected)
-     * @param lowerRight world coordinates of lower right corner (not null,
-     * unaffected)
-     * @param height height of the wall (in world units, &gt;0)
-     */
-    private void addWallSegment(Node parent, String description,
-            Vector3f lowerLeft, Vector3f lowerRight, float height) {
-        assert parent != null;
-        assert description != null;
-        assert lowerLeft != null;
-        assert lowerRight != null;
-        assert lowerLeft.y == lowerRight.y : lowerLeft.y;
-        assert height > 0f : height;
-        /*
-         * The quad's origin is in the lower left corner.
-         * Its uOffset points right. Its vOffset points up.
-         */
-        Vector3f origin = lowerLeft;
-        Vector3f uOffset = lowerRight.subtract(origin);
-        Vector3f vOffset = new Vector3f(0f, height, 0f);
-        addRectangle(parent, description, wallMaterial, idealSizeWall,
-                origin, uOffset, vOffset);
     }
 }
