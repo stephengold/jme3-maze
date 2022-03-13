@@ -26,16 +26,11 @@
 package jme3maze.items;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.effect.ParticleEmitter;
-import com.jme3.effect.ParticleMesh;
-import com.jme3.effect.influencers.ParticleInfluencer;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.texture.Texture;
 import java.util.logging.Logger;
 import jme3utilities.MyAsset;
 
@@ -155,62 +150,10 @@ public class Torch extends Item {
         ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
-        /*
-         * Attach an emitter to the node.
-         */
-        ParticleEmitter emitter = createEmitter();
-        emitter.setLocalTranslation(0f, 1f, 0f);
-        node.attachChild(emitter);
 
         return node;
     }
     // *************************************************************************
     // private methods
 
-    /**
-     * Create the emitter for the flame of this torch.
-     */
-    private ParticleEmitter createEmitter() {
-        /*
-         * Create material for particles.
-         */
-        String texturePath = "Effects/Explosion/flame.png";
-        Texture texture = MyAsset.loadTexture(assetManager, texturePath, false);
-        Material material
-                = MyAsset.createParticleMaterial(assetManager, texture);
-        /*
-         * Create the emitter.
-         */
-        ParticleMesh.Type meshType = ParticleMesh.Type.Triangle;
-        int maxParticleCount = 25;
-        ParticleEmitter emitter = new ParticleEmitter("torch emitter",
-                meshType, maxParticleCount);
-        /*
-         * Configure the emitter.
-         */
-        ColorRGBA particleEndColor = ColorRGBA.Red;
-        emitter.setEndColor(particleEndColor);
-        float particleMaxLife = 1f; // seconds
-        emitter.setHighLife(particleMaxLife);
-        emitter.setImagesX(2);
-        emitter.setImagesY(2); // 2x2 texture animation
-        emitter.setInWorldSpace(true);
-        float particleMinLife = 0.5f; // seconds
-        emitter.setLowLife(particleMinLife);
-        emitter.setMaterial(material);
-        emitter.setSelectRandomImage(true);
-        emitter.setShadowMode(RenderQueue.ShadowMode.Off);
-        ColorRGBA particleStartColor = new ColorRGBA(1f, 0.9f, 0.3f, 0.3f);
-        emitter.setStartColor(particleStartColor);
-        /*
-         * Configure the influencer.
-         */
-        ParticleInfluencer influencer = emitter.getParticleInfluencer();
-        Vector3f initialVelocity = new Vector3f(0f, 3f, 0f);
-        influencer.setInitialVelocity(initialVelocity);
-        float percentRandom = 40f;
-        influencer.setVelocityVariation(percentRandom / 100f);
-
-        return emitter;
-    }
 }
