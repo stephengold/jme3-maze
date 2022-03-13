@@ -50,10 +50,6 @@ public class MazeGame extends ActionApplication {
     // constants
 
     /**
-     * number of levels in the maze
-     */
-    final private static int numLevels = 2;
-    /**
      * message logger for this class
      */
     final private static Logger logger = Logger.getLogger(
@@ -140,7 +136,7 @@ public class MazeGame extends ActionApplication {
         /*
          * Attach model appstates to the application.
          */
-        WorldState worldState = new WorldState(numLevels);
+        WorldState worldState = new WorldState(1);
         PlayerState playerState = new PlayerState();
         stateManager.attachAll(worldState, playerState);
         /*
