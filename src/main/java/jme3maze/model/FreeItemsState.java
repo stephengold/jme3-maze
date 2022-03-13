@@ -34,10 +34,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
-import jme3maze.items.Ankh;
-import jme3maze.items.Crown;
 import jme3maze.items.Item;
-import jme3maze.items.Mummy;
 import jme3maze.items.Torch;
 import jme3utilities.Validate;
 import jme3utilities.math.noise.Generator;
@@ -224,8 +221,6 @@ public class FreeItemsState extends GameAppState {
         NavVertex goalVertex = (NavVertex) generator.pick(farVertices);
         MazeLevel bottom = worldState.getLevel(worldState.getNumLevels() - 1);
         assert goalVertex.copyLocation().y == bottom.getFloorY();
-        Crown crown = new Crown(simpleApplication);
-        add(crown, goalVertex);
         /*
          * Place the torch at a random vertex exactly 2 hops
          * from the starting point.
@@ -243,21 +238,11 @@ public class FreeItemsState extends GameAppState {
          */
         options = graph.findByHops(10, startVertex);
         options.remove(goalVertex);
-        NavVertex ankhVertex = (NavVertex) generator.pick(options);
-        if (ankhVertex != null) {
-            Ankh ankh = new Ankh(simpleApplication);
-            add(ankh, ankhVertex);
-        }
         /*
          * Place a mummy at a random vertex exactly 12 hops
          * from the starting point.
          */
         options = graph.findByHops(12, startVertex);
         options.remove(goalVertex);
-        NavVertex mummyVertex = (NavVertex) generator.pick(options);
-        if (mummyVertex != null) {
-            Mummy mummy = new Mummy(simpleApplication);
-            add(mummy, mummyVertex);
-        }
     }
 }
