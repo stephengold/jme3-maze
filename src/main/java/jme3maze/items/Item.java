@@ -37,10 +37,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3utilities.MyString;
@@ -98,10 +96,6 @@ public class Item
      */
     final protected FreeItemsState freeItemsState;
     /**
-     * locale: set by constructor
-     */
-    final protected LocaleState localeState;
-    /**
      * player: set by constructor
      */
     final protected PlayerState playerState;
@@ -109,10 +103,6 @@ public class Item
      * application: set by constructor
      */
     final protected SimpleApplication application;
-    /**
-     * localized name of this item's type: set by constructor
-     */
-    final private String localTypeName;
     /**
      * name of this item's type: set by constructor
      */
@@ -140,18 +130,8 @@ public class Item
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
 
-        localeState = stateManager.getState(LocaleState.class);
-        assert localeState != null;
-
         playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;
-        /*
-         * Initialize localization data.
-         */
-        ResourceBundle types = localeState.getTypesBundle();
-        localTypeName = types.getString(typeName);
-        assert localTypeName != null;
-        assert localTypeName.length() > 0;
     }
     // *************************************************************************
     // new methods exposed
@@ -163,30 +143,7 @@ public class Item
      * @return localized description suitable for a tool tip, or null if no uses
      */
     public String describeUse(boolean freeFlag) {
-        ResourceBundle labels = localeState.getLabelsBundle();
-        if (freeFlag && !isWithinReach()) {
-            String format = labels.getString("OUT_OF_REACH");
-            String result = String.format(format, localTypeName);
-            return result;
-        }
-
-        List<String> possibleUses = findUses(freeFlag);
-        int numUses = possibleUses.size();
-
-        String result;
-        if (numUses > 1) {
-            String format = labels.getString("CLICK_FOR_MENU");
-            result = String.format(format, localTypeName);
-        } else if (numUses == 1) {
-            String format = labels.getString("SINGLE_USE");
-            String use = possibleUses.get(0);
-            String localUse = labels.getString(use);
-            result = String.format(format, localUse, localTypeName);
-        } else {
-            result = localTypeName;
-        }
-
-        return result;
+        return "";
     }
 
     /**
@@ -247,9 +204,7 @@ public class Item
      * @return localized name of this item's type (not null, not empty)
      */
     public String getLocalTypeName() {
-        assert localTypeName != null;
-        assert localTypeName.length() > 0;
-        return localTypeName;
+        return "";
     }
 
     /**

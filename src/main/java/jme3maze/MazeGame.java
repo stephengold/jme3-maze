@@ -31,7 +31,6 @@ import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.BigSlotState;
-import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
@@ -139,11 +138,6 @@ public class MazeGame extends ActionApplication {
          */
         setDisplayFps(false);
         setDisplayStatView(false);
-        /*
-         * Attach localization appstate to the application.
-         */
-        LocaleState localeState = new LocaleState();
-        stateManager.attach(localeState);
         /*
          * Attach model appstates to the application.
          */
