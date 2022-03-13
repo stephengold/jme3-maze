@@ -112,7 +112,6 @@ public class Mapmaker extends Item {
         assert success;
 
         mapViewState.setEnabled(true);
-        inputState.alert("RECRUITED", getLocalTypeName());
     }
 
     /**

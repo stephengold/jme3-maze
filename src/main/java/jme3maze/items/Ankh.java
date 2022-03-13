@@ -84,8 +84,6 @@ public class Ankh extends Item {
 
         success = freeItemsState.remove(this);
         assert success : this;
-
-        inputState.alert("TOOK_ANKH");
     }
 
     /**

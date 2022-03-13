@@ -40,7 +40,6 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.controller.InputState;
 import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
@@ -71,8 +70,8 @@ public class Item
     /**
      * asset path to the "unknown" icon asset
      */
-    final private static String iconAssetPath =
-            "Textures/map-icons/unknown.png";
+    final private static String iconAssetPath
+            = "Textures/map-icons/unknown.png";
     /**
      * description for "SHIFT_LEFT" use
      */
@@ -99,10 +98,6 @@ public class Item
      * free items: set by constructor
      */
     final protected FreeItemsState freeItemsState;
-    /**
-     * control state: set by constructor
-     */
-    final protected InputState inputState;
     /**
      * locale: set by constructor
      */
@@ -149,9 +144,6 @@ public class Item
          */
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
-
-        inputState = stateManager.getState(InputState.class);
-        assert inputState != null;
 
         localeState = stateManager.getState(LocaleState.class);
         assert localeState != null;
@@ -311,8 +303,6 @@ public class Item
 
         success = freeItemsState.remove(this);
         assert success : this;
-
-        inputState.alert("TOOK", typeName);
     }
 
     /**
@@ -325,7 +315,6 @@ public class Item
         List<String> possibleUses = findUses(freeFlag);
         int numUses = possibleUses.size();
         if (numUses > 1) {
-            inputState.selectUse(this, freeFlag);
         } else if (numUses == 1) {
             use(possibleUses.get(0));
         }
@@ -437,6 +426,7 @@ public class Item
 
     /**
      * Generate the hash code for this item.
+     *
      * @return value for use in hashing
      */
     @Override

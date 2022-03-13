@@ -82,11 +82,6 @@ public class Crown extends Item {
     @Override
     public void encounter() {
         int moveCount = playerState.getMoveCount();
-        if (moveCount == 1) {
-            inputState.alert("ONE_MOVE");
-        } else {
-            inputState.alert("MANY_MOVES", moveCount);
-        }
 
         application.stop();
     }

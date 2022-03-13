@@ -25,16 +25,13 @@
  */
 package jme3maze;
 
+import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jme3maze.controller.AnalogInputState;
 import jme3maze.controller.BigSlotState;
-import jme3maze.controller.ExploreMode;
-import jme3maze.controller.InputState;
 import jme3maze.controller.InsetSlotState;
-import jme3maze.controller.RawInputState;
 import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
@@ -136,6 +133,8 @@ public class MazeGame extends ActionApplication {
                 MyString.quote(Heart.versionShort()));
 
         renderer.setDefaultAnisotropicFilter(8);
+        cam.setLocation(new Vector3f(-35f, 5f, 30f));
+        cam.lookAtDirection(Vector3f.UNIT_X, Vector3f.UNIT_Y);
         /*
          * Disable display of JME statistics.
          * These displays can be re-enabled by pressing the F5 hotkey.
@@ -166,21 +165,5 @@ public class MazeGame extends ActionApplication {
         MainViewState mainViewState = new MainViewState();
         MapViewState mapViewState = new MapViewState();
         stateManager.attachAll(mainViewState, mapViewState);
-        /*
-         * Attach input appstates to the application.
-         */
-        AnalogInputState analogInputState = new AnalogInputState();
-        ExploreMode exploreMode = new ExploreMode();
-        InputState inputState = new InputState();
-        MoveState moveState = new MoveState();
-        RawInputState rawInputState = new RawInputState();
-        TurnState turnState = new TurnState();
-        stateManager.attachAll(analogInputState, exploreMode, inputState,
-                moveState, rawInputState, turnState);
-        /*
-         * Enable the "explore" input mode and disable the others.
-         */
-        getDefaultInputMode().setEnabled(false);
-        exploreMode.setEnabled(true);
     }
 }

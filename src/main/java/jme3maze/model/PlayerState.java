@@ -60,7 +60,7 @@ public class PlayerState extends GameAppState {
             PlayerState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * rate of movement in world units per second (&gt;0)
      */
@@ -434,7 +434,6 @@ public class PlayerState extends GameAppState {
         /*
          * Update the controller.
          */
-        inputState.setLeftHandItem(item);
     }
 
     /**
@@ -491,7 +490,6 @@ public class PlayerState extends GameAppState {
         /*
          * Update the controller.
          */
-        inputState.setRightHandItem(item);
     }
 
     /**

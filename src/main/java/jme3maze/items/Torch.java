@@ -126,7 +126,6 @@ public class Torch extends Item {
         assert success : this;
 
         playerState.updateTorchLocation();
-        inputState.alert("TOOK_TORCH");
     }
 
     /**
