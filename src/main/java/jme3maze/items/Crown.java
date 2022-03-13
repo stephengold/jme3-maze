@@ -100,14 +100,14 @@ public class Crown extends Item {
          * Override the materials in the model.
          */
         ColorRGBA hedjetColor = ColorRGBA.White;
-        Material hedjetMaterial =
-                MyAsset.createShinyMaterial(assetManager, hedjetColor);
+        Material hedjetMaterial
+                = MyAsset.createShinyMaterial(assetManager, hedjetColor);
         Spatial hedjet = node.getChild("Hedjet");
         hedjet.setMaterial(hedjetMaterial);
 
         ColorRGBA deshretColor = ColorRGBA.Red;
-        Material deshretMaterial =
-                MyAsset.createShinyMaterial(assetManager, deshretColor);
+        Material deshretMaterial
+                = MyAsset.createShinyMaterial(assetManager, deshretColor);
         Spatial deshret = node.getChild("Deshret");
         deshret.setMaterial(deshretMaterial);
         /*
@@ -119,16 +119,5 @@ public class Crown extends Item {
         node.addControl(rotationControl);
 
         return node;
-    }
-
-    /**
-     * Visualize this crown in the map view.
-     *
-     * @return new unparented instance
-     */
-    @Override
-    public Spatial visualizeMap() {
-        Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-        return icon;
     }
 }

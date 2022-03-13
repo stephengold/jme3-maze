@@ -31,13 +31,11 @@ import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.BigSlotState;
-import jme3maze.controller.InsetSlotState;
 import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
-import jme3maze.view.MapViewState;
 import jme3utilities.Heart;
 import jme3utilities.MyString;
 import jme3utilities.debug.Dumper;
@@ -157,13 +155,11 @@ public class MazeGame extends ActionApplication {
          * Attach display slot appstates to the application.
          */
         BigSlotState bigSlotState = new BigSlotState();
-        InsetSlotState insetSlotState = new InsetSlotState();
-        stateManager.attachAll(bigSlotState, insetSlotState);
+        stateManager.attachAll(bigSlotState);
         /*
          * Attach view appstates to the application.
          */
         MainViewState mainViewState = new MainViewState();
-        MapViewState mapViewState = new MapViewState();
-        stateManager.attachAll(mainViewState, mapViewState);
+        stateManager.attachAll(mainViewState);
     }
 }

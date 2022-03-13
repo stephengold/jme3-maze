@@ -111,15 +111,4 @@ public class Ankh extends Item {
 
         return spatial;
     }
-
-    /**
-     * Visualize in the map view.
-     *
-     * @return new unparented instance
-     */
-    @Override
-    public Spatial visualizeMap() {
-        Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-        return icon;
-    }
 }

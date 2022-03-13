@@ -384,10 +384,6 @@ public class PlayerState extends GameAppState {
 
         VectorXZ horizontalDirection = arc.horizontalOffset();
         setDirection(horizontalDirection);
-        /*
-         * Update the map (if enabled and readable).
-         */
-        mapViewState.addMazeLineOfSight(vertex, direction);
     }
 
     /**
@@ -405,9 +401,6 @@ public class PlayerState extends GameAppState {
          * Visualize the rotation.
          */
         mainViewState.setPlayerOrientation(orientation);
-        if (mapViewState.isEnabled()) {
-            mapViewState.setPlayerOrientation(orientation);
-        }
     }
 
     /**
@@ -450,9 +443,6 @@ public class PlayerState extends GameAppState {
          * Visualize the translation.
          */
         mainViewState.setPlayerLocation(location);
-        if (mapViewState.isEnabled()) {
-            mapViewState.setPlayerLocation(location);
-        }
     }
 
     /**
@@ -504,10 +494,6 @@ public class PlayerState extends GameAppState {
             setLocation(newLocation);
 
             mazeLevelIndex = WorldState.levelIndex(vertex);
-            /*
-             * Update the map (if enabled).
-             */
-            mapViewState.addMazeLineOfSight(vertex, direction);
         }
     }
 

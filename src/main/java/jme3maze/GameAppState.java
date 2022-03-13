@@ -29,13 +29,11 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import java.util.logging.Logger;
 import jme3maze.controller.BigSlotState;
-import jme3maze.controller.InsetSlotState;
 import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
-import jme3maze.view.MapViewState;
 import jme3utilities.SimpleAppState;
 
 /**
@@ -67,10 +65,6 @@ public class GameAppState
      */
     protected FreeItemsState freeItemsState;
     /**
-     * appstate to manage the inset display slot: set by initialize()
-     */
-    protected InsetSlotState insetSlotState;
-    /**
      * appstate to manage localization: set by initialize()
      */
     protected LocaleState localeState;
@@ -78,10 +72,6 @@ public class GameAppState
      * appstate to manage the main view: set by initialize()
      */
     protected MainViewState mainViewState;
-    /**
-     * appstate to manage the map view: set by initialize()
-     */
-    protected MapViewState mapViewState;
     /**
      * appstate to manage the player: set by initialize()
      */
@@ -120,17 +110,11 @@ public class GameAppState
         freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
 
-        insetSlotState = stateManager.getState(InsetSlotState.class);
-        assert insetSlotState != null;
-
         localeState = stateManager.getState(LocaleState.class);
         assert localeState != null;
 
         mainViewState = stateManager.getState(MainViewState.class);
         assert mainViewState != null;
-
-        mapViewState = stateManager.getState(MapViewState.class);
-        assert mapViewState != null;
 
         playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;

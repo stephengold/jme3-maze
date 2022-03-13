@@ -55,10 +55,10 @@ public class BigSlotState
      * message logger for this class
      */
     final private static Logger logger = Logger.getLogger(
-                    BigSlotState.class.getName());
+            BigSlotState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * interval between updates (in seconds, &ge;0): set by update()
      */
@@ -71,7 +71,7 @@ public class BigSlotState
      */
     public BigSlotState() {
         super(true);
-    }    
+    }
     // *************************************************************************
     // GameAppState methods
 
@@ -168,9 +168,6 @@ public class BigSlotState
     public boolean isInside(Vector2f screenLocation) {
         Validate.nonNull(screenLocation, "screen location");
 
-        if (insetSlotState.isInside(screenLocation)) {
-            return false;
-        }
         /*
          * Scale coordinates to fractions of the viewport dimensions.
          */

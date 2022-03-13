@@ -164,17 +164,6 @@ public class Torch extends Item {
 
         return node;
     }
-
-    /**
-     * Visualize in the map view.
-     *
-     * @return new unparented instance
-     */
-    @Override
-    public Spatial visualizeMap() {
-        Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-        return icon;
-    }
     // *************************************************************************
     // private methods
 
@@ -187,8 +176,8 @@ public class Torch extends Item {
          */
         String texturePath = "Effects/Explosion/flame.png";
         Texture texture = MyAsset.loadTexture(assetManager, texturePath, false);
-        Material material =
-                MyAsset.createParticleMaterial(assetManager, texture);
+        Material material
+                = MyAsset.createParticleMaterial(assetManager, texture);
         /*
          * Create the emitter.
          */

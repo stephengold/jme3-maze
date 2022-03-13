@@ -62,7 +62,7 @@ public class FreeItemsState extends GameAppState {
             FreeItemsState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * look up the vertex where an item is located
      */
@@ -197,7 +197,6 @@ public class FreeItemsState extends GameAppState {
          */
         success = mainViewState.removeFreeItem(item);
         assert success : item;
-        mapViewState.removeFreeItem(item);
 
         return true;
     }

@@ -57,13 +57,13 @@ public class Mapmaker extends Item {
     /**
      * asset path to the "mapmaker" icon asset
      */
-    final private static String iconAssetPath =
-            "Textures/map-icons/mapmaker.png";
+    final private static String iconAssetPath
+            = "Textures/map-icons/mapmaker.png";
     /**
      * asset path to the "mapmaker" 3-D model asset
      */
-    final private static String modelAssetPath =
-            "Models/items/mapmaker/mapmaker.j3o";
+    final private static String modelAssetPath
+            = "Models/items/mapmaker/mapmaker.j3o";
     /**
      * description for "recruit" use
      */
@@ -110,8 +110,6 @@ public class Mapmaker extends Item {
     public void recruit() {
         boolean success = freeItemsState.remove(this);
         assert success;
-
-        mapViewState.setEnabled(true);
     }
 
     /**
@@ -145,22 +143,22 @@ public class Mapmaker extends Item {
         node.setLocalTranslation(offset);
 
         ColorRGBA brushColor = ColorRGBA.Red;
-        Material brushMaterial =
-                MyAsset.createShinyMaterial(assetManager, brushColor);
+        Material brushMaterial
+                = MyAsset.createShinyMaterial(assetManager, brushColor);
         Spatial brush = node.getChild("brush");
         brush.setMaterial(brushMaterial);
 
         Texture eyeTexture = MyAsset.loadTexture(assetManager,
                 "Textures/items/brown_eye.png", false);
-        Material eyesMaterial =
-                MyAsset.createShinyMaterial(assetManager, ColorRGBA.White);
+        Material eyesMaterial
+                = MyAsset.createShinyMaterial(assetManager, ColorRGBA.White);
         eyesMaterial.setTexture("DiffuseMap", eyeTexture);
         Spatial eyes = node.getChild("eyes");
         eyes.setMaterial(eyesMaterial);
 
         ColorRGBA skirtColor = ColorRGBA.White;
-        Material skirtMaterial =
-                MyAsset.createShinyMaterial(assetManager, skirtColor);
+        Material skirtMaterial
+                = MyAsset.createShinyMaterial(assetManager, skirtColor);
         RenderState renderState = skirtMaterial.getAdditionalRenderState();
         renderState.setFaceCullMode(FaceCullMode.Off);
         Node main = (Node) node.getChild("main");
@@ -168,22 +166,11 @@ public class Mapmaker extends Item {
         skirt.setMaterial(skirtMaterial);
 
         ColorRGBA tabletColor = ColorRGBA.Gray;
-        Material tabletMaterial =
-                MyAsset.createShinyMaterial(assetManager, tabletColor);
+        Material tabletMaterial
+                = MyAsset.createShinyMaterial(assetManager, tabletColor);
         Spatial tablet = node.getChild("tablet");
         tablet.setMaterial(tabletMaterial);
 
         return node;
-    }
-
-    /**
-     * Visualize the mapmaker in the map view.
-     *
-     * @return new unparented instance
-     */
-    @Override
-    public Spatial visualizeMap() {
-        Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-        return icon;
     }
 }

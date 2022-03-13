@@ -43,7 +43,6 @@ import java.util.logging.Logger;
 import jme3maze.locale.LocaleState;
 import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
-import jme3maze.view.MapViewState;
 import jme3utilities.MyString;
 import jme3utilities.Validate;
 import jme3utilities.navigation.NavVertex;
@@ -103,10 +102,6 @@ public class Item
      */
     final protected LocaleState localeState;
     /**
-     * map view: set by constructor
-     */
-    final protected MapViewState mapViewState;
-    /**
      * player: set by constructor
      */
     final protected PlayerState playerState;
@@ -147,9 +142,6 @@ public class Item
 
         localeState = stateManager.getState(LocaleState.class);
         assert localeState != null;
-
-        mapViewState = stateManager.getState(MapViewState.class);
-        assert mapViewState != null;
 
         playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;
@@ -371,18 +363,6 @@ public class Item
         logger.log(Level.WARNING, "invisible free item of type {0}",
                 MyString.quote(typeName));
         Node result = new Node();
-        return result;
-    }
-
-    /**
-     * Visualize this item, free in the map view.
-     *
-     * @return new unparented instance
-     */
-    public Spatial visualizeMap() {
-        logger.log(Level.WARNING, "free item with unknown type {0}",
-                MyString.quote(typeName));
-        Spatial result = mapViewState.loadIcon(iconAssetPath, true);
         return result;
     }
     // *************************************************************************

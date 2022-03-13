@@ -55,13 +55,13 @@ public class Mummy
     /**
      * asset path to the "mummy" icon asset
      */
-    final private static String iconAssetPath =
-            "Textures/map-icons/mummy.png";
+    final private static String iconAssetPath
+            = "Textures/map-icons/mummy.png";
     /**
      * asset path to the "mummy" 3-D model asset
      */
-    final private static String modelAssetPath =
-            "Models/items/mummy/mummy.j3o";
+    final private static String modelAssetPath
+            = "Models/items/mummy/mummy.j3o";
     /**
      * description for "with ankh" use
      */
@@ -153,16 +153,5 @@ public class Mummy
         node.setMaterial(material);
 
         return node;
-    }
-
-    /**
-     * Visualize this mummy in the map view.
-     *
-     * @return new unparented instance
-     */
-    @Override
-    public Spatial visualizeMap() {
-        Spatial icon = mapViewState.loadIcon(iconAssetPath, true);
-        return icon;
     }
 }
