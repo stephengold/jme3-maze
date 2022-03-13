@@ -304,21 +304,6 @@ public class WorldState extends GameAppState {
     }
 
     /**
-     * Alter the location of the torch.
-     *
-     * @param newLocation (in world coordinates, not null)
-     */
-    public void setTorchLocation(Vector3f newLocation) {
-        Validate.nonNull(newLocation, "new location");
-
-        torchLocation.set(newLocation);
-        /*
-         * Update the main view.
-         */
-        mainViewState.setTorchLocation(newLocation);
-    }
-
-    /**
      * Convert the specified direction to a quaternion.
      *
      * @param direction (not null, not zero, unaffected)

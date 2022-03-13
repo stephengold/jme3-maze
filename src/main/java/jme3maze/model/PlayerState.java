@@ -32,8 +32,6 @@ import com.jme3.math.Vector3f;
 import java.util.List;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
-import jme3maze.items.Item;
-import jme3maze.items.Torch;
 import jme3utilities.Validate;
 import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
@@ -77,14 +75,6 @@ public class PlayerState extends GameAppState {
      * number of moves made since the start of the game (&ge;0)
      */
     private int moveCount = 0;
-    /**
-     * item in the player's left hand
-     */
-    private Item leftHandItem = null;
-    /**
-     * item in the player's right hand
-     */
-    private Item rightHandItem = null;
     /**
      * arc which this player is on: set by constructor
      */
@@ -152,50 +142,6 @@ public class PlayerState extends GameAppState {
     }
 
     /**
-     * Remove the specified item from this player's inventory.
-     *
-     * @param item item to remove (not null)
-     * @return true if successful, otherwise false
-     */
-    public boolean discard(Item item) {
-        Validate.nonNull(item, "item");
-
-        if (item == leftHandItem) {
-            setLeftHandItem(null);
-            return true;
-        } else if (item == rightHandItem) {
-            setRightHandItem(null);
-            return true;
-        }
-        /*
-         * item not found
-         */
-        return false;
-    }
-
-    /**
-     * Find a particular class of item in this player's inventory.
-     *
-     * @param <T> class found
-     * @param itemClass class to match against
-     * @return item found, otherwise null
-     */
-    public <T extends Item> T findItem(Class<T> itemClass) {
-        if (leftHandItem != null
-                && itemClass.isAssignableFrom(leftHandItem.getClass())) {
-            @SuppressWarnings("unchecked")
-            T result = (T) leftHandItem;
-            return result;
-        } else if (rightHandItem != null
-                && itemClass.isAssignableFrom(rightHandItem.getClass())) {
-            @SuppressWarnings("unchecked")
-            T result = (T) rightHandItem;
-            return result;
-        }
-        return null;
-    }
-
-    /**
      * Access this player's current navigation arc.
      *
      * @return pre-existing instance
@@ -216,24 +162,6 @@ public class PlayerState extends GameAppState {
 
         ReadXZ norm = direction.normalize();
         return norm;
-    }
-
-    /**
-     * Read the item in this player's left hand.
-     *
-     * @return pre-existing instance or null if none
-     */
-    public Item getLeftHandItem() {
-        return leftHandItem;
-    }
-
-    /**
-     * Read the item in this player's right hand.
-     *
-     * @return pre-existing instance or null if none
-     */
-    public Item getRightHandItem() {
-        return rightHandItem;
     }
 
     /**
@@ -290,47 +218,6 @@ public class PlayerState extends GameAppState {
      */
     public void incrementMoveCount() {
         moveCount++;
-    }
-
-    /**
-     * Test whether the player's left hand is empty.
-     *
-     * @return true if empty, false otherwise
-     */
-    public boolean isLeftHandEmpty() {
-        boolean result = leftHandItem == null;
-        return result;
-    }
-
-    /**
-     * Test whether the player's right hand is empty.
-     *
-     * @return true if empty, false otherwise
-     */
-    public boolean isRightHandEmpty() {
-        boolean result = rightHandItem == null;
-        return result;
-    }
-
-    /**
-     * Remove an item from the player's inventory.
-     *
-     * @param item item to remove (not null)
-     * @return true if successful, false if item is not found
-     */
-    public boolean remove(Item item) {
-        Validate.nonNull(item, "item");
-
-        if (item == leftHandItem) {
-            setLeftHandItem(null);
-            return true;
-
-        } else if (item == rightHandItem) {
-            setRightHandItem(null);
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -396,7 +283,6 @@ public class PlayerState extends GameAppState {
 
         direction = newDirection.normalize();
         orientation.set(direction.toQuaternion());
-        updateTorchLocation();
         /*
          * Visualize the rotation.
          */
@@ -413,23 +299,6 @@ public class PlayerState extends GameAppState {
     }
 
     /**
-     * Alter what this player holds in their left hand.
-     *
-     * @param item may be null for none
-     */
-    public void setLeftHandItem(Item item) {
-        if (item != null) {
-            assert item != leftHandItem : item;
-            assert item != rightHandItem : item;
-        }
-
-        leftHandItem = item;
-        /*
-         * Update the controller.
-         */
-    }
-
-    /**
      * Alter this player's location.
      *
      * @param newLocation world coordinates (not null, unaffected)
@@ -438,7 +307,6 @@ public class PlayerState extends GameAppState {
         Validate.nonNull(newLocation, "location");
 
         location.set(newLocation);
-        updateTorchLocation();
         /*
          * Visualize the translation.
          */
@@ -466,23 +334,6 @@ public class PlayerState extends GameAppState {
     }
 
     /**
-     * Alter what this player holds in their right hand.
-     *
-     * @param item may be null for none
-     */
-    public void setRightHandItem(Item item) {
-        if (item != null) {
-            assert item != leftHandItem : item;
-            assert item != rightHandItem : item;
-        }
-
-        rightHandItem = item;
-        /*
-         * Update the controller.
-         */
-    }
-
-    /**
      * Alter this player's vertex.
      *
      * @param newVertex (or null if not at a vertex)
@@ -494,84 +345,6 @@ public class PlayerState extends GameAppState {
             setLocation(newLocation);
 
             mazeLevelIndex = WorldState.levelIndex(vertex);
-        }
-    }
-
-    /**
-     * Add the specified item to this player's inventory, in the left hand if
-     * possible.
-     *
-     * @param item (not null)
-     * @return true if successful, otherwise false
-     */
-    public boolean takeFavorLeftHand(Item item) {
-        Validate.nonNull(item, "item");
-
-        if (isLeftHandEmpty()) {
-            setLeftHandItem(item);
-            return true;
-        } else if (isRightHandEmpty()) {
-            setRightHandItem(item);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Add the specified item to this player's inventory, in the right hand if
-     * possible.
-     *
-     * @param item (not null)
-     * @return true if successful, otherwise false
-     */
-    public boolean takeFavorRightHand(Item item) {
-        Validate.nonNull(item, "item");
-
-        if (isRightHandEmpty()) {
-            setRightHandItem(item);
-            return true;
-        } else if (isLeftHandEmpty()) {
-            setLeftHandItem(item);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Update the location of the hand-held torch, if any.
-     */
-    public void updateTorchLocation() {
-        Vector3f localOffset = null;
-        if (leftHandItem instanceof Torch) {
-            localOffset = new Vector3f(-3f, 7f, 2f);
-        }
-        if (rightHandItem instanceof Torch) {
-            localOffset = new Vector3f(-3f, 7f, -2f);
-        }
-        if (localOffset == null) {
-            return;
-        }
-
-        Vector3f worldOffset = orientation.mult(localOffset);
-        Vector3f torchLocation = location.add(worldOffset);
-        worldState.setTorchLocation(torchLocation);
-    }
-
-    /**
-     * Use the left-hand item.
-     */
-    public void useLeftHandItem() {
-        if (!isLeftHandEmpty()) {
-            leftHandItem.use(false);
-        }
-    }
-
-    /**
-     * Use the right-hand item.
-     */
-    public void useRightHandItem() {
-        if (!isRightHandEmpty()) {
-            rightHandItem.use(false);
         }
     }
     // *************************************************************************

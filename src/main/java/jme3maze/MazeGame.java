@@ -31,7 +31,6 @@ import com.jme3.system.JmeVersion;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.BigSlotState;
-import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
@@ -143,8 +142,7 @@ public class MazeGame extends ActionApplication {
          */
         WorldState worldState = new WorldState(numLevels);
         PlayerState playerState = new PlayerState();
-        FreeItemsState freeItemsState = new FreeItemsState();
-        stateManager.attachAll(worldState, playerState, freeItemsState);
+        stateManager.attachAll(worldState, playerState);
         /*
          * Attach display slot appstates to the application.
          */
@@ -155,5 +153,16 @@ public class MazeGame extends ActionApplication {
          */
         MainViewState mainViewState = new MainViewState();
         stateManager.attachAll(mainViewState);
+        
+        mainViewState.setTorchLocation(new Vector3f(3f, 4.65f, 33f));
+    }
+
+    static int frameCount = 0;
+
+    public void simpleUpdate(float tpf) {
+        ++frameCount;
+        if (frameCount == 2) {
+           // dump();
+        }
     }
 }

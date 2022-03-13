@@ -27,30 +27,22 @@ package jme3maze.view;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
 import com.jme3.light.Light;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
-import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.texture.Texture;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 import jme3maze.GameAppState;
 import jme3maze.controller.DisplaySlot;
-import jme3maze.items.Item;
 import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
 import jme3utilities.MyAsset;
@@ -139,10 +131,6 @@ public class MainViewState extends GameAppState {
      */
     private DisplaySlot slot;
     /**
-     * map free items to their spatials
-     */
-    final private Map<Item, Spatial> itemSpatial = new TreeMap<>();
-    /**
      * shared material for ceiling geometries
      */
     private Material ceilingMaterial;
@@ -164,69 +152,6 @@ public class MainViewState extends GameAppState {
     final private PointLight torch = new PointLight();
     // *************************************************************************
     // new methods exposed
-
-    /**
-     * Add 3-D representation of a free item to the scene.
-     *
-     * @param item free item to represent (not null)
-     */
-    public void addFreeItem(Item item) {
-        Spatial spatial = item.visualizeMain();
-        NavVertex vertex = freeItemsState.getVertex(item);
-        Vector3f location = vertex.copyLocation();
-        spatial.move(location);
-
-        spatial.setUserData("item", item);
-        itemSpatial.put(item, spatial);
-        Node root = slot.getRootNode();
-        root.attachChild(spatial);
-    }
-
-    /**
-     * Find the item (if any) in this view at the specified screen coordinates.
-     *
-     * @param screenLocation screen coordinates (in pixels, measured from the
-     * lower left, not null, unaffected)
-     * @return pre-existing vertex or null for none
-     */
-    public Item findItem(Vector2f screenLocation) {
-        Validate.nonNull(screenLocation, "screen location");
-
-        if (!isInside(screenLocation)) {
-            return null;
-        }
-        /*
-         * Construct a ray based on the screen coordinates.
-         */
-        if (!slot.isInside(screenLocation)) {
-            return null;
-        }
-        Ray ray = slot.pickRay(screenLocation);
-        /*
-         * Trace the ray to the nearest geometry.
-         */
-        Node root = slot.getRootNode();
-        CollisionResults results = new CollisionResults();
-        root.collideWith(ray, results);
-        CollisionResult nearest = results.getClosestCollision();
-        if (nearest == null) {
-            return null;
-        }
-        Geometry geometry = nearest.getGeometry();
-        /*
-         * Check whether the geometry corresponds to an item.
-         */
-        Spatial spatial = geometry;
-        while (spatial != null) {
-            Item item = spatial.getUserData("item");
-            if (item != null) {
-                return item;
-            }
-            spatial = spatial.getParent();
-        }
-
-        return null;
-    }
 
     /**
      * Replace CameraControl with FlyByCamera for debugging.
@@ -271,25 +196,6 @@ public class MainViewState extends GameAppState {
         Validate.nonNull(screenLocation, "screen location");
         boolean result = slot.isInside(screenLocation);
         return result;
-    }
-
-    /**
-     * Remove the 3-D representation of a free item from the scene.
-     *
-     * @param item free item to remove (not null)
-     * @return true if successful, otherwise false
-     */
-    public boolean removeFreeItem(Item item) {
-        Validate.nonNull(item, "item");
-
-        Spatial spatial = itemSpatial.remove(item);
-        if (spatial == null) {
-            return false;
-        }
-        boolean success = spatial.removeFromParent();
-        assert success : item;
-
-        return true;
     }
 
     /**
@@ -433,12 +339,6 @@ public class MainViewState extends GameAppState {
             Material debugMaterial = MyAsset.createUnshadedMaterial(
                     assetManager, ColorRGBA.White);
             NavDebug.addSticks(graph, mazeNode, 0.5f, debugMaterial);
-        }
-        /*
-         * Visualize free items.
-         */
-        for (Item item : freeItemsState.getAll()) {
-            addFreeItem(item);
         }
         /*
          * Add avatar to represent the player.

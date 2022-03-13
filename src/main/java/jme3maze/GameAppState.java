@@ -29,7 +29,6 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import java.util.logging.Logger;
 import jme3maze.controller.BigSlotState;
-import jme3maze.model.FreeItemsState;
 import jme3maze.model.PlayerState;
 import jme3maze.model.WorldState;
 import jme3maze.view.MainViewState;
@@ -59,10 +58,6 @@ public class GameAppState
      * appstate to manage the full-screen display slot: set by initialize()
      */
     protected BigSlotState bigSlotState;
-    /**
-     * appstate to manage free items: set by initialize()
-     */
-    protected FreeItemsState freeItemsState;
     /**
      * appstate to manage the main view: set by initialize()
      */
@@ -101,9 +96,6 @@ public class GameAppState
 
         bigSlotState = stateManager.getState(BigSlotState.class);
         assert bigSlotState != null;
-
-        freeItemsState = stateManager.getState(FreeItemsState.class);
-        assert freeItemsState != null;
 
         mainViewState = stateManager.getState(MainViewState.class);
         assert mainViewState != null;
