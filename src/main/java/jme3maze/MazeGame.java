@@ -25,6 +25,7 @@
  */
 package jme3maze;
 
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeVersion;
@@ -126,6 +127,7 @@ public class MazeGame extends ActionApplication {
         renderer.setDefaultAnisotropicFilter(8);
         cam.setLocation(new Vector3f(-35f, 5f, 30f));
         cam.lookAtDirection(Vector3f.UNIT_X, Vector3f.UNIT_Y);
+        viewPort.setBackgroundColor(ColorRGBA.Blue);
         /*
          * Disable display of JME statistics.
          * These displays can be re-enabled by pressing the F5 hotkey.
