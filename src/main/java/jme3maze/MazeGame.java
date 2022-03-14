@@ -6,12 +6,11 @@ import com.jme3.material.Material;
 import com.jme3.material.Materials;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.shape.Quad;
 import com.jme3.shadow.PointLightShadowRenderer;
-import jme3utilities.mesh.RectangleMesh;
 
 public class MazeGame extends SimpleApplication {
 
@@ -43,15 +42,11 @@ public class MazeGame extends SimpleApplication {
         material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f));
         material.setFloat("Shininess", 1f);
 
-        float h = FastMath.sqrt(0.5f);
-        Quaternion orientation = new Quaternion(h, 0f, 0f, h);
-
-        RectangleMesh mesh = new RectangleMesh(0f, 1f, 0f, 1f,
-                0f, 10f, 0f, 10f, 1f);
+        Quad mesh = new Quad(10f, 10f);
         Geometry geometry = new Geometry("", mesh);
         rootNode.attachChild(geometry);
-        geometry.setLocalRotation(orientation);
-        geometry.setLocalTranslation(new Vector3f(-5f, 10f, 25f));
+        geometry.move(-5f, 10f, 25f);
+        geometry.rotate(FastMath.HALF_PI, 0f, 0f);
         geometry.setMaterial(material);
 
         PointLightShadowRenderer plsr
