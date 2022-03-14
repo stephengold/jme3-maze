@@ -154,19 +154,6 @@ class MazeLevelView {
                 notDone.remove(vertex);
             }
         }
-        /*
-         * non-grid vertices on this level
-         */
-        Collection<NavVertex> mids = new ArrayList<>(notDone.size());
-        for (NavVertex vertex : notDone) {
-            if (level.contains(vertex)) {
-                mids.add(vertex);
-            }
-        }
-        for (NavVertex vertex : mids) {
-            addNonGridVertex(parent, vertex);
-            notDone.remove(vertex);
-        }
     }
 
     /**

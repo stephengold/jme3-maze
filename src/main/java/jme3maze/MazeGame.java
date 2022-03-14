@@ -74,8 +74,10 @@ public class MazeGame extends ActionApplication {
     public void dump() {
         dumper.setDumpBucket(true);
         dumper.setDumpCull(true);
+        dumper.setDumpMatParam(true);
         dumper.setDumpShadow(true);
         dumper.setDumpTransform(true);
+        dumper.setDumpVertex(true);
 
         dumper.dump(renderManager);
     }
@@ -158,7 +160,8 @@ public class MazeGame extends ActionApplication {
     public void simpleUpdate(float tpf) {
         ++frameCount;
         if (frameCount == 2) {
-            // dump();
+            guiNode.detachAllChildren();
+            dump();
         }
     }
 }

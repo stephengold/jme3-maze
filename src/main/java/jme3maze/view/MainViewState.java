@@ -264,13 +264,6 @@ public class MainViewState extends GameAppState {
             MazeLevel level = worldState.getLevel(levelIndex);
             mazeLevelView.addLevel(level, mazeNode, graph, notDone);
         }
-        /*
-         * Visualize ramps between levels.
-         */
-        assert notDone.size() == numLevels - 1 : notDone;
-        for (NavVertex vertex : notDone) {
-            mazeLevelView.addNonGridVertex(mazeNode, vertex);
-        }
 
         if (debugFlag) {
             /*
