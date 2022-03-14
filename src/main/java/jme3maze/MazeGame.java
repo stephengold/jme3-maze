@@ -3,6 +3,7 @@ package jme3maze;
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
+import com.jme3.material.Materials;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -10,7 +11,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.shadow.PointLightShadowRenderer;
-import jme3utilities.MyAsset;
 import jme3utilities.mesh.RectangleMesh;
 
 public class MazeGame extends SimpleApplication {
@@ -35,8 +35,13 @@ public class MazeGame extends SimpleApplication {
         torch.setPosition(new Vector3f(3f, 4.65f, 33f));
         torch.setRadius(1000f);
 
-        Material material = MyAsset.createShinyMaterial(assetManager,
-                ColorRGBA.White.mult(2f));
+        ColorRGBA matColor = ColorRGBA.White.mult(2f);
+        Material material = new Material(assetManager, Materials.LIGHTING);
+        material.setBoolean("UseMaterialColors", true);
+        material.setColor("Ambient", matColor.clone());
+        material.setColor("Diffuse", matColor.clone());
+        material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f));
+        material.setFloat("Shininess", 1f);
 
         float h = FastMath.sqrt(0.5f);
         Quaternion orientation = new Quaternion(h, 0f, 0f, h);
