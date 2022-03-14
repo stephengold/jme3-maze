@@ -143,17 +143,13 @@ class MazeLevelView {
         /*
          * grid vertices on this level
          */
-        int gridRows = level.numGridRows();
-        int gridColumns = level.numGridColumns();
-        for (int row = 0; row < gridRows; row++) {
-            for (int column = 0; column < gridColumns; column++) {
-                NavVertex vertex = level.getGridVertex(row, column);
-                assert level.contains(vertex);
-                assert notDone.contains(vertex);
-                addGridVertex(parent, vertex);
-                notDone.remove(vertex);
-            }
-        }
+        NavVertex vertex;
+
+        vertex = level.getGridVertex(1, 2);
+        addGridVertex(parent, vertex);
+
+      //  vertex = level.getGridVertex(2, 2);
+      //  addGridVertex(parent, vertex);
     }
 
     /**
