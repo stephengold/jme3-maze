@@ -25,20 +25,19 @@ public class MazeGame extends SimpleApplication {
         cam.setLocation(new Vector3f(-35f, 5f, 30f));
         cam.lookAtDirection(Vector3f.UNIT_X, Vector3f.UNIT_Y);
         flyCam.setEnabled(false);
-        viewPort.setBackgroundColor(ColorRGBA.Blue);
+
+        viewPort.setBackgroundColor(new ColorRGBA(0f, 0f, 1f, 0f));
         rootNode.setShadowMode(ShadowMode.CastAndReceive);
 
         PointLight torch = new PointLight();
         rootNode.addLight(torch);
-        torch.setColor(ColorRGBA.White.clone());
+        torch.setColor(new ColorRGBA(1f, 1f, 1f, 1f));
         torch.setPosition(new Vector3f(3f, 4.65f, 33f));
         torch.setRadius(1000f);
 
-        ColorRGBA matColor = ColorRGBA.White.mult(2f);
         Material material = new Material(assetManager, Materials.LIGHTING);
         material.setBoolean("UseMaterialColors", true);
-        material.setColor("Ambient", matColor.clone());
-        material.setColor("Diffuse", matColor.clone());
+        material.setColor("Diffuse", new ColorRGBA(1f, 1f, 1f, 1f));
         material.setColor("Specular", new ColorRGBA(1f, 1f, 1f, 1f));
         material.setFloat("Shininess", 1f);
 
