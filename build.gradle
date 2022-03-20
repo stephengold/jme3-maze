@@ -8,8 +8,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 ext { // current versions of libraries:
-    jme3Version = '3.5.0-stable'
-    lwjgl3Version = '3.3.0'
+    jme3Version = '3.5.1-stable'
 }
 
 tasks.withType(JavaCompile) { // Java compile-time options:
@@ -64,13 +63,6 @@ dependencies {
     //  -- they are included solely to avoid warnings from AssetConfig.
     runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jme3Version
     runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jme3Version
-
-    // LWJGL 3.3 dependencies that were omitted from JME v3.5:
-    runtimeOnly 'org.lwjgl:lwjgl:' + lwjgl3Version + ':natives-macos-arm64'
-    runtimeOnly 'org.lwjgl:lwjgl-glfw:' + lwjgl3Version + ':natives-macos-arm64'
-    runtimeOnly 'org.lwjgl:lwjgl-jemalloc:' + lwjgl3Version + ':natives-macos-arm64'
-    runtimeOnly 'org.lwjgl:lwjgl-openal:' + lwjgl3Version + ':natives-macos-arm64'
-    runtimeOnly 'org.lwjgl:lwjgl-opengl:' + lwjgl3Version + ':natives-macos-arm64'
 }
 
 task runAssetProcessor(type: JavaExec) {
