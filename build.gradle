@@ -51,7 +51,7 @@ repositories {
 
 dependencies {
     implementation 'com.github.stephengold:Heart:7.5.0'
-    implementation 'com.github.stephengold:Acorus:0.9.11'
+    implementation 'com.github.stephengold:Acorus:0.9.12'
     implementation 'com.github.stephengold:jme3-utilities-x:0.3.0'
     implementation 'com.github.stephengold:tonegodgui:0.1.7'
 
@@ -71,7 +71,7 @@ tasks.register('runAssetProcessor', JavaExec) {
 
 // cleanup tasks:
 
-clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSOs', 'cleanWrittenAssets')
+clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSandbox', 'cleanSOs')
 
 tasks.register('cleanDLLs', Delete) { // extracted Windows native libraries
     delete fileTree(dir: '.', include: '*.dll')
@@ -82,9 +82,9 @@ tasks.register('cleanDyLibs', Delete) { // extracted macOS native libraries
 tasks.register('cleanLogs', Delete) { // JVM crash logs
     delete fileTree(dir: '.', include: 'hs_err_pid*.log')
 }
+tasks.register('cleanSandbox', Delete) { // Acorus sandbox
+    delete 'Written Assets'
+}
 tasks.register('cleanSOs', Delete) { // extracted Linux and Android native libraries
     delete fileTree(dir: '.', include: '*.so')
-}
-tasks.register('cleanWrittenAssets', Delete) { // Acorus output directory
-    delete 'Written Assets'
 }

@@ -27,6 +27,7 @@ package jme3maze;
 
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeVersion;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3maze.controller.AnalogInputState;
@@ -111,6 +112,10 @@ public class MazeGame extends ActionApplication {
         settings.setTitle(windowTitle);
         application.setSettings(settings);
 
+        try {
+            ActionApplication.designateSandbox("./Written Assets");
+        } catch (IOException exception) {
+        }
         application.start();
         /*
          * ... and onward to MazeGame.actionInitializeApplication()!
