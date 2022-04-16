@@ -118,7 +118,7 @@ public class MazeGame extends ActionApplication {
         }
         application.start();
         /*
-         * ... and onward to MazeGame.actionInitializeApplication()!
+         * ... and onward to MazeGame.acorusInit()!
          */
     }
     // *************************************************************************
@@ -128,7 +128,7 @@ public class MazeGame extends ActionApplication {
      * Initialize this application.
      */
     @Override
-    public void actionInitializeApplication() {
+    public void acorusInit() {
         /*
          * Log the jMonkeyEngine version string.
          */
