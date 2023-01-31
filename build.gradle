@@ -4,9 +4,7 @@ plugins {
     id 'application'
 }
 
-ext { // current versions of libraries:
-    jme3Version = '3.6.0-alpha3'
-}
+ext.jme3Version = '3.6.0-beta1' // current version of JMonkeyEngine
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -47,10 +45,11 @@ jar.manifest.attributes('Main-Class': mainClassName)
 repositories {
     //mavenLocal() // to find local SNAPSHOTs of libraries
     mavenCentral()
+    //maven { url 'https://s01.oss.sonatype.org/content/groups/staging' } // to find libraries staged but not yet released
 }
 
 dependencies {
-    implementation 'com.github.stephengold:Heart:8.2.0'
+    implementation 'com.github.stephengold:Heart:8.3.0+for36'
     implementation 'com.github.stephengold:Acorus:0.9.17'
     implementation 'com.github.stephengold:jme3-utilities-x:0.3.1'
     implementation 'com.github.stephengold:tonegodgui:0.1.7'
