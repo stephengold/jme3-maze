@@ -4,7 +4,7 @@ plugins {
     id 'application'
 }
 
-ext.jme3Version = '3.6.0-beta1' // current version of JMonkeyEngine
+ext.jme3Version = '3.6.0-beta3' // current version of JMonkeyEngine
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -49,8 +49,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.stephengold:Heart:8.3.0+for36'
-    implementation 'com.github.stephengold:Acorus:0.9.17'
+    implementation 'com.github.stephengold:Heart:8.3.1+for36'
+    implementation 'com.github.stephengold:Acorus:0.9.18+for36'
     implementation 'com.github.stephengold:jme3-utilities-x:0.3.1'
     implementation 'com.github.stephengold:tonegodgui:0.1.7'
 
