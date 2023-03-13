@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -547,7 +547,7 @@ public class MazeLevel {
 
         graph.remove(arc);
         graph.remove(reverse);
-        numGridArcs -= 2;
+        this.numGridArcs -= 2;
     }
 
     /**

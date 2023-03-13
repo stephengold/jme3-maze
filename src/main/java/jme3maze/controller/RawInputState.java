@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -176,7 +176,7 @@ public class RawInputState
             }
 
         } else if (event.getButtonIndex() == MouseInput.BUTTON_MIDDLE) {
-            middleMouseButtonPressed = event.isPressed();
+            this.middleMouseButtonPressed = event.isPressed();
         }
     }
 

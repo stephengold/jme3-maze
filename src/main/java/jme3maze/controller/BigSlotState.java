@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -125,7 +125,7 @@ public class BigSlotState
     @Override
     public void update(float elapsedTime) {
         super.update(elapsedTime);
-        updateInterval = elapsedTime;
+        this.updateInterval = elapsedTime;
     }
     // *************************************************************************
     // Slot methods

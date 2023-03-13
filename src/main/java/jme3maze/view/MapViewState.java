@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2019, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -421,7 +421,7 @@ public class MapViewState
     final public void setEnabled(boolean newStatus) {
         if (newStatus && !isEnabled()) {
             insetSlotState.setEnabled(true);
-            slot = insetSlotState;
+            this.slot = insetSlotState;
             slot.setRootNode(null);
             addCamera();
 
@@ -557,7 +557,7 @@ public class MapViewState
         /*
          * Load the "eye" icon and attach it to the avatar.
          */
-        eyeIcon = loadIcon(eyeAssetPath, false);
+        this.eyeIcon = loadIcon(eyeAssetPath, false);
         avatarNode.attachChild(eyeIcon);
     }
 
@@ -566,19 +566,19 @@ public class MapViewState
      */
     private void initializeMaze() {
         ColorRGBA intersectionColor = ColorRGBA.Yellow;
-        intersectionMaterial = MyAsset.createUnshadedMaterial(
+        this.intersectionMaterial = MyAsset.createUnshadedMaterial(
                 assetManager, intersectionColor);
 
         ColorRGBA culDeSacColor = ColorRGBA.Red;
-        culDeSacMaterial = MyAsset.createUnshadedMaterial(
+        this.culDeSacMaterial = MyAsset.createUnshadedMaterial(
                 assetManager, culDeSacColor);
 
         ColorRGBA passageColor = ColorRGBA.Green;
-        passageMaterial = MyAsset.createUnshadedMaterial(
+        this.passageMaterial = MyAsset.createUnshadedMaterial(
                 assetManager, passageColor);
 
         ColorRGBA stickColor = ColorRGBA.Blue;
-        stickMaterial = MyAsset.createUnshadedMaterial(
+        this.stickMaterial = MyAsset.createUnshadedMaterial(
                 assetManager, stickColor);
 
         mapRootNode.attachChild(mazeNode);

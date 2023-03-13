@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -463,7 +463,7 @@ public class PlayerState extends GameAppState {
      */
     public void setMaxMoveSpeed(float newSpeed) {
         Validate.positive(newSpeed, "speed");
-        maxMoveSpeed = newSpeed;
+        this.maxMoveSpeed = newSpeed;
     }
 
     /**
@@ -473,7 +473,7 @@ public class PlayerState extends GameAppState {
      */
     public void setMaxTurnRate(float newRate) {
         Validate.positive(newRate, "rate");
-        maxTurnRate = newRate;
+        this.maxTurnRate = newRate;
     }
 
     /**
@@ -487,7 +487,7 @@ public class PlayerState extends GameAppState {
             assert item != rightHandItem : item;
         }
 
-        rightHandItem = item;
+        this.rightHandItem = item;
         /*
          * Update the controller.
          */
@@ -500,12 +500,12 @@ public class PlayerState extends GameAppState {
      * @param newVertex (or null if not at a vertex)
      */
     public void setVertex(NavVertex newVertex) {
-        vertex = newVertex;
+        this.vertex = newVertex;
         if (vertex != null) {
             Vector3f newLocation = vertex.copyLocation();
             setLocation(newLocation);
 
-            mazeLevelIndex = WorldState.levelIndex(vertex);
+            this.mazeLevelIndex = WorldState.levelIndex(vertex);
             /*
              * Update the map (if enabled).
              */

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -214,7 +214,7 @@ public class InputState extends GameAppState {
      */
     public void setAction(String actionString) {
         Validate.nonEmpty(actionString, "action string");
-        lastActionString = actionString;
+        this.lastActionString = actionString;
     }
 
     /**
@@ -236,7 +236,7 @@ public class InputState extends GameAppState {
             String assetPath = newItem.visualizeInventory();
             boolean freeFlag = false;
             String tipText = newItem.describeUse(freeFlag);
-            leftHandElement = addActionButton(upperLeft, dimensions,
+            this.leftHandElement = addActionButton(upperLeft, dimensions,
                     useLeftHandItemActionString, assetPath, tipText);
         }
         /*
@@ -287,7 +287,7 @@ public class InputState extends GameAppState {
             String assetPath = newItem.visualizeInventory();
             boolean freeFlag = false;
             String tipText = newItem.describeUse(freeFlag);
-            rightHandElement = addActionButton(upperLeft, dimensions,
+            this.rightHandElement = addActionButton(upperLeft, dimensions,
                     useRightHandItemActionString, assetPath, tipText);
         }
         /*
@@ -341,7 +341,7 @@ public class InputState extends GameAppState {
         /*
          * Initialize the GUI.
          */
-        guiScreen = new Screen(application);
+        this.guiScreen = new Screen(application);
         guiScreen.setUseToolTips(true);
         guiNode.addControl(guiScreen);
         initializeAlertBox();
@@ -423,7 +423,7 @@ public class InputState extends GameAppState {
                 }
         }
 
-        lastActionString = "";
+        this.lastActionString = "";
     }
     // *************************************************************************
     // private methods
@@ -511,7 +511,7 @@ public class InputState extends GameAppState {
     private void initializeAlertBox() {
         Vector2f size = descale(0.55f, 0.3f);
         Vector2f upperLeft = descale(0.4f, 0.05f);
-        alertBox = new AlertBox(guiScreen, "alert", upperLeft, size) {
+        this.alertBox = new AlertBox(guiScreen, "alert", upperLeft, size) {
             @Override
             public void onButtonOkPressed(MouseButtonEvent e, boolean toggled) {
                 hide();
@@ -539,7 +539,7 @@ public class InputState extends GameAppState {
         String actionString = advanceActionString;
         String iconAssetPath = "Textures/buttons/advance.png";
         String tipText = labels.getString("ADVANCE");
-        advanceElement = addActionButton(upperLeft, size, actionString,
+        this.advanceElement = addActionButton(upperLeft, size, actionString,
                 iconAssetPath, tipText);
 
         size = descale(0.1f, 0.1f);

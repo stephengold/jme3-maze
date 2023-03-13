@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2019, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -361,17 +361,17 @@ public class MainViewState extends GameAppState {
         logger.info("starting");
         super.initialize(stateManager, application);
 
-        slot = bigSlotState;
+        this.slot = bigSlotState;
         Node root = slot.getRootNode();
         root.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         /*
          * Initialize materials for ceiling, floor, and walls.
          */
         if (shadedFlag) {
-            ceilingMaterial = MyAsset.createShinyMaterial(assetManager,
+            this.ceilingMaterial = MyAsset.createShinyMaterial(assetManager,
                     ColorRGBA.White.mult(2f));
         } else {
-            ceilingMaterial = MyAsset.createUnshadedMaterial(assetManager,
+            this.ceilingMaterial = MyAsset.createUnshadedMaterial(assetManager,
                     ColorRGBA.White);
         }
 
@@ -379,12 +379,12 @@ public class MainViewState extends GameAppState {
                 = MyAsset.loadTexture(assetManager, pondAssetPath, true);
         floorTexture.setWrap(Texture.WrapMode.Repeat);
         if (shadedFlag) {
-            floorMaterial
+            this.floorMaterial
                     = MyAsset.createShadedMaterial(assetManager, floorTexture);
             floorMaterial.setBoolean("UseMaterialColors", true);
             floorMaterial.setColor("Diffuse", ColorRGBA.White.mult(2f));
         } else {
-            floorMaterial = MyAsset.createUnshadedMaterial(assetManager,
+            this.floorMaterial = MyAsset.createUnshadedMaterial(assetManager,
                     floorTexture);
         }
 
@@ -392,12 +392,12 @@ public class MainViewState extends GameAppState {
                 = MyAsset.loadTexture(assetManager, wallAssetPath, true);
         wallTexture.setWrap(Texture.WrapMode.Repeat);
         if (shadedFlag) {
-            wallMaterial
+            this.wallMaterial
                     = MyAsset.createShadedMaterial(assetManager, wallTexture);
             wallMaterial.setBoolean("UseMaterialColors", true);
             wallMaterial.setColor("Diffuse", ColorRGBA.White);
         } else {
-            wallMaterial
+            this.wallMaterial
                     = MyAsset.createUnshadedMaterial(assetManager, wallTexture);
         }
         /*

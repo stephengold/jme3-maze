@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2018, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -113,7 +113,7 @@ public class InsetSlotState
              */
             camera.setViewPort(leftEdge, rightEdge, bottomEdge, topEdge);
 
-            insetViewPort = renderManager.createMainView("inset", camera);
+            this.insetViewPort = renderManager.createMainView("inset", camera);
             insetViewPort.setClearFlags(true, true, true);
 
             Node root = new Node("inset root node");
@@ -157,7 +157,7 @@ public class InsetSlotState
     @Override
     public void update(float elapsedTime) {
         super.update(elapsedTime);
-        updateInterval = elapsedTime;
+        this.updateInterval = elapsedTime;
     }
     // *************************************************************************
     // Slot methods

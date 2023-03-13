@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -142,30 +142,30 @@ public class Item
         this.typeName = typeName;
 
         this.application = application;
-        assetManager = application.getAssetManager();
-        stateManager = application.getStateManager();
+        this.assetManager = application.getAssetManager();
+        this.stateManager = application.getStateManager();
         /*
          * Initialize appState references.
          */
-        freeItemsState = stateManager.getState(FreeItemsState.class);
+        this.freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
 
-        inputState = stateManager.getState(InputState.class);
+        this.inputState = stateManager.getState(InputState.class);
         assert inputState != null;
 
-        localeState = stateManager.getState(LocaleState.class);
+        this.localeState = stateManager.getState(LocaleState.class);
         assert localeState != null;
 
-        mapViewState = stateManager.getState(MapViewState.class);
+        this.mapViewState = stateManager.getState(MapViewState.class);
         assert mapViewState != null;
 
-        playerState = stateManager.getState(PlayerState.class);
+        this.playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;
         /*
          * Initialize localization data.
          */
         ResourceBundle types = localeState.getTypesBundle();
-        localTypeName = types.getString(typeName);
+        this.localTypeName = types.getString(typeName);
         assert localTypeName != null;
         assert localTypeName.length() > 0;
     }

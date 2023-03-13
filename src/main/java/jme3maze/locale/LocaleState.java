@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2015-2017, Stephen Gold
+ Copyright (c) 2015-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -137,13 +137,13 @@ public class LocaleState
         Locale locale = Locale.getDefault();
         logger.log(Level.INFO, "locale = {0}", locale);
 
-        alerts = ResourceBundle.getBundle(alertBundlePrefix, locale);
+        this.alerts = ResourceBundle.getBundle(alertBundlePrefix, locale);
         assert alerts != null;
 
-        itemTypes = ResourceBundle.getBundle(typeBundlePrefix, locale);
+        this.itemTypes = ResourceBundle.getBundle(typeBundlePrefix, locale);
         assert itemTypes != null;
 
-        labels = ResourceBundle.getBundle(labelBundlePrefix, locale);
+        this.labels = ResourceBundle.getBundle(labelBundlePrefix, locale);
         assert labels != null;
     }
 }

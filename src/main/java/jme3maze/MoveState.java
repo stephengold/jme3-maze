@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -90,7 +90,7 @@ public class MoveState extends GameAppState {
     final public void setEnabled(boolean newStatus) {
         if (newStatus && !isEnabled()) {
             playerState.incrementMoveCount();
-            distanceTraveled = 0f;
+            this.distanceTraveled = 0f;
         }
 
         super.setEnabled(newStatus);
@@ -122,7 +122,7 @@ public class MoveState extends GameAppState {
         if (step > distanceRemaining) {
             step = distanceRemaining;
         }
-        distanceTraveled += step;
+        this.distanceTraveled += step;
         Vector3f newLocation = path.interpolate(distanceTraveled);
         playerState.setLocation(newLocation);
         playerState.setVertex(null);

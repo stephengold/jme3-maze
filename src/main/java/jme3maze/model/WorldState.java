@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2021, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -139,8 +139,8 @@ public class WorldState extends GameAppState {
         super(true);
         Validate.positive(numLevels, "number of levels");
 
-        levels = new MazeLevel[numLevels];
-        generator = new Generator(seed);
+        this.levels = new MazeLevel[numLevels];
+        this.generator = new Generator(seed);
     }
     // *************************************************************************
     // new methods exposed
@@ -415,7 +415,7 @@ public class WorldState extends GameAppState {
             MazeLevel level = new MazeLevel(baseY, numRows, numColumns, graph,
                     generator, levelName, entryStartVertex, entryEndLocation,
                     tolerance);
-            levels[levelIndex] = level;
+            this.levels[levelIndex] = level;
 
             NavVertex entryEndVertex;
             if (entryEndLocation == null) {
@@ -424,7 +424,7 @@ public class WorldState extends GameAppState {
                  */
                 assert levelIndex == 0 : levelIndex;
                 List<NavArc> gridArcs = level.listGridArcs();
-                startArc = (NavArc) generator.pick(gridArcs);
+                this.startArc = (NavArc) generator.pick(gridArcs);
                 entryEndVertex = startArc.getFromVertex();
             } else {
                 assert levelIndex > 0 : levelIndex;
@@ -505,13 +505,13 @@ public class WorldState extends GameAppState {
 
             NavArc newArc = addShortArc(v1, mid, true);
             if (startArc == arc) {
-                startArc = newArc;
+                this.startArc = newArc;
             }
             addShortArc(mid, v1, false);
 
             newArc = addShortArc(v2, mid, true);
             if (startArc == reverse) {
-                startArc = newArc;
+                this.startArc = newArc;
             }
             addShortArc(mid, v2, false);
         }

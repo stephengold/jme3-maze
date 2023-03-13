@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -140,10 +140,10 @@ public class AnalogInputState
      * Reset the cameras back to their default state.
      */
     public void resetCameras() {
-        mainZoomOut = 0f;
-        mapZoomOut = 0f;
-        panLeft = 0f;
-        tiltUp = 0f;
+        this.mainZoomOut = 0f;
+        this.mapZoomOut = 0f;
+        this.panLeft = 0f;
+        this.tiltUp = 0f;
 
         updateMainCamera();
         updateMapCamera();
@@ -287,8 +287,8 @@ public class AnalogInputState
     private void panLeft(float amount) {
         logger.log(Level.INFO, "{0}", amount);
 
-        panLeft += amount;
-        panLeft = MyMath.clamp(panLeft, maxPan);
+        this.panLeft += amount;
+        this.panLeft = MyMath.clamp(panLeft, maxPan);
         updateMainCamera();
     }
 
@@ -300,8 +300,8 @@ public class AnalogInputState
     private void tiltUp(float amount) {
         logger.log(Level.INFO, "{0}", amount);
 
-        tiltUp += amount;
-        tiltUp = MyMath.clamp(tiltUp, maxTilt);
+        this.tiltUp += amount;
+        this.tiltUp = MyMath.clamp(tiltUp, maxTilt);
         updateMainCamera();
     }
 
@@ -341,14 +341,14 @@ public class AnalogInputState
 
         Vector2f cursorLocation = inputManager.getCursorPosition();
         if (mapViewState.isInside(cursorLocation)) {
-            mapZoomOut += amount;
-            mapZoomOut = MyMath.clamp(mapZoomOut, maxMapZoom);
+            this.mapZoomOut += amount;
+            this.mapZoomOut = MyMath.clamp(mapZoomOut, maxMapZoom);
             updateMapCamera();
 
         } else if (mainViewState.isInside(cursorLocation)) {
-            mainZoomOut += amount;
-            mainZoomOut =
-                    FastMath.clamp(mainZoomOut, -maxMainZoomIn, maxMainZoomOut);
+            this.mainZoomOut += amount;
+            this.mainZoomOut
+                    = FastMath.clamp(mainZoomOut, -maxMainZoomIn, maxMainZoomOut);
             updateMainCamera();
         }
     }
