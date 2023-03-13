@@ -191,6 +191,7 @@ public class AnalogInputState
             case wheelTowardsEvent:
                 zoomOut(+amount);
                 return;
+            default:
         }
         logger.log(Level.WARNING, "Analog event {0} was not handled.",
                 MyString.quote(eventString));
