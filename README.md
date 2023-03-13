@@ -45,6 +45,7 @@ artists and software developers:
 + the creators of (and contributors to) the following software:
     + [Adobe Photoshop Elements][elements]
     + the [Blender][] 3-D animation suite
+    + the [Checkstyle] tool
     + the [FindBugs][] source-code analyzer
     + the [Git][] revision-control system and GitK commit viewer
     + the [Google Chrome web browser][chrome]
@@ -73,6 +74,7 @@ correct the situation: sgold@sonic.net
 
 [blender]: https://docs.blender.org "Blender Project"
 [bsd3]: https://opensource.org/licenses/BSD-3-Clause "3-Clause BSD License"
+[checkstyle]: https://checkstyle.org "Checkstyle"
 [chrome]: https://www.google.com/chrome "Chrome"
 [elements]: http://www.adobe.com/products/photoshop-elements.html "Photoshop Elements"
 [findbugs]: http://findbugs.sourceforge.net "FindBugs Project"
