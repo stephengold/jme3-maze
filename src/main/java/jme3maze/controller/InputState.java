@@ -430,8 +430,8 @@ public class InputState extends GameAppState {
 
         String buttonUID = UIDUtil.getUID();
         Vector4f padding = new Vector4f(0f, 0f, 0f, 0f);
-        Button button = new ButtonAdapter(guiScreen, buttonUID, upperLeft,
-                size, padding, iconAssetPath) {
+        Button button = new ButtonAdapter(
+                guiScreen, buttonUID, upperLeft, size, padding, iconAssetPath) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent e, boolean t) {
                 setAction(actionString);

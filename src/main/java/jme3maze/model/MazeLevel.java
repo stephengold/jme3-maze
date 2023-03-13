@@ -131,7 +131,8 @@ public class MazeLevel {
         addGridVertices(floorY, name);
         assert numGridVertices == numRows * numColumns : numGridVertices;
         addGridArcs();
-        assert numGridArcs == 4 * numGridVertices - 2 * (numRows + numColumns) : numGridArcs;
+        assert numGridArcs == 4 * numGridVertices
+                - 2 * (numRows + numColumns) : numGridArcs;
         assert graph.isReversible();
 
         if (entryEndLocation != null) {
