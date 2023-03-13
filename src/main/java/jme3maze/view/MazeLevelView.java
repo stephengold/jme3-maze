@@ -104,11 +104,16 @@ class MazeLevelView {
      * Instantiate a visualizer with the specified parameters.
      *
      * @param corridorWidth width of corridors (in world units, &gt;0)
-     * @param idealSize ideal width and height of a quad (in world units, &gt;0)
      * @param wallHeight height of walls (in world units, &gt;0)
      * @param ceilingMaterial material for ceiling (not null)
+     * @param idealSizeCeiling ideal width and height of a ceiling quad (in
+     * world units, &gt;0)
      * @param floorMaterial material for floor (not null)
+     * @param idealSizeFloor ideal width and height of a floor quad (in world
+     * units, &gt;0)
      * @param wallMaterial material for walls (not null)
+     * @param idealSizeWall ideal width and height of a wall quad (in world
+     * units, &gt;0)
      */
     MazeLevelView(float corridorWidth, float wallHeight,
             Material ceilingMaterial, float idealSizeCeiling,
@@ -145,6 +150,7 @@ class MazeLevelView {
      *
      * @param level maze level to visualize (not null)
      * @param parent where in the scene to attach geometries (not null)
+     * @param graph navigation graph for the level
      * @param notDone vertices not yet visualized (not null)
      */
     public void addLevel(MazeLevel level, Node parent, NavGraph graph,

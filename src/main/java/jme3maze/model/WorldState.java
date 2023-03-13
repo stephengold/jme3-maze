@@ -356,7 +356,7 @@ public class WorldState extends GameAppState {
      * @param to terminating vertex (not null, unaffected)
      * @param fromGrid true if the originating vertex is on the grid, false if
      * the terminating vertex is on the grid
-     * @return
+     * @return the new arc
      */
     private NavArc addShortArc(NavVertex from, NavVertex to, boolean fromGrid) {
         assert graph.contains(from) : from;

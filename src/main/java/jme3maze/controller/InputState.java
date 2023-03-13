@@ -418,7 +418,7 @@ public class InputState extends GameAppState {
      * @param size length and width of the button (in pixels, not null)
      * @param actionString action string to generate on a click (not null)
      * @param iconAssetPath asset path to icon texture (not null)
-     * @param describeUse action description for the tool tip (or null for none)
+     * @param tipText action description for the tool tip (or null for none)
      * @return new instance
      */
     private Button addActionButton(Vector2f upperLeft, Vector2f size,

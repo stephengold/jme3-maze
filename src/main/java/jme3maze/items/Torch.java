@@ -179,6 +179,8 @@ public class Torch extends Item {
 
     /**
      * Create the emitter for the flame of this torch.
+     *
+     * @return a new instance
      */
     private ParticleEmitter createEmitter() {
         // Create material for particles.

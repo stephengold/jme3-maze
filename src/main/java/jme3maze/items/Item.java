@@ -134,6 +134,7 @@ public class Item
      * Instantiate an item with a named type.
      *
      * @param typeName (not null, not empty)
+     * @param application the application instance
      */
     Item(String typeName, SimpleApplication application) {
         Validate.nonEmpty(typeName, "typeName");
@@ -435,6 +436,7 @@ public class Item
 
     /**
      * Generate the hash code for this item.
+     *
      * @return value for use in hashing
      */
     @Override
