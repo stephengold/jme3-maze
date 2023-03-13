@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -48,8 +48,7 @@ import jme3utilities.SimpleAppState;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class GameAppState
-        extends SimpleAppState {
+public class GameAppState extends SimpleAppState {
     // *************************************************************************
     // constants
 
@@ -60,7 +59,7 @@ public class GameAppState
             SimpleAppState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * appstate to handle analog input: set by initialize()
      */

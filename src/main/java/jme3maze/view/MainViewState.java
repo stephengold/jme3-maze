@@ -353,8 +353,8 @@ public class MainViewState extends GameAppState {
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         logger.info("starting");
         super.initialize(stateManager, application);
 
@@ -364,11 +364,11 @@ public class MainViewState extends GameAppState {
 
         // Initialize materials for ceiling, floor, and walls.
         if (shadedFlag) {
-            this.ceilingMaterial = MyAsset.createShinyMaterial(assetManager,
-                    ColorRGBA.White.mult(2f));
+            this.ceilingMaterial = MyAsset.createShinyMaterial(
+                    assetManager, ColorRGBA.White.mult(2f));
         } else {
-            this.ceilingMaterial = MyAsset.createUnshadedMaterial(assetManager,
-                    ColorRGBA.White);
+            this.ceilingMaterial = MyAsset.createUnshadedMaterial(
+                    assetManager, ColorRGBA.White);
         }
 
         Texture floorTexture
@@ -380,8 +380,8 @@ public class MainViewState extends GameAppState {
             floorMaterial.setBoolean("UseMaterialColors", true);
             floorMaterial.setColor("Diffuse", ColorRGBA.White.mult(2f));
         } else {
-            this.floorMaterial = MyAsset.createUnshadedMaterial(assetManager,
-                    floorTexture);
+            this.floorMaterial = MyAsset.createUnshadedMaterial(
+                    assetManager, floorTexture);
         }
 
         Texture wallTexture
@@ -402,8 +402,8 @@ public class MainViewState extends GameAppState {
         root.attachChild(mazeNode);
 
         float corridorWidth = WorldState.getCorridorWidth();
-        MazeLevelView mazeLevelView = new MazeLevelView(corridorWidth,
-                wallHeight, ceilingMaterial, 30f,
+        MazeLevelView mazeLevelView = new MazeLevelView(
+                corridorWidth, wallHeight, ceilingMaterial, 30f,
                 floorMaterial, 5f, wallMaterial, 10f);
 
         NavGraph graph = worldState.getGraph();

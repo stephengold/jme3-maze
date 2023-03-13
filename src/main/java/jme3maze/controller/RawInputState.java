@@ -61,7 +61,7 @@ public class RawInputState
             RawInputState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * track status of middle mouse button
      */
@@ -74,7 +74,7 @@ public class RawInputState
      */
     public RawInputState() {
         super(true);
-    }    
+    }
     // *************************************************************************
     // new methods exposed
 
@@ -96,8 +96,8 @@ public class RawInputState
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
         inputManager.addRawInputListener(this);
     }

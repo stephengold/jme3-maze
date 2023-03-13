@@ -89,16 +89,16 @@ public class InputState extends GameAppState {
     /**
      * action string for using the left-hand item
      */
-    final public static String useLeftHandItemActionString =
-            "use leftHandItem";
+    final public static String useLeftHandItemActionString
+            = "use leftHandItem";
     /**
      * action string for using the right-hand item
      */
-    final public static String useRightHandItemActionString =
-            "use rightHandItem";
+    final public static String useRightHandItemActionString
+            = "use rightHandItem";
     // *************************************************************************
     // fields
-    
+
     /**
      * GUI element for alerts
      */
@@ -185,8 +185,8 @@ public class InputState extends GameAppState {
         boolean scrollable = false;
         Menu popupMenu = new Menu(guiScreen, upperLeft, scrollable) {
             @Override
-            public void onMenuItemClicked(int index, Object value,
-                    boolean isToggled) {
+            public void onMenuItemClicked(
+                    int index, Object value, boolean isToggled) {
                 String description = (String) value;
                 item.use(description);
             }
@@ -331,8 +331,8 @@ public class InputState extends GameAppState {
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
 
         // Initialize the GUI.
@@ -521,8 +521,8 @@ public class InputState extends GameAppState {
         String actionString = advanceActionString;
         String iconAssetPath = "Textures/buttons/advance.png";
         String tipText = labels.getString("ADVANCE");
-        this.advanceElement = addActionButton(upperLeft, size, actionString,
-                iconAssetPath, tipText);
+        this.advanceElement = addActionButton(
+                upperLeft, size, actionString, iconAssetPath, tipText);
 
         size = descale(0.1f, 0.1f);
         offset = new Vector2f(0.5f, 1f).multLocal(size);

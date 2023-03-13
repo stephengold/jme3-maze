@@ -58,7 +58,7 @@ public class TurnState extends GameAppState {
             TurnState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * final direction of turn: set by activate()
      */
@@ -100,8 +100,8 @@ public class TurnState extends GameAppState {
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
 
         // Activate the player's current arc.

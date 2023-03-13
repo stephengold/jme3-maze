@@ -42,8 +42,7 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class Mummy
-        extends Item {
+public class Mummy extends Item {
     // *************************************************************************
     // constants
 

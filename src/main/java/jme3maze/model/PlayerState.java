@@ -60,7 +60,7 @@ public class PlayerState extends GameAppState {
             PlayerState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * rate of movement in world units per second (&gt;0)
      */
@@ -593,8 +593,8 @@ public class PlayerState extends GameAppState {
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
 
         // Get the player's start arc.

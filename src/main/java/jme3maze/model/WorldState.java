@@ -341,8 +341,8 @@ public class WorldState extends GameAppState {
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
         initializeMaze();
     }
@@ -407,9 +407,9 @@ public class WorldState extends GameAppState {
             int numRows = 3 + 2 * levelIndex; // 3, 5, 7, 9, ...
             int numColumns = numRows;
             String levelName = String.format("L%d", levelIndex);
-            MazeLevel level = new MazeLevel(baseY, numRows, numColumns, graph,
-                    generator, levelName, entryStartVertex, entryEndLocation,
-                    tolerance);
+            MazeLevel level = new MazeLevel(
+                    baseY, numRows, numColumns, graph, generator, levelName,
+                    entryStartVertex, entryEndLocation, tolerance);
             this.levels[levelIndex] = level;
 
             NavVertex entryEndVertex;

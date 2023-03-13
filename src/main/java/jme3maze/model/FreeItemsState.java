@@ -62,7 +62,7 @@ public class FreeItemsState extends GameAppState {
             FreeItemsState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * look up the vertex where an item is located
      */
@@ -209,8 +209,8 @@ public class FreeItemsState extends GameAppState {
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
         /*
          * Place the crown (game-ending goal) at the vertex

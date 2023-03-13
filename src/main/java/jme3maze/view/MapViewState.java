@@ -70,8 +70,7 @@ import jme3utilities.navigation.NavVertex;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class MapViewState
-        extends GameAppState {
+public class MapViewState extends GameAppState {
     // *************************************************************************
     // constants
 
@@ -445,8 +444,8 @@ public class MapViewState
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
 
         initializeMaze();

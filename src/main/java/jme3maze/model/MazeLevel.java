@@ -55,7 +55,7 @@ public class MazeLevel {
             MazeLevel.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * Y-coordinate of the floor (in world coordinates, set by constructor)
      */
@@ -415,8 +415,8 @@ public class MazeLevel {
 
                 String vertexName = String.format(
                         "%s(%d,%d)", namePrefix, row, column);
-                NavVertex newVertex = graph.addVertex(vertexName, locus,
-                        position);
+                NavVertex newVertex = graph.addVertex(
+                        vertexName, locus, position);
 
                 grid[row][column] = newVertex;
                 numGridVertices++;

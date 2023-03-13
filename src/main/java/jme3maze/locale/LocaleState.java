@@ -40,16 +40,15 @@ import jme3maze.GameAppState;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class LocaleState
-        extends GameAppState {
+public class LocaleState extends GameAppState {
     // *************************************************************************
     // constants
 
     /**
      * message logger for this class
      */
-    final private static Logger logger =
-            Logger.getLogger(LocaleState.class.getName());
+    final private static Logger logger
+            = Logger.getLogger(LocaleState.class.getName());
     /**
      * base name for resource bundles which contain localized messages for
      * alerts
@@ -87,7 +86,7 @@ public class LocaleState
      */
     public LocaleState() {
         super(true);
-    }    
+    }
     // *************************************************************************
     // new methods exposed
 
@@ -130,8 +129,8 @@ public class LocaleState
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
 
         Locale locale = Locale.getDefault();

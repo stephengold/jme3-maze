@@ -63,7 +63,7 @@ public class MoveState extends GameAppState {
             MoveState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * distance traveled from start of arc
      */

@@ -71,8 +71,8 @@ public class Item
     /**
      * asset path to the "unknown" icon asset
      */
-    final private static String iconAssetPath =
-            "Textures/map-icons/unknown.png";
+    final private static String iconAssetPath
+            = "Textures/map-icons/unknown.png";
     /**
      * description for "SHIFT_LEFT" use
      */

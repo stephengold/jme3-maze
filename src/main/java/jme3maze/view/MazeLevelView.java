@@ -422,8 +422,8 @@ class MazeLevelView {
      * @param vOffset offset of upper left corner from origin (not null, not
      * zero, unaffected, orthogonal to uOffset)
      */
-    private void addRectangle(Node parent, String description,
-            Material material, float idealSize,
+    private void addRectangle(
+            Node parent, String description, Material material, float idealSize,
             Vector3f origin, Vector3f uOffset, Vector3f vOffset) {
         assert parent != null;
         assert description != null;
@@ -459,8 +459,8 @@ class MazeLevelView {
             numV = Math.round(vLength / idealSize);
         }
 
-        RectangleMesh mesh = new RectangleMesh(0f, numU, 0f, numV,
-                0f, uLength, 0f, vLength, 1f);
+        RectangleMesh mesh = new RectangleMesh(
+                0f, numU, 0f, numV, 0f, uLength, 0f, vLength, 1f);
         Geometry geometry = new Geometry(description, mesh);
         parent.attachChild(geometry);
         geometry.setMaterial(material);

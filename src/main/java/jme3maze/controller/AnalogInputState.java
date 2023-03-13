@@ -107,7 +107,7 @@ public class AnalogInputState
     final private static String wheelTowardsEvent = "wheel towards";
     // *************************************************************************
     // fields
-    
+
     /**
      * accumulated amount of main camera zoom (outward from default)
      */
@@ -126,7 +126,7 @@ public class AnalogInputState
     private float tiltUp = 0f;
     // *************************************************************************
     // constructors
-    
+
     /**
      * Instantiate an uninitialized, enabled AnalogInputState.
      */
@@ -162,9 +162,7 @@ public class AnalogInputState
     public void onAnalog(String eventString, float amount, float ignored) {
         Validate.nonNegative(amount, "amount");
         logger.log(Level.INFO, "Received analog event {0} with amount={1}",
-                new Object[]{
-            MyString.quote(eventString), amount
-        });
+                new Object[]{MyString.quote(eventString), amount});
 
         switch (eventString) {
             case moveDownEvent:
@@ -207,8 +205,8 @@ public class AnalogInputState
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
 
         // Moving the mouse pointer downward triggers an event.
@@ -339,8 +337,8 @@ public class AnalogInputState
 
         } else if (mainViewState.isInside(cursorLocation)) {
             this.mainZoomOut += amount;
-            this.mainZoomOut
-                    = FastMath.clamp(mainZoomOut, -maxMainZoomIn, maxMainZoomOut);
+            this.mainZoomOut = FastMath.clamp(
+                    mainZoomOut, -maxMainZoomIn, maxMainZoomOut);
             updateMainCamera();
         }
     }

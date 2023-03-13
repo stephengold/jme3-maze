@@ -55,10 +55,10 @@ public class BigSlotState
      * message logger for this class
      */
     final private static Logger logger = Logger.getLogger(
-                    BigSlotState.class.getName());
+            BigSlotState.class.getName());
     // *************************************************************************
     // fields
-    
+
     /**
      * interval between updates (in seconds, &ge;0): set by update()
      */
@@ -71,7 +71,7 @@ public class BigSlotState
      */
     public BigSlotState() {
         super(true);
-    }    
+    }
     // *************************************************************************
     // GameAppState methods
 
@@ -82,8 +82,8 @@ public class BigSlotState
      * @param application attaching application (not null)
      */
     @Override
-    public void initialize(AppStateManager stateManager,
-            Application application) {
+    public void initialize(
+            AppStateManager stateManager, Application application) {
         super.initialize(stateManager, application);
 
         // Name the camera in order to ease debugging.

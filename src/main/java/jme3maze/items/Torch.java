@@ -184,14 +184,14 @@ public class Torch extends Item {
         // Create material for particles.
         String texturePath = "Effects/Explosion/flame.png";
         Texture texture = MyAsset.loadTexture(assetManager, texturePath, false);
-        Material material =
-                MyAsset.createParticleMaterial(assetManager, texture);
+        Material material
+                = MyAsset.createParticleMaterial(assetManager, texture);
 
         // Create the emitter.
         ParticleMesh.Type meshType = ParticleMesh.Type.Triangle;
         int maxParticleCount = 25;
-        ParticleEmitter emitter = new ParticleEmitter("torch emitter",
-                meshType, maxParticleCount);
+        ParticleEmitter emitter = new ParticleEmitter(
+                "torch emitter", meshType, maxParticleCount);
 
         // Configure the emitter.
         ColorRGBA particleEndColor = ColorRGBA.Red;

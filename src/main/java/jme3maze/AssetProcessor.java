@@ -125,7 +125,8 @@ public class AssetProcessor extends SimpleApplication {
         logger.log(Level.FINE, "path={0}", path);
 
         String sourceAssetPath = String.format("Models/%s.blend", path);
-        String targetFilePath = String.format("Written Assets/Models/%s.j3o", path);
+        String targetFilePath
+                = String.format("Written Assets/Models/%s.j3o", path);
         File targetFile = new File(targetFilePath);
 
         // Load the Blender model.
