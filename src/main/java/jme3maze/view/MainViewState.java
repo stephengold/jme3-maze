@@ -469,7 +469,7 @@ public class MainViewState extends GameAppState {
          */
         Vector3f localOffset = new Vector3f(-5f, eyeHeight, 0f);
         Camera slotCamera = slot.getCamera();
-        forwardView = new CameraControl(slotCamera, localOffset,
+        this.forwardView = new CameraControl(slotCamera, localOffset,
                 forwardDirection, WorldState.upDirection);
         avatarNode.addControl(forwardView);
     }
