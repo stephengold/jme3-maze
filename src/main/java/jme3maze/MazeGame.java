@@ -113,6 +113,7 @@ public class MazeGame extends ActionApplication {
         try {
             ActionApplication.designateSandbox("./Written Assets");
         } catch (IOException exception) {
+            // do nothing
         }
         application.start();
 

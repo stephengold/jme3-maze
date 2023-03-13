@@ -210,10 +210,7 @@ public class MapViewState extends GameAppState {
         VectorXZ.validateNonZero(direction, "direction");
 
         if (!isEnabled() || !isReadable()) {
-            /*
-             * If the map isn't readable, then it's not
-             * writable either.
-             */
+            // If the map isn't readable, then it's not writable either.
             return;
         }
 

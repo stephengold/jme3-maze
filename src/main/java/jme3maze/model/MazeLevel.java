@@ -123,7 +123,7 @@ public class MazeLevel {
 
         assert graph.isConnected();
         assert graph.isReversible();
-        /**
+        /*
          * Create a rectangular grid of vertices in which neighbors are
          * connected by arcs.
          */
@@ -144,7 +144,7 @@ public class MazeLevel {
             removeGridPair(arc);
         }
         assert graph.isReversible();
-        /**
+        /*
          * Prune the remaining arc-pairs until a minimum spanning tree is
          * obtained. In this way, all vertices are connected without any loops.
          */
