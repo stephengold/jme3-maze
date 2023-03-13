@@ -29,8 +29,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetLoadException;
 import com.jme3.asset.ModelKey;
 import com.jme3.audio.openal.ALAudioRenderer;
-import com.jme3.export.JmeExporter;
-import com.jme3.export.binary.BinaryExporter;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Mesh.Mode;
@@ -39,7 +37,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.plugins.blender.BlenderLoader;
 import com.jme3.system.JmeContext;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Heart;
@@ -139,16 +136,7 @@ public class AssetProcessor extends SimpleApplication {
         new Dumper().dump(model);
 
         // Save the model in J3O format.
-        JmeExporter exporter = BinaryExporter.getInstance();
-        try {
-            exporter.save(model, targetFile);
-        } catch (IOException exception) {
-            logger.log(Level.SEVERE, "write to {0} failed",
-                    MyString.quote(targetFilePath));
-            throw new RuntimeException();
-        }
-        logger.log(Level.INFO, "wrote file {0}",
-                MyString.quote(targetFilePath));
+        Heart.writeJ3O(targetFilePath, model);
     }
 
     private void processModelFolder(String folderPath, String[] paths) {
