@@ -85,9 +85,8 @@ public class IconControl extends SimpleControl {
         if (spatial == null) {
             return;
         }
-        /*
-         * Copy the orientation.
-         */
+
+        // Copy the orientation.
         Quaternion orientation = masterSpatial.getWorldRotation();
         MySpatial.setWorldOrientation(spatial, orientation);
     }

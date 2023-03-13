@@ -312,9 +312,8 @@ public class WorldState extends GameAppState {
         Validate.nonNull(newLocation, "new location");
 
         torchLocation.set(newLocation);
-        /*
-         * Update the main view.
-         */
+
+        // Update the main view.
         mainViewState.setTorchLocation(newLocation);
     }
 
@@ -368,16 +367,12 @@ public class WorldState extends GameAppState {
         Vector3f offset = result.offset();
         Vector3f[] joints;
         if (FastMath.abs(offset.y) < tolerance) {
-            /*
-             * horizontal corridor arc: no joint
-             */
+            // horizontal corridor arc: no joint
             joints = new Vector3f[2];
             joints[0] = from.copyLocation();
             joints[1] = to.copyLocation();
         } else {
-            /*
-             * ramp arc: has a joint half a width from the grid vertex
-             */
+            // ramp arc: has a joint half a width from the grid vertex
             joints = new Vector3f[3];
             joints[0] = from.copyLocation();
             joints[2] = to.copyLocation();
@@ -419,9 +414,7 @@ public class WorldState extends GameAppState {
 
             NavVertex entryEndVertex;
             if (entryEndLocation == null) {
-                /*
-                 * top level (level 0)
-                 */
+                // top level (level 0)
                 assert levelIndex == 0 : levelIndex;
                 List<NavArc> gridArcs = level.listGridArcs();
                 this.startArc = (NavArc) generator.pick(gridArcs);
@@ -430,9 +423,8 @@ public class WorldState extends GameAppState {
                 assert levelIndex > 0 : levelIndex;
                 entryEndVertex = level.findGridVertex(entryEndLocation);
             }
-            /*
-             * Put the level's exit as far as possible from its entrance.
-             */
+
+            // Put the level's exit as far as possible from its entrance.
             Collection<NavVertex> gridVertices = level.listGridVertices();
             List<NavVertex> farVertices = graph.findMostHops(
                     entryEndVertex, gridVertices);
@@ -447,9 +439,8 @@ public class WorldState extends GameAppState {
             entryEndLocation = entryStartLocation.subtract(offset);
             entryEndLocation.y -= levelSpacing;
         }
-        /*
-         * Split each pair of grid arcs by inserting a new (non-grid) vertex.
-         */
+
+        // Split each pair of grid arcs by inserting a new (non-grid) vertex.
         NavArc[] allArcs = graph.copyArcs();
         BitSet doneFlags = new BitSet(allArcs.length);
         for (int i = 0; i < allArcs.length; i++) {

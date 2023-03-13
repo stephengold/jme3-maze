@@ -205,9 +205,7 @@ public class RawInputState
      */
     @Override
     public void cleanup() {
-        /*
-         * Unregister this event listener.
-         */
+        // Unregister this event listener.
         inputManager.removeRawInputListener(this);
 
         super.cleanup();

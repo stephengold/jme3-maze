@@ -108,9 +108,8 @@ public class InsetSlotState
         if (!isEnabled() && newStatus) {
             Camera camera = cam.clone();
             camera.setName("inset camera");
-            /*
-             * Locate the inset in the upper left corner of the screen.
-             */
+
+            // Locate the inset in the upper left corner of the screen.
             camera.setViewPort(leftEdge, rightEdge, bottomEdge, topEdge);
 
             this.insetViewPort = renderManager.createMainView("inset", camera);
@@ -206,9 +205,8 @@ public class InsetSlotState
         if (!isEnabled()) {
             return false;
         }
-        /*
-         * Scale coordinates to fractions of the view port dimensions.
-         */
+
+        // Scale coordinates to fractions of the view port dimensions.
         Camera camera = getCamera();
         float xFraction = screenLocation.x / camera.getWidth();
         float yFraction = screenLocation.y / camera.getHeight();

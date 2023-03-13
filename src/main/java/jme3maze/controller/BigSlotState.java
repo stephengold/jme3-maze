@@ -85,9 +85,8 @@ public class BigSlotState
     public void initialize(AppStateManager stateManager,
             Application application) {
         super.initialize(stateManager, application);
-        /*
-         * Name the camera in order to ease debugging.
-         */
+
+        // Name the camera in order to ease debugging.
         cam.setName("default camera");
     }
     // *************************************************************************
@@ -171,9 +170,8 @@ public class BigSlotState
         if (insetSlotState.isInside(screenLocation)) {
             return false;
         }
-        /*
-         * Scale coordinates to fractions of the viewport dimensions.
-         */
+
+        // Scale coordinates to fractions of the viewport dimensions.
         float xFraction = screenLocation.x / cam.getWidth();
         float yFraction = screenLocation.y / cam.getHeight();
         if (xFraction > 0f && xFraction < 1f

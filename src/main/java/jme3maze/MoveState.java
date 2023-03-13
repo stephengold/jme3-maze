@@ -115,9 +115,8 @@ public class MoveState extends GameAppState {
             movementComplete(arc);
             return;
         }
-        /*
-         * Update the player's location on the arc.
-         */
+
+        // Update the player's location on the arc.
         float step = elapsedTime * playerState.getMaxMoveSpeed();
         if (step > distanceRemaining) {
             step = distanceRemaining;
@@ -139,9 +138,8 @@ public class MoveState extends GameAppState {
         setEnabled(false);
         NavVertex destinationVertex = arc.getToVertex();
         playerState.setVertex(destinationVertex);
-        /*
-         * Encounter any free items at the destination.
-         */
+
+        // Encounter any free items at the destination.
         Item[] items = freeItemsState.getItems(destinationVertex);
         for (Item item : items) {
             item.encounter();
@@ -150,18 +148,14 @@ public class MoveState extends GameAppState {
         int numArcs = destinationVertex.numOutgoing();
         boolean autoTurn = numArcs <= maxArcsForAutoTurn;
         if (autoTurn) {
-            /*
-             * Turn to the arc which requires the least rotation.
-             */
+            // Turn to the arc which requires the least rotation.
             ReadXZ direction = playerState.getDirection();
             NavArc nextArc = destinationVertex.findOutgoing(direction, -2.0);
             VectorXZ horizontalDirection = nextArc.horizontalOffset();
             turnState.activate(horizontalDirection);
 
         } else {
-            /*
-             * Activate the input state and await player input.
-             */
+            // Activate the input state and await player input.
             inputState.setEnabled(true);
         }
     }

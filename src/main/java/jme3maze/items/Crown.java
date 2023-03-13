@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -101,9 +101,8 @@ public class Crown extends Item {
         Node node = (Node) assetManager.loadModel(modelAssetPath);
         Vector3f offset = new Vector3f(modelOffset);
         node.setLocalTranslation(offset);
-        /*
-         * Override the materials in the model.
-         */
+
+        // Override the materials in the model.
         ColorRGBA hedjetColor = ColorRGBA.White;
         Material hedjetMaterial =
                 MyAsset.createShinyMaterial(assetManager, hedjetColor);
@@ -115,9 +114,8 @@ public class Crown extends Item {
                 MyAsset.createShinyMaterial(assetManager, deshretColor);
         Spatial deshret = node.getChild("Deshret");
         deshret.setMaterial(deshretMaterial);
-        /*
-         * Make it rotate.
-         */
+
+        // Make it rotate.
         Vector3f axis = Vector3f.UNIT_Y;
         float rate = 0.5f; // radians per second
         RotationControl rotationControl = new RotationControl(rate, axis);

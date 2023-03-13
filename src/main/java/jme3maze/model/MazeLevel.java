@@ -135,9 +135,7 @@ public class MazeLevel {
         assert graph.isReversible();
 
         if (entryEndLocation != null) {
-            /*
-             * Remove the arc-pair which would interfere with entry from above.
-             */
+            // Remove the arc-pair which would interfere with entry from above.
             Vector3f underLocation = entryStartVertex.copyLocation();
             underLocation.y = floorY;
             NavVertex underVertex = findGridVertex(underLocation);
@@ -154,9 +152,7 @@ public class MazeLevel {
         pruneGridTo(numPairs);
 
         if (entryEndLocation != null) {
-            /*
-             * Add an entry ramp down from (and up to) the previous level.
-             */
+            // Add an entry ramp down from (and up to) the previous level.
             NavVertex endVertex = findGridVertex(entryEndLocation);
             graph.addArcPair(entryStartVertex, endVertex, 1f);
         }
@@ -370,9 +366,8 @@ public class MazeLevel {
         for (int row = 0; row < numRows; row++) {
             for (int column = 0; column < numColumns; column++) {
                 NavVertex vertex = grid[row][column];
-                /*
-                 * Each vertex has two-to-four neighbors.
-                 */
+
+                // Each vertex has two-to-four neighbors.
                 if (row + 1 < numRows) {
                     NavVertex north = grid[row + 1][column];
                     addArc(vertex, north);

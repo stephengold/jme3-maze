@@ -251,9 +251,8 @@ public class MapViewState
             return null;
         }
         Ray ray = slot.pickRay(screenLocation);
-        /*
-         * Trace the ray to the nearest geometry.
-         */
+
+        // Trace the ray to the nearest geometry.
         CollisionResults results = new CollisionResults();
         mapRootNode.collideWith(ray, results);
         CollisionResult nearest = results.getClosestCollision();
@@ -452,9 +451,8 @@ public class MapViewState
 
         initializeMaze();
         addPlayer();
-        /*
-         * As a debugging aid, dump the scene graph of this view.
-         */
+
+        // As a debugging aid, dump the scene graph of this view.
         Dumper printer = new Dumper();
         printer.setDumpTransform(true);
         //printer.printSubtree(mapRootNode);
@@ -467,9 +465,8 @@ public class MapViewState
      */
     private void addCamera() {
         Camera mapCamera = slot.getCamera();
-        /*
-         * Limit far plane in order to display a single maze level at a time.
-         */
+
+        // Limit far plane in order to display a single maze level at a time.
         float levelSpacing = WorldState.getLevelSpacing();
         mapCamera.setFrustumFar(levelSpacing);
 
@@ -478,9 +475,8 @@ public class MapViewState
         MyCamera.setYTangent(mapCamera, yViewRadius);
 
         mapCamera.setParallelProjection(true);
-        /*
-         * Add a control for the downward-looking map camera.
-         */
+
+        // Add a control for the downward-looking map camera.
         float cameraHeight = 0.7f * levelSpacing; // world units
         Vector3f offset = new Vector3f(0f, cameraHeight, 0f);
         Vector3f down = new Vector3f(0f, -1f, 0f);
@@ -546,17 +542,14 @@ public class MapViewState
      * Visualize the player.
      */
     private void addPlayer() {
-        /*
-         * Add avatar node.
-         */
+        // Add avatar node.
         mapRootNode.attachChild(avatarNode);
         Vector3f location = playerState.copyLocation();
         MySpatial.setWorldLocation(avatarNode, location);
         Quaternion orientation = playerState.copyOrientation();
         MySpatial.setWorldOrientation(avatarNode, orientation);
-        /*
-         * Load the "eye" icon and attach it to the avatar.
-         */
+
+        // Load the "eye" icon and attach it to the avatar.
         this.eyeIcon = loadIcon(eyeAssetPath, false);
         avatarNode.attachChild(eyeIcon);
     }

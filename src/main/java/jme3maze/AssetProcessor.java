@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2020, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -69,24 +69,19 @@ public class AssetProcessor extends SimpleApplication {
      * @param arguments array of command-line arguments (not null)
      */
     public static void main(String[] arguments) {
-        /*
-         * Mute the chatty loggers found in some imported packages.
-         */
+        // Mute the chatty loggers found in some imported packages.
         Heart.setLoggingLevels(Level.WARNING);
         Logger.getLogger(ALAudioRenderer.class.getName())
                 .setLevel(Level.SEVERE);
-        /*
-         * Set the logging level for this class.
-         */
+
+        // Set the logging level for this class.
         logger.setLevel(Level.INFO);
-        /*
-         * Instantiate the application.
-         */
+
+        // Instantiate the application.
         AssetProcessor application = new AssetProcessor();
         application.start(JmeContext.Type.Headless);
-        /*
-         * ... and onward to AssetProcessor.simpleInitApp()!
-         */
+
+        // ... and onward to AssetProcessor.simpleInitApp()!
     }
     // *************************************************************************
     // SimpleApplication methods
@@ -132,9 +127,8 @@ public class AssetProcessor extends SimpleApplication {
         String sourceAssetPath = String.format("Models/%s.blend", path);
         String targetFilePath = String.format("Written Assets/Models/%s.j3o", path);
         File targetFile = new File(targetFilePath);
-        /*
-         * Load the Blender model.
-         */
+
+        // Load the Blender model.
         ModelKey key = new ModelKey(sourceAssetPath);
         Spatial model = assetManager.loadModel(key);
         logger.log(Level.INFO, "read Blender asset {0}",
@@ -142,9 +136,8 @@ public class AssetProcessor extends SimpleApplication {
         validateSpatial(model);
 
         new Dumper().dump(model);
-        /*
-         * Save the model in J3O format.
-         */
+
+        // Save the model in J3O format.
         JmeExporter exporter = BinaryExporter.getInstance();
         try {
             exporter.save(model, targetFile);

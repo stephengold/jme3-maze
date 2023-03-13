@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2021, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -81,9 +81,7 @@ public class ExploreMode
      */
     @Override
     public void onAction(String actionString, boolean ongoing, float tpf) {
-        /*
-         * Ignore actions which are not ongoing.
-         */
+        // Ignore actions that aren't ongoing.
         if (!ongoing) {
             return;
         }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -112,9 +112,8 @@ public class FreeItemsState extends GameAppState {
             location.addLocal(offset);
             worldState.setTorchLocation(location);
         }
-        /*
-         * update view
-         */
+
+        // update view
         if (mainViewState != null && mainViewState.isInitialized()) {
             mainViewState.addFreeItem(item);
         }
@@ -192,9 +191,8 @@ public class FreeItemsState extends GameAppState {
         assert list != null : item;
         boolean success = list.remove(item);
         assert success : item;
-        /*
-         * update view
-         */
+
+        // update view
         success = mainViewState.removeFreeItem(item);
         assert success : item;
         mapViewState.removeFreeItem(item);

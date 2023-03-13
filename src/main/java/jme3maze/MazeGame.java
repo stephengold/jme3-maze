@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2022, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -100,13 +100,11 @@ public class MazeGame extends ActionApplication {
     public static void main(String[] arguments) {
         MazeGame application = new MazeGame();
         Heart.parseAppArgs(application, arguments);
-        /*
-         * Lower the logging level for this class.
-         */
+
+        // Lower the logging level for this class.
         logger.setLevel(Level.INFO);
-        /*
-         * Customize the window's title bar.
-         */
+
+        // Customize the window's title bar.
         AppSettings settings = new AppSettings(true);
         settings.setRenderer(AppSettings.LWJGL_OPENGL32);
         settings.setTitle(windowTitle);
@@ -117,9 +115,8 @@ public class MazeGame extends ActionApplication {
         } catch (IOException exception) {
         }
         application.start();
-        /*
-         * ... and onward to MazeGame.acorusInit()!
-         */
+
+        // ... and onward to MazeGame.acorusInit()!
     }
     // *************************************************************************
     // ActionApplication methods
@@ -129,14 +126,11 @@ public class MazeGame extends ActionApplication {
      */
     @Override
     public void acorusInit() {
-        /*
-         * Log the jMonkeyEngine version string.
-         */
+        // Log the jMonkeyEngine version string.
         logger.log(Level.INFO, "jME3-core version is {0}",
                 MyString.quote(JmeVersion.FULL_NAME));
-        /*
-         * Log the jme3-utilities-heart version string.
-         */
+
+        // Log the jme3-utilities-heart version string.
         logger.log(Level.INFO, "Heart version is {0}",
                 MyString.quote(Heart.versionShort()));
 
@@ -147,33 +141,28 @@ public class MazeGame extends ActionApplication {
          */
         setDisplayFps(false);
         setDisplayStatView(false);
-        /*
-         * Attach localization appstate to the application.
-         */
+
+        // Attach localization appstate to the application.
         LocaleState localeState = new LocaleState();
         stateManager.attach(localeState);
-        /*
-         * Attach model appstates to the application.
-         */
+
+        // Attach model appstates to the application.
         WorldState worldState = new WorldState(numLevels);
         PlayerState playerState = new PlayerState();
         FreeItemsState freeItemsState = new FreeItemsState();
         stateManager.attachAll(worldState, playerState, freeItemsState);
-        /*
-         * Attach display slot appstates to the application.
-         */
+
+        // Attach display slot appstates to the application.
         BigSlotState bigSlotState = new BigSlotState();
         InsetSlotState insetSlotState = new InsetSlotState();
         stateManager.attachAll(bigSlotState, insetSlotState);
-        /*
-         * Attach view appstates to the application.
-         */
+
+        // Attach view appstates to the application.
         MainViewState mainViewState = new MainViewState();
         MapViewState mapViewState = new MapViewState();
         stateManager.attachAll(mainViewState, mapViewState);
-        /*
-         * Attach input appstates to the application.
-         */
+
+        // Attach input appstates to the application.
         AnalogInputState analogInputState = new AnalogInputState();
         ExploreMode exploreMode = new ExploreMode();
         InputState inputState = new InputState();
@@ -182,9 +171,8 @@ public class MazeGame extends ActionApplication {
         TurnState turnState = new TurnState();
         stateManager.attachAll(analogInputState, exploreMode, inputState,
                 moveState, rawInputState, turnState);
-        /*
-         * Enable the "explore" input mode and disable the others.
-         */
+
+        // Enable the "explore" input mode and disable the others.
         getDefaultInputMode().setEnabled(false);
         exploreMode.setEnabled(true);
     }

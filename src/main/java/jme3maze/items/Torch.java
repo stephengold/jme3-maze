@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2019, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -148,17 +148,15 @@ public class Torch extends Item {
     public Spatial visualizeMain() {
         Node node = new Node("torch node");
         node.setLocalTranslation(modelOffset);
-        /*
-         * Attach the torch model to the node.
-         */
+
+        // Attach the torch model to the node.
         Spatial spatial = assetManager.loadModel(modelAssetPath);
         node.attachChild(spatial);
         ColorRGBA color = new ColorRGBA(0.9f, 0.8f, 0.5f, 1f);
         Material material = MyAsset.createShinyMaterial(assetManager, color);
         spatial.setMaterial(material);
-        /*
-         * Attach an emitter to the node.
-         */
+
+        // Attach an emitter to the node.
         ParticleEmitter emitter = createEmitter();
         emitter.setLocalTranslation(0f, 1f, 0f);
         node.attachChild(emitter);
@@ -183,23 +181,19 @@ public class Torch extends Item {
      * Create the emitter for the flame of this torch.
      */
     private ParticleEmitter createEmitter() {
-        /*
-         * Create material for particles.
-         */
+        // Create material for particles.
         String texturePath = "Effects/Explosion/flame.png";
         Texture texture = MyAsset.loadTexture(assetManager, texturePath, false);
         Material material =
                 MyAsset.createParticleMaterial(assetManager, texture);
-        /*
-         * Create the emitter.
-         */
+
+        // Create the emitter.
         ParticleMesh.Type meshType = ParticleMesh.Type.Triangle;
         int maxParticleCount = 25;
         ParticleEmitter emitter = new ParticleEmitter("torch emitter",
                 meshType, maxParticleCount);
-        /*
-         * Configure the emitter.
-         */
+
+        // Configure the emitter.
         ColorRGBA particleEndColor = ColorRGBA.Red;
         emitter.setEndColor(particleEndColor);
         float particleMaxLife = 1f; // seconds
@@ -214,9 +208,8 @@ public class Torch extends Item {
         emitter.setShadowMode(RenderQueue.ShadowMode.Off);
         ColorRGBA particleStartColor = new ColorRGBA(1f, 0.9f, 0.3f, 0.3f);
         emitter.setStartColor(particleStartColor);
-        /*
-         * Configure the influencer.
-         */
+
+        // Configure the influencer.
         ParticleInfluencer influencer = emitter.getParticleInfluencer();
         Vector3f initialVelocity = new Vector3f(0f, 3f, 0f);
         influencer.setInitialVelocity(initialVelocity);

@@ -210,49 +210,43 @@ public class AnalogInputState
     public void initialize(AppStateManager stateManager,
             Application application) {
         super.initialize(stateManager, application);
-        /*
-         * Moving the mouse pointer downward triggers an event.
-         */
+
+        // Moving the mouse pointer downward triggers an event.
         boolean moveDown = true;
         MouseAxisTrigger moveDownTrigger = new MouseAxisTrigger(
                 MouseInput.AXIS_Y, moveDown);
         inputManager.addMapping(moveDownEvent, moveDownTrigger);
         inputManager.addListener(this, moveDownEvent);
-        /*
-         * Moving the mouse pointer left triggers an event.
-         */
+
+        // Moving the mouse pointer left triggers an event.
         boolean moveLeft = true;
         MouseAxisTrigger moveLeftTrigger = new MouseAxisTrigger(
                 MouseInput.AXIS_X, moveLeft);
         inputManager.addMapping(moveLeftEvent, moveLeftTrigger);
         inputManager.addListener(this, moveLeftEvent);
-        /*
-         * Moving the mouse pointer right triggers an event.
-         */
+
+        // Moving the mouse pointer right triggers an event.
         boolean moveRight = false;
         MouseAxisTrigger moveRightTrigger = new MouseAxisTrigger(
                 MouseInput.AXIS_X, moveRight);
         inputManager.addMapping(moveRightEvent, moveRightTrigger);
         inputManager.addListener(this, moveRightEvent);
-        /*
-         * Moving the mouse pointer up triggers an event.
-         */
+
+        // Moving the mouse pointer up triggers an event.
         boolean moveUp = false;
         MouseAxisTrigger moveUpTrigger = new MouseAxisTrigger(
                 MouseInput.AXIS_Y, moveUp);
         inputManager.addMapping(moveUpEvent, moveUpTrigger);
         inputManager.addListener(this, moveUpEvent);
-        /*
-         * Turning the mouse wheel away triggers an event.
-         */
+
+        // Turning the mouse wheel away triggers an event.
         boolean wheelAway = true;
         MouseAxisTrigger wheelAwayTrigger = new MouseAxisTrigger(
                 MouseInput.AXIS_WHEEL, wheelAway);
         inputManager.addMapping(wheelAwayEvent, wheelAwayTrigger);
         inputManager.addListener(this, wheelAwayEvent);
-        /*
-         * Turning the mouse wheel toward you triggers an event.
-         */
+
+        // Turning the mouse wheel toward you triggers an event.
         boolean wheelTowards = false;
         MouseAxisTrigger wheelTowardsTrigger = new MouseAxisTrigger(
                 MouseInput.AXIS_WHEEL, wheelTowards);
@@ -269,9 +263,7 @@ public class AnalogInputState
      */
     @Override
     public void cleanup() {
-        /*
-         * Unregister this event listener.
-         */
+        // Unregister this event listener.
         inputManager.removeListener(this);
 
         super.cleanup();

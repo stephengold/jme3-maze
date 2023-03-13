@@ -69,11 +69,11 @@ public class PlayerState extends GameAppState {
      * rate of rotation in radians per second (&gt;0)
      */
     private float maxTurnRate = 2f;
-    /*
+    /**
      * which level of the maze this player is on (&ge;0)
      */
     private int mazeLevelIndex = 0;
-    /*
+    /**
      * number of moves made since the start of the game (&ge;0)
      */
     private int moveCount = 0;
@@ -167,9 +167,8 @@ public class PlayerState extends GameAppState {
             setRightHandItem(null);
             return true;
         }
-        /*
-         * item not found
-         */
+
+        // item not found
         return false;
     }
 
@@ -384,9 +383,8 @@ public class PlayerState extends GameAppState {
 
         VectorXZ horizontalDirection = arc.horizontalOffset();
         setDirection(horizontalDirection);
-        /*
-         * Update the map (if enabled and readable).
-         */
+
+        // Update the map (if enabled and readable).
         mapViewState.addMazeLineOfSight(vertex, direction);
     }
 
@@ -401,9 +399,8 @@ public class PlayerState extends GameAppState {
         direction = newDirection.normalize();
         orientation.set(direction.toQuaternion());
         updateTorchLocation();
-        /*
-         * Visualize the rotation.
-         */
+
+        // Visualize the rotation.
         mainViewState.setPlayerOrientation(orientation);
         if (mapViewState.isEnabled()) {
             mapViewState.setPlayerOrientation(orientation);
@@ -431,9 +428,8 @@ public class PlayerState extends GameAppState {
         }
 
         leftHandItem = item;
-        /*
-         * Update the controller.
-         */
+
+        // Update the controller.
         inputState.setLeftHandItem(item);
     }
 
@@ -447,9 +443,8 @@ public class PlayerState extends GameAppState {
 
         location.set(newLocation);
         updateTorchLocation();
-        /*
-         * Visualize the translation.
-         */
+
+        // Visualize the translation.
         mainViewState.setPlayerLocation(location);
         if (mapViewState.isEnabled()) {
             mapViewState.setPlayerLocation(location);
@@ -488,9 +483,8 @@ public class PlayerState extends GameAppState {
         }
 
         this.rightHandItem = item;
-        /*
-         * Update the controller.
-         */
+
+        // Update the controller.
         inputState.setRightHandItem(item);
     }
 
@@ -506,9 +500,8 @@ public class PlayerState extends GameAppState {
             setLocation(newLocation);
 
             this.mazeLevelIndex = WorldState.levelIndex(vertex);
-            /*
-             * Update the map (if enabled).
-             */
+
+            // Update the map (if enabled).
             mapViewState.addMazeLineOfSight(vertex, direction);
         }
     }
@@ -603,9 +596,8 @@ public class PlayerState extends GameAppState {
     public void initialize(AppStateManager stateManager,
             Application application) {
         super.initialize(stateManager, application);
-        /*
-         * Get the player's start arc.
-         */
+
+        // Get the player's start arc.
         NavArc playerStartArc = worldState.getStartArc();
         setArc(playerStartArc);
     }

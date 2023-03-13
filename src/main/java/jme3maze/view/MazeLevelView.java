@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -151,9 +151,8 @@ class MazeLevelView {
             Collection<NavVertex> notDone) {
         Validate.nonNull(parent, "node");
         Validate.nonNull(notDone, "not-done set");
-        /*
-         * grid vertices on this level
-         */
+
+        // grid vertices on this level
         int gridRows = level.numGridRows();
         int gridColumns = level.numGridColumns();
         for (int row = 0; row < gridRows; row++) {
@@ -165,9 +164,8 @@ class MazeLevelView {
                 notDone.remove(vertex);
             }
         }
-        /*
-         * non-grid vertices on this level
-         */
+
+        // non-grid vertices on this level
         Collection<NavVertex> mids = new ArrayList<>(notDone.size());
         for (NavVertex vertex : notDone) {
             if (level.contains(vertex)) {
@@ -210,9 +208,8 @@ class MazeLevelView {
                 vertexSpacing - corridorWidth, corridorWidth);
         ReadXZ extent = northExtent.mult(horizontalDirection);
         extent = extent.firstQuadrant();
-        /*
-         * Check for slope.
-         */
+
+        // Check for slope.
         int neLevel = WorldState.levelIndex(neVertex);
         assert neLevel >= 0 : neLevel;
         int swLevel = WorldState.levelIndex(swVertex);
@@ -225,16 +222,13 @@ class MazeLevelView {
         float levelSpacing = WorldState.getLevelSpacing();
         float yChange = levelChange * levelSpacing;
         boolean nsFlag = horizontalDirection.getZ() == 0f;
-        /*
-         * Visualize ceiling and floor.
-         */
+
+        // Visualize ceiling and floor.
         addCeilingQuad(parent, vertex, extent, nsFlag, yChange);
         addFloorQuad(parent, vertex, extent, nsFlag, yChange);
 
         if (neLevel == swLevel) {
-            /*
-             * Corridor uses one set of side walls.
-             */
+            // Corridor uses one set of side walls.
             addSideWalls(parent, vertex, orientation, 0f, wallHeight);
 
         } else {
@@ -282,11 +276,11 @@ class MazeLevelView {
         Vector3f uOffset = new Vector3f(extent.getX(), 0f, 0f);
         Vector3f vOffset = new Vector3f(0f, 0f, extent.getZ());
         if (nsFlag) {
-            /* north-south */
+            // north-south
             origin.y += yChange / 2;
             uOffset.y -= yChange;
-        } else {
-            /* east-west */
+
+        } else { // east-west
             origin.y += yChange / 2;
             vOffset.y -= yChange;
         }
@@ -377,17 +371,15 @@ class MazeLevelView {
      */
     private void addGridVertex(Node parent, NavVertex gridVertex) {
         assert parent != null;
-        /*
-         * Visualize the ceiling and floor.
-         */
+
+        // Visualize the ceiling and floor.
         VectorXZ extent = new VectorXZ(corridorWidth, corridorWidth);
         boolean nsFlag = false;
         float yChange = 0f;
         addFloorQuad(parent, gridVertex, extent, nsFlag, yChange);
         addCeilingQuad(parent, gridVertex, extent, nsFlag, yChange);
-        /*
-         * Visualize opening or closure in each of the four cardinal directions.
-         */
+
+        // Visualize opening or closure in each of the four cardinal directions.
         addGridWall(parent, gridVertex, VectorXZ.east, "east");
         addGridWall(parent, gridVertex, VectorXZ.north, "north");
         addGridWall(parent, gridVertex, VectorXZ.south, "south");
@@ -442,22 +434,19 @@ class MazeLevelView {
         assert !MyVector3f.isZero(uOffset);
         assert vOffset != null;
         assert !MyVector3f.isZero(vOffset);
-        /*
-         * Calculate the dimentions of the rectangle, in world units.
-         */
+
+        // Calculate the dimentions of the rectangle, in world units.
         float uLength = uOffset.length();
         float vLength = vOffset.length();
-        /*
-         * Calculate the world direction of the axes and normal.
-         */
+
+        // Calculate the world direction of the axes and normal.
         Vector3f uDirection = uOffset.divide(uLength);
         Vector3f vDirection = vOffset.divide(vLength);
         Vector3f normal = uDirection.cross(vDirection);
         float normalLength = normal.lengthSquared();
         assert normalLength > 0.9998f && normalLength < 1.0002f : normal;
-        /*
-         * Calculate the world orientation of rectangle.
-         */
+
+        // Calculate the world orientation of rectangle.
         Quaternion orientation = new Quaternion();
         orientation.fromAxes(uDirection, vDirection, normal);
 
@@ -500,30 +489,26 @@ class MazeLevelView {
         float vertexSpacing = WorldState.getVertexSpacing();
         float halfWidth = corridorWidth / 2f;
         float halfLength = (vertexSpacing - corridorWidth) / 2f;
-        /*
-         * backward corner of left wall
-         */
+
+        // backward corner of left wall
         Vector3f backLeft = new Vector3f(-halfLength, 0f, -halfWidth);
         backLeft = orientation.mult(backLeft);
         backLeft.addLocal(location);
-        /*
-         * forward corner of left wall
-         */
+
+        // forward corner of left wall
         Vector3f forwardLeft = new Vector3f(halfLength, 0f, -halfWidth);
         forwardLeft = orientation.mult(forwardLeft);
         forwardLeft.addLocal(location);
 
         String description = "left wall of " + vertex.getName();
         addWallSegment(parent, description, backLeft, forwardLeft, height);
-        /*
-         * forward corner of right wall
-         */
+
+        // forward corner of right wall
         Vector3f forwardRight = new Vector3f(halfLength, 0f, halfWidth);
         forwardRight = orientation.mult(forwardRight);
         forwardRight.addLocal(location);
-        /*
-         * backward corner of right wall
-         */
+
+        // backward corner of right wall
         Vector3f backRight = new Vector3f(-halfLength, 0f, halfWidth);
         backRight = orientation.mult(backRight);
         backRight.addLocal(location);

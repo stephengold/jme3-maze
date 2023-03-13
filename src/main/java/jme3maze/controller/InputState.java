@@ -239,9 +239,8 @@ public class InputState extends GameAppState {
             this.leftHandElement = addActionButton(upperLeft, dimensions,
                     useLeftHandItemActionString, assetPath, tipText);
         }
-        /*
-         * Update the right-hand tooltip.
-         */
+
+        // Update the right-hand tooltip.
         Item rightHandItem = playerState.getRightHandItem();
         if (rightHandItem != null) {
             boolean freeFlag = false;
@@ -258,9 +257,7 @@ public class InputState extends GameAppState {
      * inventory item
      */
     public void setMouseItem(Item newItem, boolean freeFlag) {
-        /*
-         * Update the GUI's "forced" tool tip.
-         */
+        // Update the GUI's "forced" tool tip.
         if (newItem == null) {
             guiScreen.releaseForcedToolTip();
         } else {
@@ -290,9 +287,8 @@ public class InputState extends GameAppState {
             this.rightHandElement = addActionButton(upperLeft, dimensions,
                     useRightHandItemActionString, assetPath, tipText);
         }
-        /*
-         * Update the left-hand tooltip.
-         */
+
+        // Update the left-hand tooltip.
         Item leftHandItem = playerState.getLeftHandItem();
         if (leftHandItem != null) {
             boolean freeFlag = false;
@@ -338,9 +334,8 @@ public class InputState extends GameAppState {
     public void initialize(AppStateManager stateManager,
             Application application) {
         super.initialize(stateManager, application);
-        /*
-         * Initialize the GUI.
-         */
+
+        // Initialize the GUI.
         this.guiScreen = new Screen(application);
         guiScreen.setUseToolTips(true);
         guiNode.addControl(guiScreen);
@@ -361,53 +356,40 @@ public class InputState extends GameAppState {
 
         NavArc advanceArc = playerState.advanceArc();
         ReadXZ direction = playerState.getDirection();
-        /*
-         * Process the most recent action string.
-         */
+
+        // Process the most recent action string.
         switch (lastActionString) {
             case advanceActionString:
-                /*
-                 * Attempt to advance the player along a forward arc.
-                 */
+                // Attempt to advance the player along a forward arc.
                 if (advanceArc != null) {
                     goMove(advanceArc);
                 }
                 break;
 
             case leftActionString:
-                /*
-                 * Turn the player to the left (90 degrees CCW).
-                 */
+                // Turn the player to the left (90 degrees CCW).
                 direction = direction.rotate(-FastMath.HALF_PI);
                 goTurn(direction);
                 break;
 
             case resetActionString:
-                /*
-                 * Reset the cameras.
-                 */
+                // Reset the cameras.
                 analogInputState.resetCameras();
                 break;
 
             case rightActionString:
-                /*
-                 * Turn the player to the right (90 degrees CW).
-                 */
+                // Turn the player to the right (90 degrees CW).
                 direction = direction.rotate(FastMath.HALF_PI);
                 goTurn(direction);
                 break;
 
             case useLeftHandItemActionString:
-                /*
-                 * Attempt to use the item in the player's left hand.
-                 */
+                // Attempt to use the item in the player's left hand.
                 playerState.useLeftHandItem();
                 break;
 
             case useRightHandItemActionString:
-                /*
-                 * Attempt to use the item in the player's right hand.
-                 */
+                // Attempt to use the item in the player's right hand.
                 playerState.useRightHandItem();
                 break;
 

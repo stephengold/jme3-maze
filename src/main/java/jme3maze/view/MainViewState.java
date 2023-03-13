@@ -195,16 +195,14 @@ public class MainViewState extends GameAppState {
         if (!isInside(screenLocation)) {
             return null;
         }
-        /*
-         * Construct a ray based on the screen coordinates.
-         */
+
+        // Construct a ray based on the screen coordinates.
         if (!slot.isInside(screenLocation)) {
             return null;
         }
         Ray ray = slot.pickRay(screenLocation);
-        /*
-         * Trace the ray to the nearest geometry.
-         */
+
+        // Trace the ray to the nearest geometry.
         Node root = slot.getRootNode();
         CollisionResults results = new CollisionResults();
         root.collideWith(ray, results);
@@ -213,9 +211,8 @@ public class MainViewState extends GameAppState {
             return null;
         }
         Geometry geometry = nearest.getGeometry();
-        /*
-         * Check whether the geometry corresponds to an item.
-         */
+
+        // Check whether the geometry corresponds to an item.
         Spatial spatial = geometry;
         while (spatial != null) {
             Item item = spatial.getUserData("item");
@@ -364,9 +361,8 @@ public class MainViewState extends GameAppState {
         this.slot = bigSlotState;
         Node root = slot.getRootNode();
         root.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        /*
-         * Initialize materials for ceiling, floor, and walls.
-         */
+
+        // Initialize materials for ceiling, floor, and walls.
         if (shadedFlag) {
             this.ceilingMaterial = MyAsset.createShinyMaterial(assetManager,
                     ColorRGBA.White.mult(2f));
@@ -400,9 +396,8 @@ public class MainViewState extends GameAppState {
             this.wallMaterial
                     = MyAsset.createUnshadedMaterial(assetManager, wallTexture);
         }
-        /*
-         * Visualize each level of the maze.
-         */
+
+        // Visualize each level of the maze.
         Node mazeNode = new Node("main maze");
         root.attachChild(mazeNode);
 
@@ -418,46 +413,38 @@ public class MainViewState extends GameAppState {
             MazeLevel level = worldState.getLevel(levelIndex);
             mazeLevelView.addLevel(level, mazeNode, graph, notDone);
         }
-        /*
-         * Visualize ramps between levels.
-         */
+
+        // Visualize ramps between levels.
         assert notDone.size() == numLevels - 1 : notDone;
         for (NavVertex vertex : notDone) {
             mazeLevelView.addNonGridVertex(mazeNode, vertex);
         }
 
         if (debugFlag) {
-            /*
-             * As a debugging aid, add navigation arcs using sticks.
-             */
+            // As a debugging aid, add navigation arcs using sticks.
             Material debugMaterial = MyAsset.createUnshadedMaterial(
                     assetManager, ColorRGBA.White);
             NavDebug.addSticks(graph, mazeNode, 0.5f, debugMaterial);
         }
-        /*
-         * Visualize free items.
-         */
+
+        // Visualize free items.
         for (Item item : freeItemsState.getAll()) {
             addFreeItem(item);
         }
-        /*
-         * Add avatar to represent the player.
-         */
+
+        // Add avatar to represent the player.
         root.attachChild(avatarNode);
         Vector3f location = playerState.copyLocation();
         MySpatial.setWorldLocation(avatarNode, location);
         Quaternion orientation = playerState.copyOrientation();
         MySpatial.setWorldOrientation(avatarNode, orientation);
-        /*
-         * Add lights and camera.
-         */
+
+        // Add lights and camera.
         addLight();
         addCamera();
 
         if (debugFlag) {
-            /*
-             * As a debugging aid, dump the scene graph of this view.
-             */
+            // As a debugging aid, dump the scene graph of this view.
             Dumper printer = new Dumper();
             printer.setDumpTransform(true);
             printer.dump(root);

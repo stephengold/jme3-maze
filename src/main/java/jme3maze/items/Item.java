@@ -144,9 +144,8 @@ public class Item
         this.application = application;
         this.assetManager = application.getAssetManager();
         this.stateManager = application.getStateManager();
-        /*
-         * Initialize appState references.
-         */
+
+        // Initialize appState references.
         this.freeItemsState = stateManager.getState(FreeItemsState.class);
         assert freeItemsState != null;
 
@@ -161,9 +160,8 @@ public class Item
 
         this.playerState = stateManager.getState(PlayerState.class);
         assert playerState != null;
-        /*
-         * Initialize localization data.
-         */
+
+        // Initialize localization data.
         ResourceBundle types = localeState.getTypesBundle();
         this.localTypeName = types.getString(typeName);
         assert localTypeName != null;

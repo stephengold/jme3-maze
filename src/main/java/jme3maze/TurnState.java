@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2017, Stephen Gold
+ Copyright (c) 2014-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -103,9 +103,8 @@ public class TurnState extends GameAppState {
     public void initialize(AppStateManager stateManager,
             Application application) {
         super.initialize(stateManager, application);
-        /*
-         * Activate the player's current arc.
-         */
+
+        // Activate the player's current arc.
         NavArc arc = playerState.getArc();
         VectorXZ horizontalDirection = arc.horizontalOffset();
         activate(horizontalDirection);
