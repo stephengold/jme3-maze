@@ -70,6 +70,7 @@ dependencies {
 
 tasks.register('runAssetProcessor', JavaExec) {
     mainClass = 'jme3maze.AssetProcessor'
+    description 'Converts Blender 3-D models to runtime (.j3o) format.'
 }
 
 // cleanup tasks:
