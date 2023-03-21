@@ -53,7 +53,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.stephengold:Heart:8.3.1+for36'
+    implementation 'com.github.stephengold:Heart:8.3.2'
     implementation 'com.github.stephengold:Acorus:0.9.18+for36'
     implementation 'com.github.stephengold:jme3-utilities-x:0.3.1'
     implementation 'com.github.stephengold:tonegodgui:0.1.7'
