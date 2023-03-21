@@ -36,7 +36,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.plugins.blender.BlenderLoader;
 import com.jme3.system.JmeContext;
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jme3utilities.Heart;
@@ -124,7 +123,6 @@ public class AssetProcessor extends SimpleApplication {
         String sourceAssetPath = String.format("Models/%s.blend", path);
         String targetFilePath
                 = String.format("Written Assets/Models/%s.j3o", path);
-        File targetFile = new File(targetFilePath);
 
         // Load the Blender model.
         ModelKey key = new ModelKey(sourceAssetPath);
