@@ -41,11 +41,9 @@ tasks.withType(JavaExec) { // Java runtime options:
     //jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
 }
 
-mainClassName = 'jme3maze.MazeGame'
-if (!hasProperty('mainClass')) {
-    ext.mainClass = mainClassName
+application {
+    mainClass = 'jme3maze.MazeGame'
 }
-jar.manifest.attributes('Main-Class': mainClassName)
 
 configurations.all {
    resolutionStrategy.cacheChangingModulesFor 0, 'seconds' // to disable caching of SNAPSHOTs
