@@ -34,7 +34,7 @@ tasks.withType(JavaExec) { // Java runtime options:
     enableAssertions true
     //jvmArgs '-verbose:gc'
     //jvmArgs '-Xms512m', '-Xmx512m' // to enlarge the Java heap
-    jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
+    //jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
 }
 
 mainClassName = 'jme3maze.MazeGame'
