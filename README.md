@@ -18,7 +18,7 @@ It uses [jMonkeyEngine][jme], [tonegodGUI][], and [jme3-utilities][utilities].
   + using Windows Command Prompt:  `set JAVA_HOME="` *path to installation* `"`
   + using PowerShell: `$env:JAVA_HOME = '` *path to installation* `'`
 3. Download and extract the Jme3-maze source code using Git:
-  + `git clone https://github.com/stephengold/jme3-maze.git
+  + `git clone https://github.com/stephengold/jme3-maze.git`
   + `cd jme3-maze`
 4. Build the project from source:
   + using Bash or PowerShell: `./gradlew build runAssetProcessor`
