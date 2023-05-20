@@ -6,6 +6,9 @@ with a mouse-oriented GUI.  Its logline is:
 Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme.
 </blockquote>
 
+Complete source code (in Java) is provided under
+[a 3-clause BSD license][license].
+
 It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
 
 
@@ -100,6 +103,7 @@ correct the situation: sgold@sonic.net
 [jfrog]: https://www.jfrog.com "JFrog"
 [jme]: https://jmonkeyengine.org "jMonkeyEngine Project"
 [jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
+[license]: https://github.com/stephengold/jme3-maze/blob/master/LICENSE "Jme3-maze license"
 [makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
 [meld]: https://meldmerge.org "Meld merge tool"
