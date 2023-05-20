@@ -66,6 +66,7 @@ artists and software developers:
     + the [IntelliJ IDEA][idea] and [NetBeans] integrated development environments
     + the [Java] compiler, standard doclet, and runtime environment
     + [jMonkeyEngine][jme] and the jME3 Software Development Kit
+    + the [Linux Mint][mint] operating system
     + LWJGL, the Lightweight Java Game Library
     + the [MakeHuman] 3-D character creation tool
     + the [Markdown] document-conversion tool
@@ -75,7 +76,7 @@ artists and software developers:
     + the Subversion revision-control system
     + the [WinMerge] differencing and merging tool
 
-I am grateful to [JFrog], Google, and [Github]
+I am grateful to [JFrog], Google, [Github], and [Imgur]
 for providing free hosting for this project
 and many other open-source projects.
 
@@ -99,6 +100,7 @@ correct the situation: sgold@sonic.net
 [gitkraken]: https://www.gitkraken.com "GitKraken client"
 [gradle]: https://gradle.org "Gradle Project"
 [idea]: https://www.jetbrains.com/idea/ "IntelliJ IDEA"
+[imgur]: https://imgur.com/ "Imgur"
 [java]: https://java.com "Java"
 [jfrog]: https://www.jfrog.com "JFrog"
 [jme]: https://jmonkeyengine.org "jMonkeyEngine Project"
@@ -107,6 +109,7 @@ correct the situation: sgold@sonic.net
 [makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
 [meld]: https://meldmerge.org "Meld merge tool"
+[mint]: https://linuxmint.com "Linux Mint Project"
 [netbeans]: https://netbeans.org "NetBeans Project"
 [tonegodgui]: https://github.com/stephengold/tonegodgui "TonegodGUI Project"
 [utilities]: https://github.com/stephengold/jme3-utilities "jME3 Utilities Project"
