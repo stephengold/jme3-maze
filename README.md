@@ -61,7 +61,7 @@ artists and software developers:
     + the [GitKraken] client
     + the [Gradle] build tool
     + the [IntelliJ IDEA][idea] and [NetBeans] integrated development environments
-    + the Java compiler, standard doclet, and runtime environment
+    + the [Java] compiler, standard doclet, and runtime environment
     + [jMonkeyEngine][jme] and the jME3 Software Development Kit
     + LWJGL, the Lightweight Java Game Library
     + the [MakeHuman] 3-D character creation tool
@@ -96,6 +96,7 @@ correct the situation: sgold@sonic.net
 [gitkraken]: https://www.gitkraken.com "GitKraken client"
 [gradle]: https://gradle.org "Gradle Project"
 [idea]: https://www.jetbrains.com/idea/ "IntelliJ IDEA"
+[java]: https://java.com "Java"
 [jfrog]: https://www.jfrog.com "JFrog"
 [jme]: https://jmonkeyengine.org "jMonkeyEngine Project"
 [jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
