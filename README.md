@@ -14,23 +14,23 @@ It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
 1. Install Git and a Java Development Kit (JDK),
    if you don't already have one.
 2. Point the `JAVA_HOME` environment variable to your JDK installation.
-  + using Bash or Zsh:  `export JAVA_HOME="` *path to installation* `"`
-  + using Windows Command Prompt:  `set JAVA_HOME="` *path to installation* `"`
+  + using Bash or Zsh: `export JAVA_HOME="` *path to installation* `"`
+  + using Windows Command Prompt: `set JAVA_HOME="` *path to installation* `"`
   + using PowerShell: `$env:JAVA_HOME = '` *path to installation* `'`
 3. Download and extract the Jme3-maze source code using Git:
-  + `git clone https://github.com/stephengold/jme3-maze.git`
-  + `cd jme3-maze`
+    + `git clone https://github.com/stephengold/jme3-maze.git`
+    + `cd jme3-maze`
 4. Build the project from source:
   + using Bash or PowerShell or Zsh: `./gradlew build runAssetProcessor`
   + using Windows Command Prompt: `.\gradlew build runAssetProcessor`
 
 You can run the local build using the Gradle wrapper:
-  + using Bash or PowerShell or Zsh: `./gradlew run`
-  + using Windows Command Prompt: `.\gradlew run`
++ using Bash or PowerShell or Zsh: `./gradlew run`
++ using Windows Command Prompt: `.\gradlew run`
 
 You can restore the project to a pristine state:
- + using Bash or PowerShell or Zsh: `./gradlew clean`
- + using Windows Command Prompt: `.\gradlew clean`
++ using Bash or PowerShell or Zsh: `./gradlew clean`
++ using Windows Command Prompt: `.\gradlew clean`
 
 [Jump to table of contents](#toc)
 
@@ -61,7 +61,8 @@ artists and software developers:
     + the Subversion revision-control system
     + the [WinMerge] differencing and merging tool
 
-I am grateful to [JFrog], Google, and [Github] for providing free hosting for the
+I am grateful to [JFrog], Google, and [Github]
+for providing free hosting for the
 Jme3-maze Project and many other open-source projects.
 
 I'm also grateful to my dear Holly, for keeping me sane.
@@ -82,7 +83,7 @@ correct the situation: sgold@sonic.net
 [github]: https://github.com "GitHub"
 [gradle]: https://gradle.org "Gradle Project"
 [jfrog]: https://www.jfrog.com "JFrog"
-[jme]: https://jmonkeyengine.org  "jMonkeyEngine Project"
+[jme]: https://jmonkeyengine.org "jMonkeyEngine Project"
 [jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
 [makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
