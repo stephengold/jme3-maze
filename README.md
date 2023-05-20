@@ -13,7 +13,7 @@ It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
 
 1. Install Git and a Java Development Kit (JDK),
    if you don't already have one.
-2. Point the `JAVA_HOME` environment variable to your JDK installation.
+2. Point the "JAVA_HOME" environment variable to your JDK installation.
   + using Bash or Zsh: `export JAVA_HOME="` *path to installation* `"`
   + using Windows Command Prompt: `set JAVA_HOME="` *path to installation* `"`
   + using PowerShell: `$env:JAVA_HOME = '` *path to installation* `'`
@@ -37,7 +37,7 @@ You can restore the project to a pristine state:
 
 ## Acknowledgments
 
-Like most projects, the Jme3-maze Project builds on the work of many who
+Like most projects, Jme3-maze builds on the work of many who
 have gone before.  I therefore acknowledge the following
 artists and software developers:
 
@@ -54,7 +54,7 @@ artists and software developers:
     + [jMonkeyEngine][jme] and the jME3 Software Development Kit
     + LWJGL, the Lightweight Java Game Library
     + the [MakeHuman] 3-D character creation tool
-    + the [Markdown] document conversion tool
+    + the [Markdown] document-conversion tool
     + Microsoft Windows 7 Professional
     + the [NetBeans] integrated development environment
     + the PMD source-code analyzer
@@ -62,12 +62,12 @@ artists and software developers:
     + the [WinMerge] differencing and merging tool
 
 I am grateful to [JFrog], Google, and [Github]
-for providing free hosting for the
-Jme3-maze Project and many other open-source projects.
+for providing free hosting for this project
+and many other open-source projects.
 
 I'm also grateful to my dear Holly, for keeping me sane.
 
-If I've misattributed anything or left anyone out, please let me know so I can
+If I've misattributed anything or left anyone out, please let me know, so I can
 correct the situation: sgold@sonic.net
 
 [Jump to table of contents](#toc)
