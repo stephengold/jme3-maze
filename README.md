@@ -11,15 +11,21 @@ It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
 
 ## How to build and run Jme3-maze from source
 
-1. Install Git and a Java Development Kit (JDK),
+1. Install a Java Development Kit (JDK),
    if you don't already have one.
 2. Point the "JAVA_HOME" environment variable to your JDK installation.
   + using Bash or Zsh: `export JAVA_HOME="` *path to installation* `"`
   + using Windows Command Prompt: `set JAVA_HOME="` *path to installation* `"`
   + using PowerShell: `$env:JAVA_HOME = '` *path to installation* `'`
-3. Download and extract the Jme3-maze source code using Git:
+3. Download and extract the Jme3-maze source code from GitHub:
+  + using [Git]:
     + `git clone https://github.com/stephengold/jme3-maze.git`
     + `cd jme3-maze`
+  + using a web browser:
+    + Browse to https://github.com/stephengold/jme3-maze/archive/refs/heads/master.zip
+    + save the ZIP file
+    + extract the contents of the saved ZIP file
+    + `cd` to the extracted directory/folder
 4. Build the project from source:
   + using Bash or PowerShell or Zsh: `./gradlew build runAssetProcessor`
   + using Windows Command Prompt: `.\gradlew build runAssetProcessor`
