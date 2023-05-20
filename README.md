@@ -67,7 +67,7 @@ artists and software developers:
     + the [MakeHuman] 3-D character creation tool
     + the [Markdown] document-conversion tool
     + the [Meld] visual merge tool
-    + Microsoft Windows 7 Professional
+    + Microsoft Windows
     + the PMD source-code analyzer
     + the Subversion revision-control system
     + the [WinMerge] differencing and merging tool
