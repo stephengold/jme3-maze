@@ -56,16 +56,18 @@ artists and software developers:
     + the [Blender] 3-D animation suite
     + the [Checkstyle] tool
     + the [FindBugs] source-code analyzer
+    + the [Firefox] and [Google Chrome][chrome] web browsers
     + the [Git] revision-control system and GitK commit viewer
-    + the [Google Chrome web browser][chrome]
+    + the [GitKraken] client
     + the [Gradle] build tool
+    + the [IntelliJ IDEA][idea] and [NetBeans] integrated development environments
     + the Java compiler, standard doclet, and runtime environment
     + [jMonkeyEngine][jme] and the jME3 Software Development Kit
     + LWJGL, the Lightweight Java Game Library
     + the [MakeHuman] 3-D character creation tool
     + the [Markdown] document-conversion tool
+    + the [Meld] visual merge tool
     + Microsoft Windows 7 Professional
-    + the [NetBeans] integrated development environment
     + the PMD source-code analyzer
     + the Subversion revision-control system
     + the [WinMerge] differencing and merging tool
@@ -89,14 +91,18 @@ correct the situation: sgold@sonic.net
 [chrome]: https://www.google.com/chrome "Chrome"
 [elements]: https://www.adobe.com/products/photoshop-elements.html "Photoshop Elements"
 [findbugs]: https://findbugs.sourceforge.net "FindBugs Project"
+[firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
 [git]: https://git-scm.com "Git"
 [github]: https://github.com "GitHub"
+[gitkraken]: https://www.gitkraken.com "GitKraken client"
 [gradle]: https://gradle.org "Gradle Project"
+[idea]: https://www.jetbrains.com/idea/ "IntelliJ IDEA"
 [jfrog]: https://www.jfrog.com "JFrog"
 [jme]: https://jmonkeyengine.org "jMonkeyEngine Project"
 [jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
 [makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
+[meld]: https://meldmerge.org "Meld merge tool"
 [netbeans]: https://netbeans.org "NetBeans Project"
 [tonegodgui]: https://github.com/stephengold/tonegodgui "TonegodGUI Project"
 [utilities]: https://github.com/stephengold/jme3-utilities "jME3 Utilities Project"
