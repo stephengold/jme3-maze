@@ -86,7 +86,6 @@ correct the situation: sgold@sonic.net
 
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
 [blender]: https://docs.blender.org "Blender Project"
-[bsd3]: https://opensource.org/licenses/BSD-3-Clause "3-Clause BSD License"
 [checkstyle]: https://checkstyle.org "Checkstyle"
 [chrome]: https://www.google.com/chrome "Chrome"
 [elements]: https://www.adobe.com/products/photoshop-elements.html "Photoshop Elements"
