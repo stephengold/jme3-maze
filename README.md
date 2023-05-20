@@ -6,7 +6,7 @@ with a mouse-oriented GUI.  Its logline is:
 Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme.
 </blockquote>
 
-It uses [jMonkeyEngine][jme], [tonegodGUI][], and [jme3-utilities][utilities].
+It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
 
 
 ## How to build and run Jme3-maze from source
@@ -44,24 +44,24 @@ artists and software developers:
 + Cris (aka "t0neg0d") for creating tonegodGUI and adapting it to my needs
 + the creators of (and contributors to) the following software:
     + [Adobe Photoshop Elements][elements]
-    + the [Blender][] 3-D animation suite
+    + the [Blender] 3-D animation suite
     + the [Checkstyle] tool
-    + the [FindBugs][] source-code analyzer
-    + the [Git][] revision-control system and GitK commit viewer
+    + the [FindBugs] source-code analyzer
+    + the [Git] revision-control system and GitK commit viewer
     + the [Google Chrome web browser][chrome]
-    + the [Gradle][] build tool
+    + the [Gradle] build tool
     + the Java compiler, standard doclet, and runtime environment
     + [jMonkeyEngine][jme] and the jME3 Software Development Kit
     + LWJGL, the Lightweight Java Game Library
-    + the [MakeHuman][] 3-D character creation tool
-    + the [Markdown][] document conversion tool
+    + the [MakeHuman] 3-D character creation tool
+    + the [Markdown] document conversion tool
     + Microsoft Windows 7 Professional
-    + the [NetBeans][] integrated development environment
+    + the [NetBeans] integrated development environment
     + the PMD source-code analyzer
     + the Subversion revision-control system
-    + the [WinMerge][] differencing and merging tool
+    + the [WinMerge] differencing and merging tool
 
-I am grateful to [JFrog][], Google, and [Github][] for providing free hosting for the
+I am grateful to [JFrog], Google, and [Github] for providing free hosting for the
 Jme3-maze Project and many other open-source projects.
 
 I'm also grateful to my dear Holly, for keeping me sane.
