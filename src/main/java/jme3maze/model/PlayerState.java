@@ -35,6 +35,7 @@ import jme3maze.GameAppState;
 import jme3maze.items.Item;
 import jme3maze.items.Torch;
 import jme3utilities.Validate;
+import jme3utilities.math.MyQuaternion;
 import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
 import jme3utilities.navigation.NavArc;
@@ -561,7 +562,8 @@ public class PlayerState extends GameAppState {
             return;
         }
 
-        Vector3f worldOffset = orientation.mult(localOffset);
+        Vector3f worldOffset
+                = MyQuaternion.rotate(orientation, localOffset, null);
         Vector3f torchLocation = location.add(worldOffset);
         worldState.setTorchLocation(torchLocation);
     }

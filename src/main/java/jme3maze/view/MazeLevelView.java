@@ -37,6 +37,7 @@ import jme3maze.model.MazeLevel;
 import jme3maze.model.WorldState;
 import jme3utilities.MySpatial;
 import jme3utilities.Validate;
+import jme3utilities.math.MyQuaternion;
 import jme3utilities.math.MyVector3f;
 import jme3utilities.math.ReadXZ;
 import jme3utilities.math.VectorXZ;
@@ -314,11 +315,13 @@ class MazeLevelView {
 
         float halfWidth = corridorWidth / 2;
         Vector3f lowerLeftCorner = new Vector3f(halfWidth, 0f, -halfWidth);
-        lowerLeftCorner = orientation.mult(lowerLeftCorner);
+        lowerLeftCorner
+                = MyQuaternion.rotate(orientation, lowerLeftCorner, null);
         lowerLeftCorner.addLocal(vertexLocation);
 
         Vector3f lowerRightCorner = new Vector3f(halfWidth, 0f, halfWidth);
-        lowerRightCorner = orientation.mult(lowerRightCorner);
+        lowerRightCorner
+                = MyQuaternion.rotate(orientation, lowerRightCorner, null);
         lowerRightCorner.addLocal(vertexLocation);
 
         String description = String.format("%s closure wall for %s",
@@ -498,12 +501,12 @@ class MazeLevelView {
 
         // backward corner of left wall
         Vector3f backLeft = new Vector3f(-halfLength, 0f, -halfWidth);
-        backLeft = orientation.mult(backLeft);
+        backLeft = MyQuaternion.rotate(orientation, backLeft, null);
         backLeft.addLocal(location);
 
         // forward corner of left wall
         Vector3f forwardLeft = new Vector3f(halfLength, 0f, -halfWidth);
-        forwardLeft = orientation.mult(forwardLeft);
+        forwardLeft = MyQuaternion.rotate(orientation, forwardLeft, null);
         forwardLeft.addLocal(location);
 
         String description = "left wall of " + vertex.getName();
@@ -511,12 +514,12 @@ class MazeLevelView {
 
         // forward corner of right wall
         Vector3f forwardRight = new Vector3f(halfLength, 0f, halfWidth);
-        forwardRight = orientation.mult(forwardRight);
+        forwardRight = MyQuaternion.rotate(orientation, forwardRight, null);
         forwardRight.addLocal(location);
 
         // backward corner of right wall
         Vector3f backRight = new Vector3f(-halfLength, 0f, halfWidth);
-        backRight = orientation.mult(backRight);
+        backRight = MyQuaternion.rotate(orientation, backRight, null);
         backRight.addLocal(location);
 
         description = "right wall of " + vertex.getName();
