@@ -52,7 +52,7 @@ application {
 }
 
 configurations.configureEach {
-   resolutionStrategy.cacheChangingModulesFor 0, 'seconds' // to disable caching of SNAPSHOTs
+   resolutionStrategy.cacheChangingModulesFor 0, 'seconds' // to disable caching of snapshots
 }
 
 dependencies {
@@ -76,7 +76,7 @@ tasks.register('runAssetProcessor', JavaExec) {
     description 'Converts Blender 3-D models to runtime (.j3o) format.'
 }
 
-// cleanup tasks:
+// Register cleanup tasks:
 
 clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSandbox', 'cleanSOs')
 
