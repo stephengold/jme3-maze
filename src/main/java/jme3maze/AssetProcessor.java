@@ -84,6 +84,10 @@ public class AssetProcessor extends SimpleApplication {
 
     /**
      * Initialize this application.
+     * <p>
+     * Since this method always invokes {@code stop()}, the application exits
+     * soon after this method returns, before {@code simpleUpdate} can be
+     * invoked.
      */
     @Override
     public void simpleInitApp() {
