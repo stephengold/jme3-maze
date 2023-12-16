@@ -91,6 +91,7 @@ public class AssetProcessor extends SimpleApplication {
      */
     @Override
     public void simpleInitApp() {
+        System.out.println("Using Heart version " + Heart.versionShort());
         assetManager.registerLoader(BlenderLoader.class, "blend");
 
         String userDir = System.getProperty("user.dir");
