@@ -57,7 +57,7 @@ configurations.configureEach {
 
 dependencies {
     implementation 'com.github.stephengold:Heart:9.0.0'
-    implementation 'com.github.stephengold:Acorus:1.1.1'
+    implementation 'com.github.stephengold:Acorus:2.0.0'
     implementation 'com.github.stephengold:jme3-utilities-x:0.3.2'
     implementation 'com.github.stephengold:tonegodgui:0.1.8'
 
