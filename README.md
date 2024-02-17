@@ -9,7 +9,7 @@ Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme
 Complete source code (in Java) is provided under
 [a 3-clause BSD license][license].
 
-It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
+It uses [jMonkeyEngine][jme], [tonegodGUI], and [Acorus].
 
 
 ## How to build and run Jme3-maze from source
@@ -90,6 +90,7 @@ correct the situation: sgold@sonic.net
 
 
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
+[acorus]: https://stephengold.github.io/Acorus "Acorus Project"
 [blender]: https://docs.blender.org "Blender Project"
 [checkstyle]: https://checkstyle.org "Checkstyle"
 [chrome]: https://www.google.com/chrome "Chrome"
@@ -114,5 +115,4 @@ correct the situation: sgold@sonic.net
 [mint]: https://linuxmint.com "Linux Mint Project"
 [netbeans]: https://netbeans.org "NetBeans Project"
 [tonegodgui]: https://github.com/stephengold/tonegodgui "TonegodGUI Project"
-[utilities]: https://github.com/stephengold/jme3-utilities "jME3 Utilities Project"
 [winmerge]: https://winmerge.org "WinMerge Project"
