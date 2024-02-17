@@ -21,6 +21,7 @@ It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
    or "/usr/lib/jvm/java-8-openjdk-amd64" or
    "/Library/Java/JavaVirtualMachines/liberica-jdk-17-full.jdk/Contents/Home" .)
   + using Bash or Zsh: `export JAVA_HOME="` *path to installation* `"`
+  + using [Fish]: `set -g JAVA_HOME "` *path to installation* `"`
   + using Windows Command Prompt: `set JAVA_HOME="` *path to installation* `"`
   + using PowerShell: `$env:JAVA_HOME = '` *path to installation* `'`
 3. Download and extract the Jme3-maze source code from GitHub:
@@ -33,15 +34,15 @@ It uses [jMonkeyEngine][jme], [tonegodGUI], and [jme3-utilities][utilities].
     + extract the contents of the saved ZIP file
     + `cd` to the extracted directory/folder
 4. Run the [Gradle] wrapper:
-  + using Bash or PowerShell or Zsh: `./gradlew build runAssetProcessor`
+  + using Bash or Fish or PowerShell or Zsh: `./gradlew build runAssetProcessor`
   + using Windows Command Prompt: `.\gradlew build runAssetProcessor`
 
 You can run the local build using the Gradle wrapper:
-+ using Bash or PowerShell or Zsh: `./gradlew run`
++ using Bash or Fish or PowerShell or Zsh: `./gradlew run`
 + using Windows Command Prompt: `.\gradlew run`
 
 You can restore the project to a pristine state:
-+ using Bash or PowerShell or Zsh: `./gradlew clean`
++ using Bash or Fish or PowerShell or Zsh: `./gradlew clean`
 + using Windows Command Prompt: `.\gradlew clean`
 
 [Jump to table of contents](#toc)
@@ -95,6 +96,7 @@ correct the situation: sgold@sonic.net
 [elements]: https://www.adobe.com/products/photoshop-elements.html "Photoshop Elements"
 [findbugs]: https://findbugs.sourceforge.net "FindBugs Project"
 [firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
+[fish]: https://fishshell.com/ "Fish command-line shell"
 [git]: https://git-scm.com "Git"
 [github]: https://github.com "GitHub"
 [gitkraken]: https://www.gitkraken.com "GitKraken client"
