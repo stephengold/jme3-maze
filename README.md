@@ -6,7 +6,7 @@ with a mouse-oriented GUI.  Its logline is:
 Explore a randomly-generated three-dimensional maze with a Pharaonic Egypt theme.
 </blockquote>
 
-Complete source code (in Java) is provided under
+Complete source code (in [Java]) is provided under
 [a 3-clause BSD license][license].
 
 It uses [jMonkeyEngine][jme], [tonegodGUI], and [Acorus].
@@ -68,7 +68,7 @@ artists and software developers:
     + the [Java] compiler, standard doclet, and runtime environment
     + [jMonkeyEngine][jme] and the jME3 Software Development Kit
     + the [Linux Mint][mint] operating system
-    + LWJGL, the Lightweight Java Game Library
+    + [LWJGL], the Lightweight Java Game Library
     + the [MakeHuman] 3-D character creation tool
     + the [Markdown] document-conversion tool
     + the [Meld] visual merge tool
@@ -109,6 +109,7 @@ correct the situation: sgold@sonic.net
 [jme]: https://jmonkeyengine.org "jMonkeyEngine Project"
 [jme3maze]: https://github.com/stephengold/jme3-maze "Jme3-maze Project"
 [license]: https://github.com/stephengold/jme3-maze/blob/master/LICENSE "Jme3-maze license"
+[lwjgl]: https://www.lwjgl.org "Lightweight Java Game Library"
 [makehuman]: http://www.makehumancommunity.org/ "MakeHuman Community"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
 [meld]: https://meldmerge.org "Meld merge tool"
