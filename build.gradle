@@ -1,8 +1,8 @@
-// Gradle build script for the jme3-maze project
+// Gradle script to build the jme3-maze project
 
 plugins {
-    id 'application'
-    id 'checkstyle'
+    id 'application' // to build a JVM application
+    id 'checkstyle'  // to analyze Java sourcecode for style violations
 }
 
 ext.jme3Version = '3.7.0-alpha3.1' // current version of JMonkeyEngine
