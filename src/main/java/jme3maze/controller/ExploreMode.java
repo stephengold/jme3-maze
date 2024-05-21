@@ -128,7 +128,8 @@ public class ExploreMode extends InputMode {
         bind(InputState.leftActionString, KeyInput.KEY_A, KeyInput.KEY_LEFT);
         bind(InputState.rightActionString, KeyInput.KEY_D, KeyInput.KEY_RIGHT);
         bind(InputState.resetActionString, KeyInput.KEY_NUMPAD0);
-        bind(InputState.advanceActionString, KeyInput.KEY_S, KeyInput.KEY_UP, KeyInput.KEY_W);
+        bind(InputState.advanceActionString,
+                KeyInput.KEY_S, KeyInput.KEY_UP, KeyInput.KEY_W);
         bind(InputState.useRightHandItemActionString, KeyInput.KEY_X);
         bind(InputState.useLeftHandItemActionString, KeyInput.KEY_Z);
 
