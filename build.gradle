@@ -1,7 +1,7 @@
 // Gradle script to build the jme3-maze project
 
 plugins {
-    id 'application' // to build a JVM application
+    id 'application' // to build JVM applications
     id 'checkstyle'  // to analyze Java sourcecode for style violations
 }
 
@@ -52,7 +52,7 @@ application {
 }
 
 configurations.configureEach {
-   resolutionStrategy.cacheChangingModulesFor 0, 'seconds' // to disable caching of snapshots
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds' // to disable caching of snapshots
 }
 
 dependencies {

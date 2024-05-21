@@ -1,6 +1,4 @@
-/*
- * settings.gradle: global settings for the jme3-maze project
- */
+// global build settings for the jme3-maze project
 
 dependencyResolutionManagement {
     repositories {
@@ -12,3 +10,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'jme3-maze'
+
+// no subprojects
