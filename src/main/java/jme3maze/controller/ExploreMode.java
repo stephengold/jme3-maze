@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2023, Stephen Gold
+ Copyright (c) 2014-2024 Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -125,14 +125,10 @@ public class ExploreMode extends InputMode {
          */
         bind("close", KeyInput.KEY_ESCAPE);
         bind("dump", KeyInput.KEY_P);
-        bind(InputState.leftActionString, KeyInput.KEY_A);
-        bind(InputState.rightActionString, KeyInput.KEY_D);
-        bind(InputState.leftActionString, KeyInput.KEY_LEFT);
+        bind(InputState.leftActionString, KeyInput.KEY_A, KeyInput.KEY_LEFT);
+        bind(InputState.rightActionString, KeyInput.KEY_D, KeyInput.KEY_RIGHT);
         bind(InputState.resetActionString, KeyInput.KEY_NUMPAD0);
-        bind(InputState.rightActionString, KeyInput.KEY_RIGHT);
-        bind(InputState.advanceActionString, KeyInput.KEY_S);
-        bind(InputState.advanceActionString, KeyInput.KEY_UP);
-        bind(InputState.advanceActionString, KeyInput.KEY_W);
+        bind(InputState.advanceActionString, KeyInput.KEY_S, KeyInput.KEY_UP, KeyInput.KEY_W);
         bind(InputState.useRightHandItemActionString, KeyInput.KEY_X);
         bind(InputState.useLeftHandItemActionString, KeyInput.KEY_Z);
 
