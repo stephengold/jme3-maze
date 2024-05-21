@@ -5,15 +5,13 @@ plugins {
     id 'checkstyle'  // to analyze Java sourcecode for style violations
 }
 
-ext.jme3Version = '3.7.0-beta1' // current version of JMonkeyEngine
-
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 checkstyle {
-    toolVersion '9.3'
+    toolVersion libs.versions.checkstyle.get()
 }
 
 tasks.withType(JavaCompile).configureEach { // Java compile-time options:
@@ -56,19 +54,19 @@ configurations.configureEach {
 }
 
 dependencies {
-    implementation 'com.github.stephengold:Heart:9.0.0'
-    implementation 'com.github.stephengold:Acorus:2.0.0'
-    implementation 'com.github.stephengold:jme3-utilities-x:0.3.2'
-    implementation 'com.github.stephengold:tonegodgui:0.1.8'
+    implementation(libs.heart)
+    implementation(libs.acorus)
+    implementation(libs.jme3.utilities.x)
+    implementation(libs.tonegodgui)
 
-    implementation 'org.jmonkeyengine:jme3-blender:3.3.2-stable'
-    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jme3Version
-    runtimeOnly 'org.jmonkeyengine:jme3-testdata:' + jme3Version
+    implementation(libs.jme3.blender)
+    runtimeOnly(libs.jme3.lwjgl3)
+    runtimeOnly(libs.jme3.testdata)
 
     // jme3-maze doesn't use jme3-jogg nor jme3-plugins
     //  -- they are included solely to avoid warnings from AssetConfig.
-    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jme3Version
-    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jme3Version
+    runtimeOnly(libs.jme3.jogg)
+    runtimeOnly(libs.jme3.plugins)
 }
 
 tasks.register('runAssetProcessor', JavaExec) {
