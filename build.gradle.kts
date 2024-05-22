@@ -12,6 +12,14 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+application {
+    mainClass = "jme3maze.MazeGame"
+}
+tasks.register<JavaExec>("runAssetProcessor") {
+    mainClass = "jme3maze.AssetProcessor"
+    description = "Converts Blender 3-D models to runtime (.j3o) format."
+}
+
 checkstyle {
     toolVersion = libs.versions.checkstyle.get()
 }
@@ -46,10 +54,6 @@ tasks.withType<JavaExec>().all { // Java runtime options:
     //jvmArgs("-XX:+UseG1GC", "-XX:MaxGCPauseMillis=10")
 }
 
-application {
-    mainClass = "jme3maze.MazeGame"
-}
-
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds") // to disable caching of snapshots
 }
@@ -68,11 +72,6 @@ dependencies {
     //  -- they are included solely to avoid warnings from AssetConfig.
     runtimeOnly(libs.jme3.jogg)
     runtimeOnly(libs.jme3.plugins)
-}
-
-tasks.register<JavaExec>("runAssetProcessor") {
-    mainClass = "jme3maze.AssetProcessor"
-    description = "Converts Blender 3-D models to runtime (.j3o) format."
 }
 
 // Register cleanup tasks:
