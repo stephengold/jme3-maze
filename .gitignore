@@ -12,8 +12,3 @@
 
 # Ignore the Acorus sandbox:
 /Written Assets/
-
-# Ignore extracted native libraries:
-/*.dll
-/*.dylib
-/*.so
