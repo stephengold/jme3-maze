@@ -81,9 +81,7 @@ tasks.named("clean") {
 }
 
 tasks.register<Delete>("cleanLogs") { // JVM crash logs
-    delete(fileTree(".").matching {
-        include("hs_err_pid*.log")
-    })
+    delete(fileTree(".").matching{ include("hs_err_pid*.log") })
 }
 tasks.register<Delete>("cleanSandbox") { // Acorus sandbox
     delete("Written Assets")
