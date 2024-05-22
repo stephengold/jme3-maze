@@ -76,20 +76,11 @@ tasks.register('runAssetProcessor', JavaExec) {
 
 // Register cleanup tasks:
 
-clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSandbox', 'cleanSOs')
+clean.dependsOn('cleanLogs', 'cleanSandbox')
 
-tasks.register('cleanDLLs', Delete) { // extracted Windows native libraries
-    delete fileTree(dir: '.', include: '*.dll')
-}
-tasks.register('cleanDyLibs', Delete) { // extracted macOS native libraries
-    delete fileTree(dir: '.', include: '*.dylib')
-}
 tasks.register('cleanLogs', Delete) { // JVM crash logs
     delete fileTree(dir: '.', include: 'hs_err_pid*.log')
 }
 tasks.register('cleanSandbox', Delete) { // Acorus sandbox
     delete 'Written Assets'
-}
-tasks.register('cleanSOs', Delete) { // extracted Linux and Android native libraries
-    delete fileTree(dir: '.', include: '*.so')
 }
