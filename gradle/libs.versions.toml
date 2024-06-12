@@ -15,7 +15,7 @@ jme3-lwjgl3 = { module = "org.jmonkeyengine:jme3-lwjgl3", version.ref = "jme" }
 jme3-plugins = { module = "org.jmonkeyengine:jme3-plugins", version.ref = "jme" }
 jme3-testdata = { module = "org.jmonkeyengine:jme3-testdata", version.ref = "jme" }
 jme3-utilities-x = "com.github.stephengold:jme3-utilities-x:0.3.2"
-tonegodgui = "com.github.stephengold:tonegodgui:0.1.8"
+tonegodgui = "com.github.stephengold:tonegodgui:0.1.10"
 
 [bundles]
 
