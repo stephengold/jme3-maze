@@ -40,7 +40,6 @@ import com.jme3.scene.Node;
  * @author Stephen Gold sgold@sonic.net
  */
 public interface DisplaySlot {
-
     /**
      * Access this slot's camera.
      *
