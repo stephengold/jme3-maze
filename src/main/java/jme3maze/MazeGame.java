@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2023 Stephen Gold
+ Copyright (c) 2014-2025 Stephen Gold
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -110,6 +110,7 @@ public class MazeGame extends ActionApplication {
         // Customize the window's title bar.
         AppSettings settings = new AppSettings(true);
         settings.setRenderer(AppSettings.LWJGL_OPENGL32);
+        settings.setHeight(560);
         settings.setTitle(windowTitle);
         application.setSettings(settings);
 
