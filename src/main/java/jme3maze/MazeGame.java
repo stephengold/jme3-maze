@@ -49,6 +49,7 @@ import jme3utilities.Heart;
 import jme3utilities.MyString;
 import jme3utilities.debug.Dumper;
 import jme3utilities.ui.ActionApplication;
+import tonegod.gui.core.TonegodGuiVersion;
 
 /**
  * Desktop action application to play a maze game. The application's main entry
@@ -138,6 +139,10 @@ public class MazeGame extends ActionApplication {
         // Log the jme3-utilities-heart version string.
         logger.log(Level.INFO, "Heart version is {0}",
                 MyString.quote(Heart.versionShort()));
+
+        // Log the tonegodgui version string.
+        logger.log(Level.INFO, "Tonegod GUI version is {0}",
+                MyString.quote(TonegodGuiVersion.versionShort()));
 
         renderer.setDefaultAnisotropicFilter(8);
         /*
