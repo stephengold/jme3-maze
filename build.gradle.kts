@@ -41,6 +41,8 @@ tasks.withType<JavaCompile>().all { // Java compile-time options:
     }
 }
 
+val enableNativeAccess = JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)
+
 tasks.withType<JavaExec>().all { // Java runtime options:
     if (isMacOS) {
         jvmArgs("-XstartOnFirstThread")
@@ -50,6 +52,9 @@ tasks.withType<JavaExec>().all { // Java runtime options:
     //args("--verbose") // to enable additional log output
     classpath = sourceSets.main.get().getRuntimeClasspath()
     enableAssertions = true
+    if (enableNativeAccess) {
+        jvmArgs("--enable-native-access=ALL-UNNAMED") // suppress System::load() warning
+    }
     //jvmArgs("-verbose:gc")
     //jvmArgs("-Xms512m", "-Xmx512m") // to enlarge the Java heap
     //jvmArgs("-XX:+UseG1GC", "-XX:MaxGCPauseMillis=10")
