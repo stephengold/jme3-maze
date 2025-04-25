@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2023 Stephen Gold
+ Copyright (c) 2014-2025 Stephen Gold
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -59,6 +59,18 @@ public class AssetProcessor extends SimpleApplication {
      */
     final private static Logger logger = Logger.getLogger(
             AssetProcessor.class.getName());
+    // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate the AssetProcessor application.
+     * <p>
+     * This no-arg constructor was made explicit to avoid javadoc warnings from
+     * JDK 18+.
+     */
+    public AssetProcessor() {
+        // do nothing
+    }
     // *************************************************************************
     // new methods exposed
 
