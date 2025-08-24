@@ -36,12 +36,8 @@ tasks.withType<JavaCompile>().all { // Java compile-time options:
     options.compilerArgs.add("-Xlint:unchecked")
     options.setDeprecation(true) // to provide detailed deprecation warnings
     options.encoding = "UTF-8"
-    if (javaVersion.isCompatibleWith(JavaVersion.VERSION_1_10)) {
-        options.release = 8
-    }
+    options.release = 8
 }
-
-val enableNativeAccess = JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)
 
 tasks.withType<JavaExec>().all { // Java runtime options:
     if (isMacOS) {
@@ -52,9 +48,7 @@ tasks.withType<JavaExec>().all { // Java runtime options:
     //args("--verbose") // to enable additional log output
     classpath = sourceSets.main.get().getRuntimeClasspath()
     enableAssertions = true
-    if (enableNativeAccess) {
-        jvmArgs("--enable-native-access=ALL-UNNAMED") // suppress System::load() warning
-    }
+    jvmArgs("--enable-native-access=ALL-UNNAMED") // suppress System::load() warning
     //jvmArgs("-verbose:gc")
     //jvmArgs("-Xms512m", "-Xmx512m") // to enlarge the Java heap
     //jvmArgs("-XX:+UseG1GC", "-XX:MaxGCPauseMillis=10")
