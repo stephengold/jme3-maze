@@ -157,6 +157,12 @@ public class AssetProcessor extends SimpleApplication {
         Heart.writeJ3O(targetFilePath, model);
     }
 
+    /**
+     * Convert the specified Blender models to J3O format.
+     *
+     * @param folderPath the asset path to the parent folder (not null)
+     * @param paths the names of the assets within the folder (not null)
+     */
     private void processModelFolder(String folderPath, String[] paths) {
         for (String modelPath : paths) {
             String assetPath = String.format("%s/%s", folderPath, modelPath);
