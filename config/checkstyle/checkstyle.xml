@@ -62,6 +62,7 @@
 
         <!-- Checks for blocks:                       -->
         <!-- See https://checkstyle.org/checks/blocks -->
+        <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock">
             <property name="option" value="TEXT"/>
             <property name="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH, ARRAY_INIT, INSTANCE_INIT, LITERAL_CASE, LITERAL_CATCH, LITERAL_DEFAULT, LITERAL_DO, LITERAL_FOR, LITERAL_SYNCHRONIZED, LITERAL_WHILE, STATIC_INIT"/>
@@ -94,7 +95,11 @@
         <module name="FinalClass"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
+        <module name="MutableException"/>
         <module name="OneTopLevelClass"/>
+        <module name="ThrowsCount">
+            <property name="max" value="1"/>
+        </module>
 
         <!-- Checks for common coding problems:       -->
         <!-- See https://checkstyle.org/checks/coding -->
@@ -120,6 +125,7 @@
             <property name="message" value="Use special escape sequence instead of octal value or Unicode escaped value."/>
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
         </module>
+        <module name="IllegalType"/>
         <module name="MissingSwitchDefault"/>
         <module name="ModifiedControlVariable"/>
         <module name="MultipleVariableDeclarations"/>
