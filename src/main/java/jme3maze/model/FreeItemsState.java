@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2014-2023 Stephen Gold
+ Copyright (c) 2014-2025 Stephen Gold
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,8 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -69,11 +71,11 @@ public class FreeItemsState extends GameAppState {
     /**
      * look up the vertex where an item is located
      */
-    final private TreeMap<Item, NavVertex> itemVertex = new TreeMap<>();
+    final private Map<Item, NavVertex> itemVertex = new TreeMap<>();
     /**
      * look up all items items at a location
      */
-    final private TreeMap<NavVertex, TreeSet<Item>> itemsAt = new TreeMap<>();
+    final private Map<NavVertex, Set<Item>> itemsAt = new TreeMap<>();
     // *************************************************************************
     // constructors
 
@@ -99,10 +101,10 @@ public class FreeItemsState extends GameAppState {
         NavVertex previousVertex = itemVertex.put(item, vertex);
         assert previousVertex == null : previousVertex;
 
-        TreeSet<Item> list = itemsAt.get(vertex);
+        Set<Item> list = itemsAt.get(vertex);
         if (list == null) {
             list = new TreeSet<>();
-            TreeSet<Item> previousList = itemsAt.put(vertex, list);
+            Set<Item> previousList = itemsAt.put(vertex, list);
             assert previousList == null : previousList;
         }
         boolean success = list.add(item);
@@ -190,7 +192,7 @@ public class FreeItemsState extends GameAppState {
         if (vertex == null) {
             return false;
         }
-        TreeSet<Item> list = itemsAt.get(vertex);
+        Set<Item> list = itemsAt.get(vertex);
         assert list != null : item;
         boolean success = list.remove(item);
         assert success : item;
