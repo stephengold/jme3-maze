@@ -8,7 +8,7 @@ jme = "3.9.0-stable"
 [libraries]
 
 acorus = "com.github.stephengold:Acorus:2.0.2"
-heart = "com.github.stephengold:Heart:9.2.0"
+heart = "com.github.stephengold:Heart:9.3.0"
 
 jme3-blender = "org.jmonkeyengine:jme3-blender:3.3.2-stable"
 jme3-jogg = { module = "org.jmonkeyengine:jme3-jogg", version.ref = "jme" }
