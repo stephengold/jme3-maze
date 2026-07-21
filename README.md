@@ -93,7 +93,7 @@ correct the situation: sgold@sonic.net
 [Jump to the table of contents](#toc)
 
 
-[adoptium]: https://adoptium.net/releases.html "Adoptium Project"
+[adoptium]: https://adoptium.net/temurin/releases/ "Adoptium Project"
 [acorus]: https://stephengold.github.io/Acorus "Acorus Project"
 [blender]: https://docs.blender.org "Blender Project"
 [checkstyle]: https://checkstyle.org "Checkstyle"
