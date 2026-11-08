@@ -12,7 +12,7 @@ val javaVersion = JavaVersion.current()
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 application {
@@ -36,7 +36,7 @@ tasks.withType<JavaCompile>().configureEach { // Java compile-time options:
     options.compilerArgs.add("-Xlint:unchecked")
     options.setDeprecation(true) // to provide detailed deprecation warnings
     options.encoding = "UTF-8"
-    options.release = 8
+    options.release = 11
 }
 
 tasks.withType<JavaExec>().configureEach { // Java runtime options:
